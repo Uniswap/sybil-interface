@@ -1,5 +1,6 @@
 {
   "noWallet": "No Ethereum wallet found",
+  "addAttestation": "Add an Attestation",
   "wrongNetwork": "You are on the wrong network",
   "switchNetwork": "Please switch to {{ correctNetwork }}",
   "installWeb3MobileBrowser": "Please visit us from a web3-enabled mobile browser such as Trust Wallet or Coinbase Wallet.",

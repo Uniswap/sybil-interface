@@ -117,5 +117,10 @@
       "last 1 safari version"
     ]
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "fetch-tweets": "^0.1.7",
+    "request": "^2.88.2"
+  }
 }

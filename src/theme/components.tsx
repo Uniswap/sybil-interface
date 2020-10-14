@@ -149,6 +149,12 @@ export function ExternalLink({
   return <StyledLink target={target} rel={rel} href={href} onClick={handleClick} {...rest} />
 }
 
+export const SolidSectionBreak = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.black};
+`
+
 const rotate = keyframes`
   from {
     transform: rotate(0deg);
