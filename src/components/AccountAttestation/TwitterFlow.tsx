@@ -3,6 +3,7 @@ import { AutoColumn } from '../Column'
 import { ButtonPrimary, ExternalLinkButton } from '../Button'
 import { TYPE, CloseIcon } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
+
 import { RowBetween } from '../Row'
 import styled from 'styled-components'
 
