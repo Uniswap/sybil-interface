@@ -5,6 +5,7 @@ import { TYPE, CloseIcon } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
 import { RowBetween } from '../Row'
 import styled from 'styled-components'
+import { ethers } from 'ethers'
 
 const TweetWrapper = styled.div`
     padding: 1rem;
@@ -33,40 +34,49 @@ export default function TwitterFlow({ endFlow }: { endFlow: () => void }) {
       return
     }
 
-    const EIP712Domain = [
-      { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' },
-      { name: 'chainId', type: 'uint256' },
-      { name: 'verifyingContract', type: 'address' }
-    ]
-    const domain = {
-      name: 'Uniswap V2',
-      version: '1',
-      chainId: chainId,
-      verifyingContract: '0x6b7bad8b1b1a46e39dbd964d16672c6aa06b6111' //@todo change this
-    }
-    const Permit = [{ name: 'owner', type: 'address' }]
-    const message = {
-      owner: account
-    }
-    const data = JSON.stringify({
-      types: {
-        EIP712Domain,
-        Permit
-      },
-      domain,
-      primaryType: 'Permit',
-      message
-    })
+    // const EIP712Domain = [
+    //   { name: 'name', type: 'string' },
+    //   { name: 'version', type: 'string' },
+    //   { name: 'chainId', type: 'uint256' },
+    //   { name: 'verifyingContract', type: 'address' }
+    // ]
+    // const domain = {
+    //   name: 'Uniswap V2',
+    //   version: '1',
+    //   chainId: chainId,
+    //   verifyingContract: '0x6b7bad8b1b1a46e39dbd964d16672c6aa06b6111' //@todo change this
+    // }
+    // const Permit = [{ name: 'owner', type: 'address' }]
+    // const message = {
+    //   owner: account
+    // }
+    // const data = JSON.stringify({
+    //   types: {
+    //     EIP712Domain,
+    //     Permit
+    //   },
+    //   domain,
+    //   primaryType: 'Permit',
+    //   message
+    // })
 
+    // library
+    //   ?.send('eth_signTypedData_v4', [account, data])
+    //   .catch(error => {
+    //     console.log(error)
+    //   })
+    //   .then(res => {
+    //     console.log(res)
+    //     const sig = splitSignature(res)
+    //     console.log(sig)
+    //     setSignedMessage(res)
+    //   })
     library
-      ?.send('eth_signTypedData_v4', [account, data])
-      .catch(error => {
-        console.log(error)
-      })
-      .then(res => {
-        console.log(res)
-        setSignedMessage(res)
+      ?.getSigner()
+      .signMessage('testmessage')
+      .then(data => {
+        console.log(data)
+        console.log(ethers.utils.hexlify(data))
       })
   }
 
