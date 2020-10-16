@@ -23,7 +23,7 @@ export default function Home() {
                 This tool connects a wallet address to a digital identity by singing a message on chain.
               </TYPE.black>
               <TYPE.black>
-                This mapping of address identity can be updated, removed and queried on chain using any ethereum
+                The mapping of address ↔ identity can be updated, removed and queried on chain using any ethereum
                 indexer.
               </TYPE.black>
               <TYPE.black>
