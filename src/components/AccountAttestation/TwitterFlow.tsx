@@ -1,16 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, ReactNode } from 'react'
 import { AutoColumn } from '../Column'
 import { ButtonPrimary } from '../Button'
-import { TYPE, CloseIcon, ExternalLink } from '../../theme'
+import { TYPE, CloseIcon, ExternalLink, BackArrowSimple } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
 
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
 import TwitterAccountView from './AccountView'
 import { useTwitterDataForHandle, fetchLatestTweetByHandle, LatestTweetResponse } from '../../state/attestations/hooks'
 import { SYBIL_ADDRESS } from '../../constants'
 import { useAttestCallback } from '../../hooks/useAttestCallback'
-import { TwitterTweetEmbed } from 'react-twitter-embed'
+import { Tweet } from 'react-twitter-widgets'
+import TransactionConfirmationModal from '../TransactionConfirmationModal'
+
+const ModalContentWrapper = styled.div`
+  padding: 2rem;
+  width: 100%;
+`
 
 const TweetWrapper = styled.div`
     padding: 1rem;
@@ -19,11 +25,17 @@ const TweetWrapper = styled.div`
     word-break: break-word;
 `
 
+const StyledTextInput = styled.input`
+  padding: 0.5rem;
+  border: 1px solid ${({ theme }) => theme.bg3};
+  font-size: 1rem;
+`
+
 export default function TwitterFlow({ endFlow }: { endFlow: () => void }) {
   const { account, library, chainId } = useActiveWeb3React()
 
   // monitor input or login @todo (which one?) for twitter handle
-  const [twitterHandle, setTwitterHandle] = useState<string | undefined>()
+  const [twitterHandle, setTwitterHandle] = useState<string | undefined>('testcryptotest')
   const [typedTwitterHandle, setTypedTwitterHandle] = useState('')
 
   // fetch tweet id either with watcher or manual trigger for last tweet @todo (which one)
@@ -107,71 +119,109 @@ export default function TwitterFlow({ endFlow }: { endFlow: () => void }) {
 
   const { attestCallback } = useAttestCallback(tweetID, twitterHandle)
 
+  const [attemptingSubmit, setAttemptingSubmit] = useState(false)
+  const [txnHash, setTxnHash] = useState<string | undefined>()
+
   async function attest() {
-    attestCallback().then(() => {
-      console.log('sent')
-    })
+    setAttemptingSubmit(true)
+    attestCallback()
+      .then(hash => {
+        setTxnHash(hash)
+        setAttemptingSubmit(false)
+      })
+      .catch(e => {
+        console.log(e)
+        setAttemptingSubmit(false)
+      })
   }
 
-  return !twitterHandle ? (
-    <AutoColumn gap="lg">
-      <RowBetween>
-        <TYPE.mediumHeader>1/5 Enter Twitter handle</TYPE.mediumHeader>
-        <CloseIcon onClick={endFlow} />
-      </RowBetween>
-      <TYPE.black>Enter handle to attest for.</TYPE.black>
-      <input
-        value={typedTwitterHandle}
-        onChange={e => setTypedTwitterHandle(e.target.value)}
-        placeholder={'@example'}
-      />
-      <TwitterAccountView name={profileData?.name} handle={profileData?.handle} imageURL={profileData?.profileURL} />
-      <ButtonPrimary onClick={() => setTwitterHandle(typedTwitterHandle)} disabled={!profileData}>
-        Next
-      </ButtonPrimary>
-    </AutoColumn>
-  ) : !signedMessage ? (
-    <AutoColumn gap="lg">
-      <RowBetween>
-        <TYPE.mediumHeader>2/5 Sign Message</TYPE.mediumHeader>
-        <CloseIcon onClick={endFlow} />
-      </RowBetween>
-      <TYPE.black>
-        Sign a mesage that will be used to veirfy your address on chain. The signature will be derived from the
-        following data:{' '}
-      </TYPE.black>
-      <TweetWrapper>
-        <AutoColumn gap="md">
-          <TYPE.black>Account: {account ?? ''}</TYPE.black>
-          <TYPE.black>Twitter Handle: @{twitterHandle ?? ''}</TYPE.black>
+  const twitterModalContent: ReactNode = (
+    <ModalContentWrapper>
+      {!twitterHandle ? (
+        <AutoColumn gap="lg">
+          <RowBetween>
+            <TYPE.mediumHeader>1/4 Enter Twitter handle</TYPE.mediumHeader>
+            <CloseIcon onClick={endFlow} />
+          </RowBetween>
+          <TYPE.black>This will link this handle with your ethereum address.</TYPE.black>
+          <StyledTextInput
+            value={typedTwitterHandle}
+            onChange={e => setTypedTwitterHandle(e.target.value)}
+            placeholder={'@example'}
+          />
+          <TwitterAccountView
+            name={profileData?.name}
+            handle={profileData?.handle}
+            imageURL={profileData?.profileURL}
+          />
+          <ButtonPrimary onClick={() => setTwitterHandle(typedTwitterHandle)} disabled={!profileData}>
+            Next
+          </ButtonPrimary>
         </AutoColumn>
-      </TweetWrapper>
-      <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
-    </AutoColumn>
-  ) : !tweetID ? (
-    <AutoColumn gap="lg">
-      <RowBetween>
-        <TYPE.mediumHeader>3/5 Tweet Signature</TYPE.mediumHeader>
-        <CloseIcon onClick={endFlow} />
-      </RowBetween>
-      <TweetWrapper>{tweetCopy}</TweetWrapper>
-      <AutoColumn justify="center">
-        <ExternalLink href={'https://twitter.com/intent/tweet?text=' + tweetCopy}>Tweet this ↗</ExternalLink>
-      </AutoColumn>
-      <ButtonPrimary onClick={checkForTweet}>Ive Tweeted</ButtonPrimary>
-      {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
-    </AutoColumn>
-  ) : (
-    <AutoColumn gap="lg">
-      <RowBetween>
-        <TYPE.mediumHeader>4/4 Verify On Chain</TYPE.mediumHeader>
-        <CloseIcon onClick={endFlow} />
-      </RowBetween>
-      <TwitterTweetEmbed tweetId={tweetID} />
-      <TYPE.black>Submit a transaction with your tweet location to be verified on chain.</TYPE.black>
-      <ButtonPrimary onClick={attest} disabled={!account || !tweetID || !signedMessage}>
-        Verify
-      </ButtonPrimary>
-    </AutoColumn>
+      ) : !signedMessage ? (
+        <AutoColumn gap="lg">
+          <RowBetween>
+            <RowFixed>
+              <BackArrowSimple onClick={() => setTwitterHandle(undefined)} />
+              <TYPE.mediumHeader ml="6px">2/4 Sign Message</TYPE.mediumHeader>
+            </RowFixed>
+            <CloseIcon onClick={endFlow} />
+          </RowBetween>
+          <TYPE.black>
+            Sign a mesage that will be used to veirfy your address on chain. The signature will be derived from the
+            following data:{' '}
+          </TYPE.black>
+          <TweetWrapper>
+            <AutoColumn gap="md">
+              <TYPE.black>Account: {account ?? ''}</TYPE.black>
+              <TYPE.black>Twitter Handle: @{twitterHandle ?? ''}</TYPE.black>
+            </AutoColumn>
+          </TweetWrapper>
+          <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
+        </AutoColumn>
+      ) : !tweetID ? (
+        <AutoColumn gap="lg">
+          <RowBetween>
+            <RowFixed>
+              <BackArrowSimple onClick={() => setSignedMessage(undefined)} />
+              <TYPE.mediumHeader ml="6px">3/4 Announce</TYPE.mediumHeader>
+            </RowFixed>
+            <CloseIcon onClick={endFlow} />
+          </RowBetween>
+          <TweetWrapper>{tweetCopy}</TweetWrapper>
+          <AutoColumn justify="center">
+            <ExternalLink href={'https://twitter.com/intent/tweet?text=' + tweetCopy}>Tweet this ↗</ExternalLink>
+          </AutoColumn>
+          <ButtonPrimary onClick={checkForTweet}>Ive Tweeted</ButtonPrimary>
+          {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
+        </AutoColumn>
+      ) : (
+        <AutoColumn gap="lg">
+          <RowBetween>
+            <RowFixed>
+              <BackArrowSimple onClick={() => setTweetID(undefined)} />
+              <TYPE.mediumHeader ml="6px">4/4 Submit</TYPE.mediumHeader>
+            </RowFixed>
+            <CloseIcon onClick={endFlow} />
+          </RowBetween>
+          <Tweet tweetId={tweetID} />
+          <TYPE.black>Submit a transaction with your tweet location to be verified on chain.</TYPE.black>
+          <ButtonPrimary onClick={attest} disabled={!account || !tweetID || !signedMessage}>
+            Submit
+          </ButtonPrimary>
+        </AutoColumn>
+      )}
+    </ModalContentWrapper>
+  )
+
+  return (
+    <TransactionConfirmationModal
+      attemptingTxn={attemptingSubmit}
+      pendingText="Attempting verification."
+      isOpen={true}
+      onDismiss={endFlow}
+      hash={txnHash}
+      content={() => twitterModalContent}
+    />
   )
 }
