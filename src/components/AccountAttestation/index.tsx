@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
 
 import { AutoColumn } from '../Column'
 import { RowBetween } from '../Row'
@@ -12,13 +11,7 @@ import AccountView from './AccountView'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import TwitterFlow from './TwitterFlow'
 import useENS from '../../hooks/useENS'
-import Modal from '../Modal'
 import { useTwitterDataForAccount } from '../../state/attestations/hooks'
-
-const StepsWrapper = styled.div`
-  padding: 2rem;
-  width: 100%;
-`
 
 export default function AccountAttestation() {
   const { chainId, account } = useActiveWeb3React()
@@ -34,11 +27,7 @@ export default function AccountAttestation() {
 
   return (
     <OutlineCard>
-      <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)} minHeight={false} maxHeight={90}>
-        <StepsWrapper>
-          <TwitterFlow endFlow={() => setShowTwitterFlow(false)} />
-        </StepsWrapper>
-      </Modal>
+      {showTwitterFlow && <TwitterFlow endFlow={() => setShowTwitterFlow(false)} />}
       <AutoColumn gap="lg">
         {account ? (
           <AutoColumn gap="sm">

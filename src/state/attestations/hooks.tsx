@@ -1,34 +1,33 @@
 import { useState, useEffect } from 'react'
 import { client } from '../../apollo/client'
-import { LOOKUP } from '../../apollo/queries'
+import { HANDLE_LOOKUP } from '../../apollo/queries'
 import { isAddress } from '../../utils'
 import { ChainId } from '@uniswap/sdk'
 import { useActiveWeb3React } from '../../hooks'
 
+// @todo add typed query response
 export function useHandleForAddress(address: string | null | undefined): string | undefined {
-  const [data, setData] = useState()
+  const [handle, setHandle] = useState()
 
   // subgraphs only store ids in lowercase, format
   const formattedAddress = address?.toLocaleLowerCase()
   useEffect(() => {
-    async function fetch() {
-      const res = await client.query({
-        query: LOOKUP,
+    client
+      .query({
+        query: HANDLE_LOOKUP,
         variables: {
           user: formattedAddress
         },
         fetchPolicy: 'cache-first'
       })
-      if (res) {
-        setData(res.data.attestations[0]?.handle)
-      }
-    }
-    if (!data && address) {
-      fetch()
-    }
-  }, [address, data, formattedAddress])
+      .then(res => {
+        if (res) {
+          setHandle(res.data.attestations[0]?.handle)
+        }
+      })
+  }, [address, handle, formattedAddress])
 
-  return data
+  return handle
 }
 
 const TWITTER_WORK_URL = 'https://twitter-worker.ianlapham.workers.dev/'

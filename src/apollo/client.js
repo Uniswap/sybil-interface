@@ -9,3 +9,11 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
   shouldBatch: true
 })
+
+export const governanceClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/governance-tracking'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})

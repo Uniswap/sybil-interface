@@ -12,6 +12,10 @@ const EmptyCircle = styled.div`
   margin-right: 1rem;
 `
 
+const FixedRowHeight = styled(Row)`
+  height: 48px;
+`
+
 const RoundedProfileImage = styled.div`
   display: flex;
   align-items; 
@@ -40,15 +44,15 @@ interface AccountViewProps {
 
 export default function TwitterAccountView({ name, handle, imageURL }: AccountViewProps) {
   return !handle ? (
-    <Row>
+    <FixedRowHeight>
       <EmptyCircle />
       <FadedDetails gap="0.5rem">
         <TYPE.mediumHeader>Account</TYPE.mediumHeader>
         <TYPE.black fontSize={12}>Linked accounts will appear here</TYPE.black>
       </FadedDetails>
-    </Row>
+    </FixedRowHeight>
   ) : (
-    <Row>
+    <FixedRowHeight>
       {imageURL && (
         <RoundedProfileImage>
           <img src={imageURL} />
@@ -58,6 +62,6 @@ export default function TwitterAccountView({ name, handle, imageURL }: AccountVi
         <TYPE.mediumHeader>{name}</TYPE.mediumHeader>
         <TYPE.black fontSize={12}>@{handle}</TYPE.black>
       </AutoColumn>
-    </Row>
+    </FixedRowHeight>
   )
 }

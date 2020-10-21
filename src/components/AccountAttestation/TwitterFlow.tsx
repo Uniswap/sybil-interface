@@ -35,7 +35,7 @@ export default function TwitterFlow({ endFlow }: { endFlow: () => void }) {
   const { account, library, chainId } = useActiveWeb3React()
 
   // monitor input or login @todo (which one?) for twitter handle
-  const [twitterHandle, setTwitterHandle] = useState<string | undefined>('testcryptotest')
+  const [twitterHandle, setTwitterHandle] = useState<string | undefined>()
   const [typedTwitterHandle, setTypedTwitterHandle] = useState('')
 
   // fetch tweet id either with watcher or manual trigger for last tweet @todo (which one)
