@@ -64,47 +64,6 @@ export const ButtonPrimary = styled(Base)`
   }
 `
 
-export const ExternalLinkButton = styled.a`
-  padding: 8px;
-  width: 100%;
-  font-weight: 500;
-  text-align: center;
-  border-radius: 0px;
-  outline: none;
-  border: 1px solid transparent;
-  color: white;
-  text-decoration: none;
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  &:disabled {
-    cursor: auto;
-  }
-
-  > * {
-    user-select: none;
-  }
-
-  background-color: ${({ theme }) => theme.primary1};
-  color: white;
-  font-size: 20px;
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.1, theme.primary1)};
-  }
-`
-
 export const ButtonLight = styled(Base)`
   background-color: ${({ theme }) => theme.primary5};
   color: ${({ theme }) => theme.primaryText1};

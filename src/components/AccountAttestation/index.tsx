@@ -8,11 +8,12 @@ import { TYPE, SolidSectionBreak, ExternalLink } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
 import { OutlineCard } from '../Card'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import EmptyAccount from './EmptyAccount'
+import AccountView from './AccountView'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import TwitterFlow from './TwitterFlow'
 import useENS from '../../hooks/useENS'
 import Modal from '../Modal'
+import { useTwitterDataForAccount } from '../../state/attestations/hooks'
 
 const StepsWrapper = styled.div`
   padding: 2rem;
@@ -24,13 +25,12 @@ export default function AccountAttestation() {
 
   const toggleWalletModal = useWalletModalToggle()
 
-  // verified attestation for addres <-> handle
-  const [linkedHandle] = useState()
-
   // if not attested, show twitter flow
-  const [showTwitterFlow, setShowTwitterFlow] = useState(false)
+  const [showTwitterFlow, setShowTwitterFlow] = useState(true)
 
   const { name } = useENS(account)
+
+  const profileData = useTwitterDataForAccount(account)
 
   return (
     <OutlineCard>
@@ -55,12 +55,12 @@ export default function AccountAttestation() {
           ) : (
             <TYPE.mediumHeader> {'Add an attestation'}</TYPE.mediumHeader>
           )}
-          {!linkedHandle && account && (
+          {!profileData?.handle && account && (
             <ButtonPrimary onClick={() => setShowTwitterFlow(true)}>Link this address</ButtonPrimary>
           )}
           {!account && <ButtonPrimary onClick={toggleWalletModal}>Connect a wallet</ButtonPrimary>}
           <SolidSectionBreak />
-          <EmptyAccount />
+          <AccountView name={profileData?.name} handle={profileData?.handle} imageURL={profileData?.profileURL} />
         </AutoColumn>
       )}
     </OutlineCard>
