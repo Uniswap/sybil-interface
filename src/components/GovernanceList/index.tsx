@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 
-import { OutlineCard } from '../Card'
+import { BlurredCard } from '../Card'
 import { TYPE, SolidSectionBreak } from '../../theme'
 import Row from '../Row'
 import UniLogo from '../../assets/images/unilogo.svg'
@@ -25,7 +25,7 @@ export default function Overview() {
   const [activePlatform, setActivePlatform] = useState<GovernanceOption | undefined>(GovernanceOption.Uniswap)
 
   return (
-    <OutlineCard>
+    <BlurredCard>
       {!showDelegates ? (
         <AutoColumn gap="lg">
           <TYPE.mediumHeader>Governance</TYPE.mediumHeader>
@@ -46,6 +46,6 @@ export default function Overview() {
       ) : (
         <DelegateList endFlow={() => setShowDelegates(false)} />
       )}
-    </OutlineCard>
+    </BlurredCard>
   )
 }

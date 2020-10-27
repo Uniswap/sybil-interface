@@ -5,7 +5,7 @@ import { RowBetween } from '../Row'
 import { ButtonPrimary } from '../Button'
 import { TYPE, SolidSectionBreak, ExternalLink } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
-import { OutlineCard } from '../Card'
+import { BlurredCard } from '../Card'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import AccountView from './AccountView'
 import { useWalletModalToggle } from '../../state/application/hooks'
@@ -26,9 +26,14 @@ export default function AccountAttestation() {
   const profileData = useTwitterDataForAccount(account)
 
   return (
-    <OutlineCard>
+    <BlurredCard>
       {showTwitterFlow && <TwitterFlow endFlow={() => setShowTwitterFlow(false)} />}
       <AutoColumn gap="lg">
+      {!profileData?.handle && account && (
+          <ButtonPrimary onClick={() => setShowTwitterFlow(true)}>Announce yourself as a Uniswap delegate</ButtonPrimary>
+        )}
+        {!account && <ButtonPrimary onClick={toggleWalletModal}>Connect a wallet</ButtonPrimary>}
+       
         {account ? (
           <AutoColumn gap="sm">
             <RowBetween>
@@ -42,13 +47,9 @@ export default function AccountAttestation() {
         ) : (
           <TYPE.mediumHeader> {'Add an attestation'}</TYPE.mediumHeader>
         )}
-        {!profileData?.handle && account && (
-          <ButtonPrimary onClick={() => setShowTwitterFlow(true)}>Link this address</ButtonPrimary>
-        )}
-        {!account && <ButtonPrimary onClick={toggleWalletModal}>Connect a wallet</ButtonPrimary>}
         <SolidSectionBreak />
         <AccountView name={profileData?.name} handle={profileData?.handle} imageURL={profileData?.profileURL} />
       </AutoColumn>
-    </OutlineCard>
+    </BlurredCard>
   )
 }

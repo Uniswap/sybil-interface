@@ -1,9 +1,8 @@
 import React from 'react'
 import { AutoColumn } from '../Column'
 
-import { TYPE, SolidSectionBreak, BackArrowSimple, ExternalLink } from '../../theme'
+import { TYPE } from '../../theme'
 import { RowFixed, RowBetween } from '../Row'
-import UniLogo from '../../assets/images/unilogo.svg'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { WrappedListLogo } from './styled'
 import { shortenAddress } from '../../utils'
@@ -14,22 +13,6 @@ export default function DelegateList({ endFlow }: { endFlow: () => void }) {
 
   return (
     <AutoColumn gap="lg">
-      <RowFixed>
-        <BackArrowSimple onClick={endFlow} />
-        <TYPE.mediumHeader>Back to lists</TYPE.mediumHeader>
-      </RowFixed>
-      <SolidSectionBreak />
-      <RowBetween>
-        <RowFixed>
-          <WrappedListLogo src={UniLogo} />
-          <AutoColumn gap="6px">
-            <TYPE.mediumHeader>Uniswap Governance</TYPE.mediumHeader>
-            <TYPE.black fontSize="12px">28 public delegates</TYPE.black>
-          </AutoColumn>
-        </RowFixed>
-        <ExternalLink href="">Homepage ↗</ExternalLink>
-      </RowBetween>
-      <SolidSectionBreak />
       <TYPE.mediumHeader>Top Delegates</TYPE.mediumHeader>
       {topDelegates?.map(d => {
         return (
