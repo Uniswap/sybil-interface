@@ -13,10 +13,30 @@ export const HANDLE_LOOKUP = gql`
 // fetch top delegates by votes delegated at current time
 export const TOP_DELEGATES = gql`
   query delegates {
-    delegates(first: 10, orderBy: delegatedVotes, orderDirection: desc) {
+    delegates(first: 50, orderBy: delegatedVotes, orderDirection: desc) {
       id
       delegatedVotes
       tokenHoldersRepresentedAmount
+    }
+  }
+`
+
+// all proposals
+export const PROPOSALS = gql`
+  query proposals {
+    proposals(first: 100) {
+      id
+      targets
+      values
+      signatures
+      status
+      calldatas
+      description
+      startBlock
+      endBlock
+      proposer {
+        id
+      }
     }
   }
 `

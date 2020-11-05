@@ -8,7 +8,8 @@ import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
-import Home from './home'
+import Overview from './Governance'
+import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const BodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-top: 60px;
+  padding-top: 20px;
   align-items: center;
   flex: 1;
   overflow-y: auto;
@@ -61,7 +62,8 @@ export default function App() {
           <Polling />
           <Web3ReactManager>
             <Switch>
-              <Route exact strict path="/" component={Home} />
+              <Route exact strict path="/:protocolId" component={Overview} />
+              <Route exact strict path="/" component={RedirectWithUpdatedGovernance} />
             </Switch>
           </Web3ReactManager>
           <Marginer />

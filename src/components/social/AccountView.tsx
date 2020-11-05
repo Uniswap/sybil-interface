@@ -55,7 +55,7 @@ export default function TwitterAccountView({ name, handle, imageURL }: AccountVi
     <FixedRowHeight>
       {imageURL && (
         <RoundedProfileImage>
-          <img src={imageURL} />
+          <img src={imageURL} alt="profile" />
         </RoundedProfileImage>
       )}
       <AutoColumn gap="0.5rem">

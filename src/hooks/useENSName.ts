@@ -1,10 +1,11 @@
 import { namehash } from 'ethers/lib/utils'
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
 import isZero from '../utils/isZero'
 import { useENSRegistrarContract, useENSResolverContract } from './useContract'
 import useDebounce from './useDebounce'
+import { useActiveWeb3React } from '.'
 
 /**
  * Does a reverse lookup for an address to find its ENS name.
@@ -33,5 +34,33 @@ export default function useENSName(address?: string): { ENSName: string | null; 
   return {
     ENSName: changed ? null : name.result?.[0] ?? null,
     loading: changed || resolverAddress.loading || name.loading
+  }
+}
+
+export function useBulkENS(addresses: string[]): { names: string[] | null; loading: boolean } {
+  const { library } = useActiveWeb3React()
+
+  useEffect(() => {
+    async function fetchAllAddresses() {
+      const answers = await Promise.all(
+        addresses.map(a => {
+          return library?.lookupAddress(a)
+        })
+      )
+      const amountHave = answers.reduce((accum, name) => {
+        if (name) {
+          return (accum = accum + 1)
+        }
+        return accum
+      }, 0)
+
+      console.log('amount have: ' + amountHave + ' / ' + answers.length)
+    }
+    fetchAllAddresses()
+  }, [addresses, library])
+
+  return {
+    names: [''],
+    loading: false
   }
 }

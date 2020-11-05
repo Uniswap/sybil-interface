@@ -11,7 +11,8 @@ import AccountView from './AccountView'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import TwitterFlow from './TwitterFlow'
 import useENS from '../../hooks/useENS'
-import { useTwitterDataForAccount } from '../../state/attestations/hooks'
+import Modal from '../Modal'
+import { useTwitterProfileData, useVerifiedHandle } from '../../state/social/hooks'
 
 export default function AccountAttestation() {
   const { chainId, account } = useActiveWeb3React()
@@ -21,13 +22,17 @@ export default function AccountAttestation() {
   // if not attested, show twitter flow
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  const { name } = useENS(account)
+  const { name: ensName } = useENS(account)
 
-  const profileData = useTwitterDataForAccount(account)
+  // check kv list for handle, then fetch profile info from twitter
+  const verifiedHandle = useVerifiedHandle(account)
+  const profileData = useTwitterProfileData(verifiedHandle)
 
   return (
     <OutlineCard>
-      {showTwitterFlow && <TwitterFlow endFlow={() => setShowTwitterFlow(false)} />}
+      <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
+        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
+      </Modal>
       <AutoColumn gap="lg">
         {account ? (
           <AutoColumn gap="sm">
@@ -37,7 +42,7 @@ export default function AccountAttestation() {
                 <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
               )}
             </RowBetween>
-            {name && name}
+            {ensName ?? ''}
           </AutoColumn>
         ) : (
           <TYPE.mediumHeader> {'Add an attestation'}</TYPE.mediumHeader>

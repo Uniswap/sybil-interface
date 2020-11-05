@@ -126,6 +126,7 @@
     "fetch-tweets": "^0.1.7",
     "graphql": "^15.3.0",
     "graphql-tag": "^2.11.0",
+    "react-twitter-auth": "^0.0.13",
     "react-twitter-embed": "^3.0.3",
     "react-twitter-widgets": "^1.9.5",
     "request": "^2.88.2"
