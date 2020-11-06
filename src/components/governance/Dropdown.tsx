@@ -12,7 +12,6 @@ const Wrapper = styled.div<{ backgroundColor?: string }>`
   position: relative;
   padding: 1rem;
   border-radius: 20px;
-  margin-bottom: 1rem;
   background-color: ${({ backgroundColor }) => backgroundColor ?? 'white'};
 `
 

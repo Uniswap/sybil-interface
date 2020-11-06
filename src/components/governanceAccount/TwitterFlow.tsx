@@ -6,7 +6,7 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled, { ThemeContext } from 'styled-components'
-import TwitterAccountView from './AccountView'
+import TwitterAccountView from './ProfileCard'
 import {
   LatestTweetResponse,
   useTwitterProfileData,

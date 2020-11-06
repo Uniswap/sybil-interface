@@ -40,17 +40,21 @@ export function useTopDelegates() {
 
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
-    governanceClient
-      .query({
-        query: TOP_DELEGATES,
+    try {
+      governanceClient
+        .query({
+          query: TOP_DELEGATES,
 
-        fetchPolicy: 'cache-first'
-      })
-      .then((res: DelegateResponse) => {
-        if (res) {
-          setDelegates(res.data.delegates)
-        }
-      })
+          fetchPolicy: 'cache-first'
+        })
+        .then((res: DelegateResponse) => {
+          if (res) {
+            setDelegates(res.data.delegates)
+          }
+        })
+    } catch (e) {
+      console.log(e)
+    }
   }, [])
 
   return delegates
@@ -114,34 +118,38 @@ export function useAllProposals() {
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
     async function fetchData() {
-      governanceClient
-        .query({
-          query: PROPOSALS,
-          fetchPolicy: 'cache-first'
-        })
-        .then((res: ProposalResponse) => {
-          if (res) {
-            const formatted: ProposalData[] | undefined = res.data.proposals.map(p => ({
-              id: p.id,
-              title: p.description?.split(/# |\n/g)[1] || 'Untitled',
-              description: p.description?.split(/# /)[1] || 'No description.',
-              proposer: p.proposer.id,
-              status: p.status ?? 'Undetermined',
-              forCount: 1000,
-              againstCount: 1000,
-              startBlock: parseInt(p.startBlock),
-              endBlock: parseInt(p.endBlock),
-              details: p.targets.map((t, i) => {
-                return {
-                  target: p.targets[i],
-                  functionSig: p.signatures[i],
-                  callData: p.calldatas[i]
-                }
-              })
-            }))
-            setProposals(formatted)
-          }
-        })
+      try {
+        governanceClient
+          .query({
+            query: PROPOSALS,
+            fetchPolicy: 'cache-first'
+          })
+          .then((res: ProposalResponse) => {
+            if (res) {
+              const formatted: ProposalData[] | undefined = res.data.proposals.map(p => ({
+                id: p.id,
+                title: p.description?.split(/# |\n/g)[1] || 'Untitled',
+                description: p.description?.split(/# /)[1] || 'No description.',
+                proposer: p.proposer.id,
+                status: p.status ?? 'Undetermined',
+                forCount: 1000,
+                againstCount: 1000,
+                startBlock: parseInt(p.startBlock),
+                endBlock: parseInt(p.endBlock),
+                details: p.targets.map((t, i) => {
+                  return {
+                    target: p.targets[i],
+                    functionSig: p.signatures[i],
+                    callData: p.calldatas[i]
+                  }
+                })
+              }))
+              setProposals(formatted)
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     if (!proposals) {

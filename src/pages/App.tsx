@@ -10,6 +10,16 @@ import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import Overview from './Governance'
 import { RedirectWithUpdatedGovernance } from './Governance/redirect'
+import SideMenu from '../components/Menu/SideMenu'
+
+const SiteWrapper = styled.div`
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 1.5em;
+  overflow: auto;
+`
 
 const AppWrapper = styled.div`
   display: flex;
@@ -52,23 +62,26 @@ export default function App() {
     <Suspense fallback={null}>
       <Route component={GoogleAnalyticsReporter} />
       <Route component={DarkModeQueryParamReader} />
-      <AppWrapper>
-        <URLWarning />
-        <HeaderWrapper>
-          <Header />
-        </HeaderWrapper>
-        <BodyWrapper>
-          <Popups />
-          <Polling />
-          <Web3ReactManager>
-            <Switch>
-              <Route exact strict path="/:protocolId" component={Overview} />
-              <Route exact strict path="/" component={RedirectWithUpdatedGovernance} />
-            </Switch>
-          </Web3ReactManager>
-          <Marginer />
-        </BodyWrapper>
-      </AppWrapper>
+      <SiteWrapper>
+        <SideMenu />
+        <AppWrapper>
+          <URLWarning />
+          <HeaderWrapper>
+            <Header />
+          </HeaderWrapper>
+          <BodyWrapper>
+            <Popups />
+            <Polling />
+            <Web3ReactManager>
+              <Switch>
+                <Route exact strict path="/:protocolId" component={Overview} />
+                <Route exact strict path="/" component={RedirectWithUpdatedGovernance} />
+              </Switch>
+            </Web3ReactManager>
+            <Marginer />
+          </BodyWrapper>
+        </AppWrapper>
+      </SiteWrapper>
     </Suspense>
   )
 }

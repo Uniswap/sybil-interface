@@ -42,7 +42,7 @@ interface AccountViewProps {
   imageURL: string | undefined
 }
 
-export default function TwitterAccountView({ name, handle, imageURL }: AccountViewProps) {
+export default function ProfileCard({ name, handle, imageURL }: AccountViewProps) {
   return !handle ? (
     <FixedRowHeight>
       <EmptyCircle />

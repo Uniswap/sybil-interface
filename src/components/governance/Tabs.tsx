@@ -33,7 +33,7 @@ export default function Tabs({
   const [activeProtocol] = useActiveProtocol()
 
   return (
-    <GreyCard backgroundColor={activeProtocol?.secondaryColor} mb="1rem">
+    <GreyCard backgroundColor={activeProtocol?.secondaryColor}>
       <AutoRow gap="10px">
         <TabOption selected={activeTab === ActiveTab.DELEGATES} onClick={() => setActiveTab(ActiveTab.DELEGATES)}>
           <TYPE.black fontSize={'16px'}>Delegates</TYPE.black>
