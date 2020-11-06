@@ -4,7 +4,6 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { TYPE } from '../../theme'
 
 import { YellowCard } from '../Card'
 
@@ -119,9 +118,7 @@ export default function Header() {
 
   return (
     <HeaderFrame>
-      <HeaderRow>
-        <TYPE.largeHeader>Sybil</TYPE.largeHeader>
-      </HeaderRow>
+      <HeaderRow></HeaderRow>
       <HeaderControls>
         <HeaderElement>
           <HideSmall>

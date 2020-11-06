@@ -10,6 +10,7 @@ import { shortenAddress, getEtherscanLink } from '../../utils'
 import TwitterAccountSection from './TwitterAccountSection'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import useENS from '../../hooks/useENS'
+import { useUserVotes } from '../../state/governance/hooks'
 
 export default function GovernanceAccountSection() {
   const { chainId, account } = useActiveWeb3React()
@@ -19,21 +20,27 @@ export default function GovernanceAccountSection() {
   // if not attested, show twitter flow
   const { name: ensName } = useENS(account)
 
+  const userVotes = useUserVotes()
+
   return (
     <GreyCard>
       <AutoColumn gap="lg">
-        {account ? (
-          <AutoColumn gap="sm">
-            <RowBetween>
-              <TYPE.mediumHeader>{shortenAddress(account)}</TYPE.mediumHeader>
-              {account && chainId && (
-                <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
-              )}
-            </RowBetween>
-            {ensName ?? ''}
-          </AutoColumn>
-        ) : (
-          <TYPE.mediumHeader> {'Add an attestation'}</TYPE.mediumHeader>
+        {account && (
+          <RowBetween>
+            <AutoColumn gap="sm">
+              <RowBetween>
+                <TYPE.mediumHeader>{shortenAddress(account)}</TYPE.mediumHeader>
+                {account && chainId && (
+                  <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
+                )}
+              </RowBetween>
+              {ensName ?? ''}
+            </AutoColumn>
+            <AutoColumn gap="sm" justify="flex-end">
+              <TYPE.body>{userVotes?.toFixed(0)} Total Votes</TYPE.body>
+              <TYPE.green>{userVotes ? 'You are self delegated' : ''}</TYPE.green>
+            </AutoColumn>
+          </RowBetween>
         )}
         {!account && <ButtonPrimary onClick={toggleWalletModal}>Connect a wallet</ButtonPrimary>}
         <TwitterAccountSection />

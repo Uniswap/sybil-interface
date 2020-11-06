@@ -1,3 +1,5 @@
+import { TransactionResponse } from '@ethersproject/providers'
+import { TokenAmount } from '@uniswap/sdk'
 import { updateActiveProtocol } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
@@ -5,8 +7,12 @@ import { GovernanceInfo } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { governanceClient } from '../../apollo/client'
 import { TOP_DELEGATES, PROPOSALS } from '../../apollo/queries'
-import { useGovernanceContract } from '../../hooks/useContract'
+import { useGovernanceContract, useUniContract } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
+import { useActiveWeb3React } from '../../hooks'
+import { useTransactionAdder } from '../transactions/hooks'
+import { UNI } from '../../constants'
+import { isAddress, calculateGasMargin } from '../../utils'
 
 export interface DelegateData {
   id: string
@@ -163,4 +169,89 @@ export function useAllProposals() {
 export function useProposalData(id: string): ProposalData | undefined {
   const allProposalData = useAllProposals()
   return allProposalData?.find(p => p.id === id)
+}
+
+// get the users delegatee if it exists
+export function useUserDelegatee(): string {
+  const { account } = useActiveWeb3React()
+  const uniContract = useUniContract()
+  const { result } = useSingleCallResult(uniContract, 'delegates', [account ?? undefined])
+  return result?.[0] ?? undefined
+}
+
+// gets the users current votes
+export function useUserVotes(): TokenAmount | undefined {
+  const { account, chainId } = useActiveWeb3React()
+  const uniContract = useUniContract()
+
+  // check for available votes
+  const uni = chainId ? UNI[chainId] : undefined
+  const votes = useSingleCallResult(uniContract, 'getCurrentVotes', [account ?? undefined])?.result?.[0]
+  return votes && uni ? new TokenAmount(uni, votes) : undefined
+}
+
+// fetch available votes as of block (usually proposal start block)
+export function useUserVotesAsOfBlock(block: number | undefined): TokenAmount | undefined {
+  const { account, chainId } = useActiveWeb3React()
+  const uniContract = useUniContract()
+
+  // check for available votes
+  const uni = chainId ? UNI[chainId] : undefined
+  const votes = useSingleCallResult(uniContract, 'getPriorVotes', [account ?? undefined, block ?? undefined])
+    ?.result?.[0]
+  return votes && uni ? new TokenAmount(uni, votes) : undefined
+}
+
+export function useDelegateCallback(): (delegatee: string | undefined) => undefined | Promise<string> {
+  const { account, chainId, library } = useActiveWeb3React()
+  const addTransaction = useTransactionAdder()
+
+  const uniContract = useUniContract()
+
+  return useCallback(
+    (delegatee: string | undefined) => {
+      if (!library || !chainId || !account || !isAddress(delegatee ?? '')) return undefined
+      const args = [delegatee]
+      if (!uniContract) throw new Error('No UNI Contract!')
+      return uniContract.estimateGas.delegate(...args, {}).then(estimatedGasLimit => {
+        return uniContract
+          .delegate(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
+          .then((response: TransactionResponse) => {
+            addTransaction(response, {
+              summary: `Delegated votes`
+            })
+            return response.hash
+          })
+      })
+    },
+    [account, addTransaction, chainId, library, uniContract]
+  )
+}
+
+export function useVoteCallback(): {
+  voteCallback: (proposalId: string | undefined, support: boolean) => undefined | Promise<string>
+} {
+  const { account } = useActiveWeb3React()
+
+  const govContract = useGovernanceContract()
+  const addTransaction = useTransactionAdder()
+
+  const voteCallback = useCallback(
+    (proposalId: string | undefined, support: boolean) => {
+      if (!account || !govContract || !proposalId) return
+      const args = [proposalId, support]
+      return govContract.estimateGas.castVote(...args, {}).then(estimatedGasLimit => {
+        return govContract
+          .castVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
+          .then((response: TransactionResponse) => {
+            addTransaction(response, {
+              summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+            })
+            return response.hash
+          })
+      })
+    },
+    [account, addTransaction, govContract]
+  )
+  return { voteCallback }
 }
