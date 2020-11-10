@@ -10,13 +10,30 @@ export const HANDLE_LOOKUP = gql`
   }
 `
 
+export const GLOBAL_DATA = gql`
+  query governance {
+    governances(first: 1) {
+      delegatedVotes
+      delegatedVotesRaw
+      totalTokenHolders
+      totalDelegates
+    }
+  }
+`
+
 // fetch top delegates by votes delegated at current time
 export const TOP_DELEGATES = gql`
   query delegates {
     delegates(first: 50, orderBy: delegatedVotes, orderDirection: desc) {
       id
       delegatedVotes
+      delegatedVotesRaw
       tokenHoldersRepresentedAmount
+      votes {
+        id
+        votes
+        support
+      }
     }
   }
 `
@@ -24,7 +41,7 @@ export const TOP_DELEGATES = gql`
 // all proposals
 export const PROPOSALS = gql`
   query proposals {
-    proposals(first: 100) {
+    proposals(first: 100, orderBy: startBlock, orderDirection: desc) {
       id
       targets
       values

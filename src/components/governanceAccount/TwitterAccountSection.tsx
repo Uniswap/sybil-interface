@@ -16,14 +16,6 @@ const Wrapper = styled.div`
     0px 0px 1px rgba(0, 0, 0, 0.04);
 `
 
-// const EmptyCircle = styled.div`
-//   height: 48px;
-//   width: 48px;
-//   background: ${({ theme }) => theme.bg2};
-//   border-radius: 50%;
-//   margin-right: 1rem;
-// `
-
 const FixedRowHeight = styled(Row)`
   height: 48px;
 `
@@ -79,7 +71,7 @@ export default function TwitterAccountSection() {
       {!profileData ? (
         <VerifyButton onClick={() => setShowTwitterFlow(true)}>
           <RowBetween>
-            <TYPE.white>Announce yourself as a delegate for Compound</TYPE.white>
+            <TYPE.white>Announce yourself as a delegate</TYPE.white>
             <TwitterLogo src={TwitterIcon} />
           </RowBetween>
         </VerifyButton>

@@ -7,7 +7,7 @@ import { abi as MERKLE_DISTRIBUTOR_ABI } from '@uniswap/merkle-distributor/build
 import { ChainId, WETH } from '@uniswap/sdk'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { useMemo } from 'react'
-import { GOVERNANCE_ADDRESS, MERKLE_DISTRIBUTOR_ADDRESS, UNI } from '../constants'
+import { MERKLE_DISTRIBUTOR_ADDRESS } from '../constants'
 import {
   ARGENT_WALLET_DETECTOR_ABI,
   ARGENT_WALLET_DETECTOR_MAINNET_ADDRESS
@@ -24,6 +24,7 @@ import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { V1_EXCHANGE_ABI, V1_FACTORY_ABI, V1_FACTORY_ADDRESSES } from '../constants/v1'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
+import { useActiveProtocol } from '../state/governance/hooks'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -114,12 +115,15 @@ export function useMerkleDistributorContract(): Contract | null {
 }
 
 export function useGovernanceContract(): Contract | null {
-  return useContract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, true)
+  const { chainId } = useActiveWeb3React()
+  const [activeProtocol] = useActiveProtocol()
+  return useContract(chainId ? activeProtocol.governanceAddress[chainId] : undefined, GOVERNANCE_ABI, true)
 }
 
-export function useUniContract(): Contract | null {
+export function useGovTokenContract(): Contract | null {
   const { chainId } = useActiveWeb3React()
-  return useContract(chainId ? UNI[chainId].address : undefined, UNI_ABI, true)
+  const [activeProtocol] = useActiveProtocol()
+  return useContract(chainId ? activeProtocol.token.address[chainId] : undefined, UNI_ABI, true)
 }
 
 export function useStakingContract(stakingAddress?: string, withSignerIfPossible?: boolean): Contract | null {

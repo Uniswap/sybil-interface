@@ -39,18 +39,6 @@ export function useToggleSettingsMenu(): () => void {
   return useToggleModal(ApplicationModal.SETTINGS)
 }
 
-export function useShowClaimPopup(): boolean {
-  return useModalOpen(ApplicationModal.CLAIM_POPUP)
-}
-
-export function useToggleShowClaimPopup(): () => void {
-  return useToggleModal(ApplicationModal.CLAIM_POPUP)
-}
-
-export function useToggleSelfClaimModal(): () => void {
-  return useToggleModal(ApplicationModal.SELF_CLAIM)
-}
-
 // returns a function that allows adding a popup
 export function useAddPopup(): (content: PopupContent, key?: string) => void {
   const dispatch = useDispatch()

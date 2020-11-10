@@ -64,6 +64,12 @@ export const ButtonPrimary = styled(Base)`
   }
 `
 
+export const ButtonBasic = styled(ButtonPrimary)`
+  width: fit-content;
+  font-size: 1rem;
+  white-space: no-wrap;
+`
+
 export const ButtonLight = styled(Base)`
   background-color: ${({ theme }) => theme.primary5};
   color: ${({ theme }) => theme.primaryText1};
@@ -85,6 +91,34 @@ export const ButtonLight = styled(Base)`
     :hover {
       cursor: auto;
       background-color: ${({ theme }) => theme.primary5};
+      box-shadow: none;
+      border: 1px solid transparent;
+      outline: none;
+    }
+  }
+`
+
+export const ButtonBlue = styled(Base)`
+  background-color: ${({ theme }) => theme.blue3};
+  color: ${({ theme }) => theme.blue1};
+  font-size: 14px;
+  font-weight: 500;
+  &:focus {
+    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && darken(0.03, theme.blue3)};
+    background-color: ${({ theme, disabled }) => !disabled && darken(0.03, theme.blue3)};
+  }
+  &:hover {
+    background-color: ${({ theme, disabled }) => !disabled && darken(0.03, theme.blue3)};
+  }
+  &:active {
+    box-shadow: 0 0 0 1pt ${({ theme, disabled }) => !disabled && darken(0.05, theme.blue3)};
+    background-color: ${({ theme, disabled }) => !disabled && darken(0.05, theme.blue3)};
+  }
+  :disabled {
+    opacity: 0.4;
+    :hover {
+      cursor: auto;
+      background-color: ${({ theme }) => theme.blue3};
       box-shadow: none;
       border: 1px solid transparent;
       outline: none;

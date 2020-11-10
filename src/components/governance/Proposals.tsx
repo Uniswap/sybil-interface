@@ -6,6 +6,7 @@ import { TYPE } from '../../theme'
 import { GreyCard } from '../Card'
 import ProposalDetails from './ProposalDetails'
 import { RowBetween, RowFixed } from '../Row'
+import { AutoColumn } from '../Column'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -25,7 +26,7 @@ const ProposalItem = styled.div`
 export default function Proposals() {
   const allProposals = useAllProposals()
 
-  const [shownProposal, setShownProposal] = useState<string | undefined>('1')
+  const [shownProposal, setShownProposal] = useState<string | undefined>()
 
   return (
     <Wrapper>
@@ -39,20 +40,22 @@ export default function Proposals() {
             </TYPE.subHeader>
           </EmptyProposals>
         )}
-        {!shownProposal &&
-          allProposals?.map((p: ProposalData, i) => {
-            return (
-              <ProposalItem key={i} onClick={() => setShownProposal(p.id)}>
-                <RowBetween>
-                  <RowFixed>
-                    <TYPE.black mr="8px">{p.id}</TYPE.black>
-                    <TYPE.black>{p.title}</TYPE.black>
-                  </RowFixed>
-                  <ProposalStatus status={p.status}>{p.status}</ProposalStatus>
-                </RowBetween>
-              </ProposalItem>
-            )
-          })}
+        <AutoColumn gap="1rem">
+          {!shownProposal &&
+            allProposals?.map((p: ProposalData, i) => {
+              return (
+                <ProposalItem key={i} onClick={() => setShownProposal(p.id)}>
+                  <RowBetween>
+                    <RowFixed>
+                      <TYPE.black mr="8px">{p.id}</TYPE.black>
+                      <TYPE.black>{p.title}</TYPE.black>
+                    </RowFixed>
+                    <ProposalStatus status={p.status}>{p.status}</ProposalStatus>
+                  </RowBetween>
+                </ProposalItem>
+              )
+            })}
+        </AutoColumn>
       </GreyCard>
     </Wrapper>
   )

@@ -78,7 +78,9 @@ export function colors(darkMode: boolean): Colors {
     green1: '#27AE60',
     yellow1: '#FFE270',
     yellow2: '#F3841E',
-    blue1: '#2172E5'
+    blue1: '#2172E5',
+    blue2: '#4D8FEA',
+    blue3: '#EBF4FF'
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
@@ -88,7 +90,7 @@ export function colors(darkMode: boolean): Colors {
 
 export function theme(darkMode: boolean): DefaultTheme {
   return {
-    ...colors(false),
+    ...colors(false), // hard code until dark mode needed
 
     grids: {
       sm: 8,
@@ -162,6 +164,9 @@ export const TYPE = {
   },
   yellow(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'yellow1'} {...props} />
+  },
+  darkYellow(props: TextProps) {
+    return <TextWrapper fontWeight={500} color={'yellow2'} {...props} />
   },
   darkGray(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'text3'} {...props} />

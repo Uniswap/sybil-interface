@@ -9,21 +9,21 @@ export const WrappedListLogo = styled.img`
 
 const handleColorType = (status?: any, theme?: any) => {
   switch (status) {
-    case 'PENDING':
+    case 'pending':
       return theme.blue1
-    case 'ACTIVE':
+    case 'active':
       return theme.blue1
-    case 'SUCCEEDED':
+    case 'succeeded':
       return theme.green1
-    case 'DEFEATED':
+    case 'defeated':
       return theme.red1
-    case 'QUEUED':
+    case 'queued':
       return theme.text3
-    case 'EXECUTED':
+    case 'execited':
       return theme.green1
-    case 'CANCELED':
-      return theme.text3
-    case 'EXPIRED':
+    case 'canceled':
+      return theme.red1
+    case 'expired':
       return theme.text3
     default:
       return theme.text3

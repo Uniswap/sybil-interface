@@ -4,8 +4,29 @@ import styled from 'styled-components'
 
 import EthereumLogo from '../../assets/images/ethereum-logo.png'
 import useHttpLocations from '../../hooks/useHttpLocations'
-import { WrappedTokenInfo } from '../../state/lists/hooks'
 import Logo from '../Logo'
+import { Tags, TokenInfo } from '@uniswap/token-lists'
+
+type TagDetails = Tags[keyof Tags]
+export interface TagInfo extends TagDetails {
+  id: string
+}
+
+/**
+ * Token instances created from token info.
+ */
+export class WrappedTokenInfo extends Token {
+  public readonly tokenInfo: TokenInfo
+  public readonly tags: TagInfo[]
+  constructor(tokenInfo: TokenInfo, tags: TagInfo[]) {
+    super(tokenInfo.chainId, tokenInfo.address, tokenInfo.decimals, tokenInfo.symbol, tokenInfo.name)
+    this.tokenInfo = tokenInfo
+    this.tags = tags
+  }
+  public get logoURI(): string | undefined {
+    return this.tokenInfo.logoURI
+  }
+}
 
 const getTokenLogoURL = (address: string) =>
   `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`

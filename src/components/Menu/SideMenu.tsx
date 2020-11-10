@@ -9,14 +9,14 @@ const Wrapper = styled.div<{ open: boolean }>`
   height: 100vh;
   width: ${({ open }) => (open ? '280px' : '60px')};
   background-color: #f7f8fa;
-  padding: 1rem;
+  padding: 1rem 2rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background: url(${MenuBG});
 
   :hover {
-    cursor: ${({ open }) => !open && 'pointer'};
+    cursor: pointer;
   }
 `
 
@@ -29,7 +29,7 @@ export default function SideMenu() {
 
   return (
     // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/30451
-    <Wrapper open={open} onClick={() => !open && setOpen(true)}>
+    <Wrapper open={open} onClick={() => setOpen(!open)}>
       {!open && (
         <FlippedText>
           <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>

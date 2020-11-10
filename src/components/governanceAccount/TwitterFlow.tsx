@@ -39,12 +39,9 @@ const StyledTextInput = styled.input`
 const Wrapper = styled.div`
   width: 100%;
 `
-const Section = styled(AutoColumn)`
-  padding: 24px;
-`
 
 const ConfirmedIcon = styled(ColumnCenter)`
-  padding: 60px 0;
+  padding: 40px 0;
 `
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
@@ -141,25 +138,23 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
     <ModalContentWrapper>
       {verified ? (
         <Wrapper>
-          <Section>
-            <RowBetween>
-              <div />
-              <CloseIcon onClick={onDismiss} />
-            </RowBetween>
-            <ConfirmedIcon>
-              <CheckCircle strokeWidth={0.5} size={90} color={theme.primary1} />
-            </ConfirmedIcon>
-            <AutoColumn gap="12px" justify={'center'}>
+          <RowBetween>
+            <div />
+            <CloseIcon onClick={onDismiss} />
+          </RowBetween>
+          <ConfirmedIcon>
+            <CheckCircle strokeWidth={0.5} size={90} color={theme.primary1} />
+          </ConfirmedIcon>
+          <AutoColumn gap="12px" justify={'center'}>
+            <Text fontWeight={500} fontSize={20}>
+              Verification Successful
+            </Text>
+            <ButtonPrimary onClick={onDismiss} style={{ margin: '20px 0 0 0' }}>
               <Text fontWeight={500} fontSize={20}>
-                Verification Successful
+                Close
               </Text>
-              <ButtonPrimary onClick={onDismiss} style={{ margin: '20px 0 0 0' }}>
-                <Text fontWeight={500} fontSize={20}>
-                  Close
-                </Text>
-              </ButtonPrimary>
-            </AutoColumn>
-          </Section>
+            </ButtonPrimary>
+          </AutoColumn>
         </Wrapper>
       ) : !twitterHandle ? (
         <AutoColumn gap="lg">

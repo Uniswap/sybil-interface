@@ -23,7 +23,7 @@ export enum ApplicationModal {
   SETTINGS,
   SELF_CLAIM,
   ADDRESS_CLAIM,
-  CLAIM_POPUP,
+  DELEGATE,
   MENU
 }
 

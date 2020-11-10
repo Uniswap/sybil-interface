@@ -18,11 +18,9 @@ const Wrapper = styled.div<{ backgroundColor?: string }>`
 `
 
 const ProposalInfo = styled(AutoColumn)`
-  border: 1px solid ${({ theme }) => theme.bg4};
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
-  max-width: 640px;
   width: 100%;
 `
 
@@ -82,7 +80,6 @@ const Progress = styled.div<{ status: 'for' | 'against'; percentageString?: stri
 `
 
 const MarkDownWrapper = styled.div`
-  max-width: 640px;
   overflow: hidden;
 `
 

@@ -48,7 +48,7 @@ export default function ProfileCard({ name, handle, imageURL }: AccountViewProps
       <EmptyCircle />
       <FadedDetails gap="0.5rem">
         <TYPE.mediumHeader>Account</TYPE.mediumHeader>
-        <TYPE.black fontSize={12}>Linked accounts will appear here</TYPE.black>
+        <TYPE.black fontSize={12}>Account will appear here</TYPE.black>
       </FadedDetails>
     </FixedRowHeight>
   ) : (

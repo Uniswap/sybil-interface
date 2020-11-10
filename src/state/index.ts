@@ -6,10 +6,9 @@ import governance from './governance/reducer'
 import { updateVersion } from './global/actions'
 import user from './user/reducer'
 import transactions from './transactions/reducer'
-import lists from './lists/reducer'
 import multicall from './multicall/reducer'
 
-const PERSISTED_KEYS: string[] = ['user', 'transactions', 'lists']
+const PERSISTED_KEYS: string[] = ['user', 'transactions']
 
 const store = configureStore({
   reducer: {
@@ -17,7 +16,6 @@ const store = configureStore({
     user,
     transactions,
     multicall,
-    lists,
     governance
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],
