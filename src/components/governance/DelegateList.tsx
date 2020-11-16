@@ -2,10 +2,10 @@ import React, { useState, useMemo } from 'react'
 import { AutoColumn } from '../Column'
 
 import { TYPE, ExternalLink } from '../../theme'
-import { AutoRow } from '../Row'
+import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import { useTopDelegates, DelegateData, useGlobalData, useActiveProtocol } from '../../state/governance/hooks'
+import { DelegateData, useActiveProtocol } from '../../state/governance/hooks'
 import { WrappedListLogo } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
@@ -15,6 +15,7 @@ import { useModalOpen, useToggleModal } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import DelegateModal from '../vote/DelegateModal'
 import { Percent, JSBI } from '@uniswap/sdk'
+import Loader from '../Loader'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -50,10 +51,8 @@ const DataRow = styled.div`
   }
 `
 
-export default function DelegateList() {
+export default function DelegateList({ topDelegates }: { topDelegates: DelegateData[] | undefined }) {
   const { chainId } = useActiveWeb3React()
-
-  const topDelegates: DelegateData[] | undefined = useTopDelegates()
 
   // toggle for showing delegation modal
   const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
@@ -62,16 +61,14 @@ export default function DelegateList() {
   // used to prefil modal with delegate address
   const [prefilledDelegate, setPrefilledDelegate] = useState<string | undefined>()
 
-  // get data for entire governance
-  const globalData = useGlobalData()
-
+  // used to calculate % ownership of votes
   const [activeProtocol] = useActiveProtocol()
 
   const delegateList = useMemo(() => {
     return (
       chainId &&
-      globalData &&
       topDelegates &&
+      activeProtocol &&
       topDelegates.map((d, i) => {
         return (
           <DataRow key={d.id}>
@@ -96,9 +93,7 @@ export default function DelegateList() {
             </AutoRow>
             <NoWrap textAlign="end">{d.votes.length}</NoWrap>
             <NoWrap textAlign="end">
-              {globalData
-                ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), activeProtocol.token.totalSupply).toFixed(3) + '%'
-                : '-'}
+              {new Percent(JSBI.BigInt(d.delegatedVotesRaw), activeProtocol.token.totalSupply).toFixed(3) + '%'}
             </NoWrap>
             <NoWrap textAlign="end">
               {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
@@ -107,7 +102,7 @@ export default function DelegateList() {
         )
       })
     )
-  }, [activeProtocol.token.totalSupply, chainId, globalData, toggelDelegateModal, topDelegates])
+  }, [activeProtocol, chainId, toggelDelegateModal, topDelegates])
 
   return (
     <GreyCard padding="2rem 0">
@@ -127,7 +122,11 @@ export default function DelegateList() {
           <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
-        {delegateList}
+        {delegateList ?? (
+          <Row justify="center">
+            <Loader />
+          </Row>
+        )}
       </AutoColumn>
     </GreyCard>
   )

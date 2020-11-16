@@ -49,9 +49,14 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
     setTyped(val)
   }
 
+  // reset modal based on prefilled value or not
   useEffect(() => {
     if (prefilledDelegate) {
+      setUsingDelegate(true)
       setTyped(prefilledDelegate)
+    } else {
+      setTyped('')
+      setUsingDelegate(false)
     }
   }, [prefilledDelegate])
 

@@ -5,6 +5,7 @@ import UniLogo from '../../assets/images/unilogo.svg'
 import CompLogo from '../../assets/images/compLogo.png'
 
 export interface GovernanceInfo {
+  id: string
   name: string
   logo: string
   primaryColor: string
@@ -28,6 +29,7 @@ export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
 
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
+  id: 'uniswap',
   name: 'Uniswap Governance',
   logo: UniLogo,
   primaryColor: '#FF007A',
@@ -56,6 +58,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
 }
 
 export const COMPOUND_GOVERNANCE: GovernanceInfo = {
+  id: 'compound',
   name: 'Compound Governance',
   logo: CompLogo,
   primaryColor: '#00D395',
@@ -83,6 +86,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   subgraphClientURL: 'https://api.thegraph.com/subgraphs/name/ianlapham/governance-tracking'
 }
 
+// mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
   compound: COMPOUND_GOVERNANCE
@@ -90,11 +94,11 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
 
 export interface GovernanceState {
   // the selected option from supported protocol options
-  activeProtocol: GovernanceInfo
+  activeProtocol: GovernanceInfo | undefined
 }
 
 export const initialState: GovernanceState = {
-  activeProtocol: UNISWAP_GOVERNANCE
+  activeProtocol: undefined
 }
 
 export default createReducer(initialState, builder =>

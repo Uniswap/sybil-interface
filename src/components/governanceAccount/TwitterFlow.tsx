@@ -1,22 +1,20 @@
-import React, { useState, useContext } from 'react'
-import { AutoColumn, ColumnCenter } from '../Column'
+import React, { useState } from 'react'
+import { AutoColumn } from '../Column'
 import { ButtonPrimary } from '../Button'
 import { TYPE, CloseIcon, ExternalLink, BackArrowSimple } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
-import styled, { ThemeContext } from 'styled-components'
+import styled from 'styled-components'
 import TwitterAccountView from './ProfileCard'
 import {
   LatestTweetResponse,
   useTwitterProfileData,
   fetchLatestTweet,
-  useVerifyCallback,
-  VerifyResult
+  useAttestCallBack
 } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
-import { CheckCircle } from 'react-feather'
-import { Text } from 'rebass'
+import { LoadingView, SubmittedView } from '../ModalViews'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -36,21 +34,12 @@ const StyledTextInput = styled.input`
   font-size: 1rem;
 `
 
-const Wrapper = styled.div`
-  width: 100%;
-`
-
-const ConfirmedIcon = styled(ColumnCenter)`
-  padding: 40px 0;
-`
-
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const { account, library } = useActiveWeb3React()
-  const theme = useContext(ThemeContext)
 
   // monitor input or login @todo (which one?) for twitter handle
   const [twitterHandle, setTwitterHandle] = useState<string | undefined>()
-  const [typedTwitterHandle, setTypedTwitterHandle] = useState('')
+  const [typedTwitterHandle, setTypedTwitterHandle] = useState<string>('')
 
   // fetch profile info for display
   const profileData = useTwitterProfileData(typedTwitterHandle)
@@ -61,16 +50,37 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   // keep track of signed message
   const [signedMessage, setSignedMessage] = useState<undefined | string>()
 
-  const { verifyCallback } = useVerifyCallback(tweetID)
+  const attestCallback = useAttestCallBack(twitterHandle)
   const [requestError, setRequestError] = useState<string | undefined>()
-  const [verified, setVerified] = useState<boolean>(false)
 
-  // attempt to verify, display success or fail to user
-  async function verify() {
-    setRequestError(undefined) // reset error
-    const res: VerifyResult = await verifyCallback()
-    if (res.success) setVerified(true)
-    if (res.error) setRequestError(res.error)
+  // monitor call to help UI loading state
+  const [hash, setHash] = useState<string | undefined>()
+  const [attempting, setAttempting] = useState(false)
+
+  // wrapper to reset state on modal close
+  function wrappedOndismiss() {
+    setHash(undefined)
+    setAttempting(false)
+    onDismiss()
+  }
+
+  async function onVerify() {
+    setAttempting(true)
+
+    // if callback not returned properly ignore
+    if (!attestCallback || !account || !tweetID) return
+
+    // try delegation and store hash
+    const hash = await attestCallback(account, tweetID)?.catch(error => {
+      setAttempting(false)
+      setRequestError('Error submitting verification')
+      console.log(error)
+    })
+
+    if (hash) {
+      setAttempting(false)
+      setHash(hash)
+    }
   }
 
   async function signMessage() {
@@ -136,26 +146,19 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <ModalContentWrapper>
-      {verified ? (
-        <Wrapper>
-          <RowBetween>
-            <div />
-            <CloseIcon onClick={onDismiss} />
-          </RowBetween>
-          <ConfirmedIcon>
-            <CheckCircle strokeWidth={0.5} size={90} color={theme.primary1} />
-          </ConfirmedIcon>
-          <AutoColumn gap="12px" justify={'center'}>
-            <Text fontWeight={500} fontSize={20}>
-              Verification Successful
-            </Text>
-            <ButtonPrimary onClick={onDismiss} style={{ margin: '20px 0 0 0' }}>
-              <Text fontWeight={500} fontSize={20}>
-                Close
-              </Text>
-            </ButtonPrimary>
+      {attempting && !hash ? (
+        <LoadingView onDismiss={wrappedOndismiss}>
+          <AutoColumn gap="2rem" justify={'center'}>
+            <TYPE.largeHeader>Submitting social data</TYPE.largeHeader>
           </AutoColumn>
-        </Wrapper>
+        </LoadingView>
+      ) : hash ? (
+        <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
+          <AutoColumn gap="2rem" justify={'center'}>
+            <TYPE.largeHeader>Verification Submitted</TYPE.largeHeader>
+            <ButtonPrimary onClick={wrappedOndismiss}>Close</ButtonPrimary>
+          </AutoColumn>
+        </SubmittedView>
       ) : !twitterHandle ? (
         <AutoColumn gap="lg">
           <RowBetween>
@@ -224,7 +227,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </RowBetween>
           <Tweet tweetId={tweetID} />
           <TYPE.black>Submit a transaction with your tweet location to be verified on chain.</TYPE.black>
-          <ButtonPrimary onClick={verify} disabled={!account || !tweetID || !signedMessage}>
+          <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>
             Submit
           </ButtonPrimary>
           {requestError && <TYPE.error error={true}>{requestError}</TYPE.error>}

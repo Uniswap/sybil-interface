@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { BodyWrapper } from '../AppBody'
 import { AutoColumn } from '../../components/Column'
 import styled from 'styled-components'
-import { useActiveProtocol } from '../../state/governance/hooks'
+import {
+  useActiveProtocol,
+  useTopDelegates,
+  DelegateData,
+  useAllProposals,
+  ProposalData
+} from '../../state/governance/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../state'
@@ -10,7 +16,7 @@ import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import Dropdown from '../../components/governance/Dropdown'
 import DelegateList from '../../components/governance/DelegateList'
 import Tabs from '../../components/governance/Tabs'
-import Proposals from '../../components/governance/Proposals'
+import Proposals from '../../components/governance/ProposalList'
 import GovernanceAccountSection from '../../components/governanceAccount'
 
 const SectionWrapper = styled.div`
@@ -41,6 +47,12 @@ export default function Overview({
   // set the active view
   const [activeTab, setActiveTab] = useState<ActiveTab>(ActiveTab.DELEGATES)
 
+  //  get top delegates
+  const topDelegates: DelegateData[] | undefined = useTopDelegates()
+
+  // get list of proposals
+  const allProposals: ProposalData[] | undefined = useAllProposals()
+
   return (
     <BodyWrapper>
       <SectionWrapper>
@@ -48,7 +60,11 @@ export default function Overview({
           <Dropdown />
           <GovernanceAccountSection />
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-          {activeTab === ActiveTab.DELEGATES ? <DelegateList /> : <Proposals />}
+          {activeTab === ActiveTab.DELEGATES ? (
+            <DelegateList topDelegates={topDelegates} />
+          ) : (
+            <Proposals allProposals={allProposals} />
+          )}
         </AutoColumn>
       </SectionWrapper>
     </BodyWrapper>

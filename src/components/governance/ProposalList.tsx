@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useAllProposals, ProposalData } from '../../state/governance/hooks'
+import { ProposalData } from '../../state/governance/hooks'
 import { EmptyProposals, ProposalStatus } from './styled'
 import { TYPE } from '../../theme'
 import { GreyCard } from '../Card'
@@ -23,9 +23,7 @@ const ProposalItem = styled.div`
   }
 `
 
-export default function Proposals() {
-  const allProposals = useAllProposals()
-
+export default function ProposalList({ allProposals }: { allProposals: ProposalData[] | undefined }) {
   const [shownProposal, setShownProposal] = useState<string | undefined>()
 
   return (

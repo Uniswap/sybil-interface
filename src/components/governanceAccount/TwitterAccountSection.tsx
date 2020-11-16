@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import Row, { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../theme'
-import { useVerifiedHandle, useTwitterProfileData } from '../../state/social/hooks'
+import { useTwitterProfileData, useVerifiedHandles } from '../../state/social/hooks'
 import Modal from '../Modal'
 import TwitterFlow from './TwitterFlow'
-import { useActiveWeb3React } from '../../hooks'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
+import { useActiveWeb3React } from '../../hooks'
+import { useAllTransactions, isTransactionRecent } from '../../state/transactions/hooks'
+import { TransactionDetails } from '../../state/transactions/reducer'
+import { LoaderSecondary } from '../Loader'
 
 const Wrapper = styled.div`
   padding: 1rem;
@@ -53,15 +56,43 @@ const VerifyButton = styled.button`
   }
 `
 
+const PendingFlag = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid ${({ theme }) => theme.yellow2};
+  color: ${({ theme }) => theme.yellow2};
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+`
+
+// we want the latest one to come first, so return negative if a is after b
+export function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
+  return b.addedTime - a.addedTime
+}
+
 export default function TwitterAccountSection() {
   const { account } = useActiveWeb3React()
 
-  // if not attested, show twitter flow
+  // toggle modal for twitter verification
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  // check kv list for handle, then fetch profile info from twitter
-  const verifiedHandle = useVerifiedHandle(account)
-  const profileData = useTwitterProfileData(verifiedHandle)
+  // monitor for pending attempt to verify, pull out profile if so
+  const allTransactions = useAllTransactions()
+  const sortedRecentTransactions: TransactionDetails[] = useMemo(() => {
+    const txs = Object.values(allTransactions)
+    return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
+  }, [allTransactions])
+  const pendingVerifications = sortedRecentTransactions.filter(tx => !tx.receipt && tx.social)
+  const pendingProfile = pendingVerifications?.[0]?.social?.username
+
+  // get any verified handles for this user
+  const handles = useVerifiedHandles(account)
+  const verifiedHandle = handles ? handles?.[0] : undefined // just show first handle found for now
+
+  // if pending profile, fetch data with that - else use the verified handle
+  const profileData = useTwitterProfileData(pendingProfile ?? verifiedHandle)
 
   return (
     <>
@@ -84,7 +115,14 @@ export default function TwitterAccountSection() {
                   <img src={profileData.profileURL} alt="profile" />
                 </RoundedProfileImage>
                 <AutoColumn gap="0.5rem">
-                  <TYPE.mediumHeader>{profileData.name}</TYPE.mediumHeader>
+                  <RowFixed>
+                    <TYPE.mediumHeader mr={pendingProfile ? '12px' : '0'}>{profileData.name}</TYPE.mediumHeader>
+                    {pendingProfile && (
+                      <PendingFlag>
+                        Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
+                      </PendingFlag>
+                    )}
+                  </RowFixed>
                   <TYPE.black fontSize={12}>@{profileData.handle}</TYPE.black>
                 </AutoColumn>
               </RowFixed>

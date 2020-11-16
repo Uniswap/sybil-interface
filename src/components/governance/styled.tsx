@@ -19,7 +19,7 @@ const handleColorType = (status?: any, theme?: any) => {
       return theme.red1
     case 'queued':
       return theme.text3
-    case 'execited':
+    case 'executed':
       return theme.green1
     case 'canceled':
       return theme.red1

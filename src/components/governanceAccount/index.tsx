@@ -8,7 +8,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { GreyCard } from '../Card'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import TwitterAccountSection from './TwitterAccountSection'
-import { useWalletModalToggle, useModalOpen, useToggleModal } from '../../state/application/hooks'
+import { useWalletModalToggle, useToggleModal } from '../../state/application/hooks'
 import useENS from '../../hooks/useENS'
 import { useUserVotes, useUserDelegatee, useGovernanceToken } from '../../state/governance/hooks'
 import styled from 'styled-components'
@@ -17,7 +17,6 @@ import { useTokenBalance } from '../../state/wallet/hooks'
 import { ZERO_ADDRESS } from '../../constants'
 import { ApplicationModal } from '../../state/application/actions'
 import { TokenAmount, JSBI } from '@uniswap/sdk'
-import DelegateModal from '../vote/DelegateModal'
 
 const EmptyCircle = styled.div`
   height: 48px;
@@ -36,7 +35,6 @@ export default function GovernanceAccountSection() {
   const { name: ensName } = useENS(account)
 
   // toggle for showing delegation modal
-  const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
 
   // get protocol specific data
@@ -54,11 +52,6 @@ export default function GovernanceAccountSection() {
 
   return (
     <GreyCard>
-      <DelegateModal
-        isOpen={showDelegateModal}
-        onDismiss={toggelDelegateModal}
-        title={showUnlockVoting ? 'Unlock Votes' : 'Update Delegation'}
-      />
       <AutoColumn gap="lg">
         {!account && (
           <RowBetween>
