@@ -30,7 +30,6 @@ const Flyout = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
   padding: 1rem;
   position: absolute;
   bottom: -68px;
-  z-index: 0;
   left: 0px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;

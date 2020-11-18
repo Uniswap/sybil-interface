@@ -33,6 +33,7 @@ export interface DelegateData {
   }[]
   EOA: boolean | undefined //
   handle: string | undefined // twitter handle
+  imageURL?: string | undefined
 }
 
 export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtocol: GovernanceInfo) => void] {

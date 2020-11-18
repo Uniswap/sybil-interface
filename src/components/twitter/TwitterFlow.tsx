@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AutoColumn } from '../Column'
 import { ButtonPrimary } from '../Button'
-import { TYPE, CloseIcon, ExternalLink, BackArrowSimple } from '../../theme'
+import { TYPE, CloseIcon, BackArrowSimple } from '../../theme'
 import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import { LatestTweetResponse, fetchLatestTweet, useAttestCallBack } from '../../state/social/hooks'
+import { useAttestCallBack } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
 import { LoadingView, SubmittedView } from '../ModalViews'
+import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
+import { Dots } from '../../theme/components'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -99,31 +101,55 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
       })
   }
 
+  const tweetCopy = `Announcing myself as a delegate on UNI governance. Address:${account}. Signature:${signedMessage ??
+    ''}`
+
+  // twitter watcher
+  const [watcher, setWatcher] = useState<NodeJS.Timeout | undefined>()
   const [tweetError, setTweetError] = useState<string | undefined>()
-  function checkForTweet() {
-    if (twitterHandle) {
-      fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
-        if (res?.data[0]) {
-          const tweetData = res?.data?.[0]
-          // @TODO add regex for format check
-          const passedRegex = true
-          if (passedRegex) {
-            setTweetID(tweetData.id)
-          } else {
-            setTweetError('Tweet format incorrect, try again with exact message.')
-          }
-        } else {
-          setTweetError('Tweet not found, try again')
-        }
-      })
+
+  function resetTweetWatcher() {
+    if (watcher) {
+      clearInterval(watcher)
     }
+    setWatcher(undefined)
+    setTweetID(undefined)
   }
 
-  const tweetCopy = `Announcing myself as a delegate on UNI governance.     
-  \n\n
-  \n\nAddress:${account}. 
-  \n\n   
-   Signature:${signedMessage ?? ''}`
+  // start watching and open window
+  function checkForTweet() {
+    window.open('https://twitter.com/intent/tweet?text=' + tweetCopy)
+    const watcher = setInterval(function() {
+      if (twitterHandle) {
+        fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
+          console.log('fetching latest tweet ')
+          if (res?.data[0]) {
+            const tweetData = res?.data?.[0]
+
+            // @TODO add regex for format check
+            const passedRegex = tweetData.text === tweetCopy
+            if (passedRegex) {
+              setTweetID(tweetData.id)
+            } else {
+              resetTweetWatcher()
+              setTweetError('Tweet format incorrect, try again with exact message.')
+            }
+          } else {
+            resetTweetWatcher()
+            setTweetError('Tweet not found, try again')
+          }
+        })
+      }
+    }, 6000)
+    setWatcher(watcher)
+  }
+
+  // reset watcher if tweet found
+  useEffect(() => {
+    if (tweetID && watcher) {
+      clearInterval(watcher)
+    }
+  }, [tweetID, watcher])
 
   return (
     <ModalContentWrapper>
@@ -169,17 +195,16 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TweetWrapper>{tweetCopy}</TweetWrapper>
-          <AutoColumn justify="center">
-            <ExternalLink href={'https://twitter.com/intent/tweet?text=' + tweetCopy}>Tweet this ↗</ExternalLink>
-          </AutoColumn>
-          <ButtonPrimary onClick={checkForTweet}>Ive Tweeted</ButtonPrimary>
+          <ButtonPrimary onClick={checkForTweet}>
+            {watcher ? <Dots>Looking for tweet</Dots> : 'Tweet This'}
+          </ButtonPrimary>
           {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
         </AutoColumn>
       ) : (
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
-              <BackArrowSimple onClick={() => setTweetID(undefined)} />
+              <BackArrowSimple onClick={resetTweetWatcher} />
               <TYPE.mediumHeader ml="6px">3/3 Submit</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />

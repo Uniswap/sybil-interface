@@ -1,21 +1,12 @@
 import gql from 'graphql-tag'
 
-// check subgraph if address has an announced handle
-export const CONTENT_LOOKUP_FOR_ADDRESS = gql`
-  query attestations($account: Bytes!) {
-    attestations(where: { account: $account }) {
+export const HANDLES_BULK = gql`
+  query governance($accounts: [Bytes]!) {
+    attestations(where: { account_in: $accounts }) {
       id
       account
       tweetID
-    }
-  }
-`
-export const CONTENT_QUERY = gql`
-  query content($account: Bytes!) {
-    attestations(where: { account: $account }) {
-      id
-      account
-      tweetID
+      timestamp
     }
   }
 `

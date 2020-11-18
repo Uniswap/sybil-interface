@@ -5,8 +5,8 @@ import { AutoColumn } from '../Column'
 import { TYPE } from '../../theme'
 
 const EmptyCircle = styled.div`
-  height: 48px;
-  width: 48px;
+  height: 40px;
+  width: 40px;
   background: ${({ theme }) => theme.bg2};
   border-radius: 50%;
   margin-right: 1rem;
@@ -16,12 +16,12 @@ const FixedRowHeight = styled(Row)`
   height: 48px;
 `
 
-const RoundedProfileImage = styled.div`
+export const RoundedProfileImage = styled.div`
   display: flex;
   align-items; 
   justify-content: center;
-  height: 48px;
-  width: 48px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   margin-right: 1rem;
 

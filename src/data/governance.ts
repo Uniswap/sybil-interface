@@ -1,8 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA } from '../apollo/queries'
+import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, HANDLES_BULK } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
 import { Percent } from '@uniswap/sdk'
+import { client as sybilClient } from '../apollo/client'
+import { verifyHandleForAddress, fetchProfileData } from './social'
 
 interface DelegateResponse {
   data: {
@@ -13,6 +15,17 @@ interface DelegateResponse {
 interface GlobalResponse {
   data: {
     governances: GlobaData[]
+  }
+}
+
+interface HandlesResponse {
+  data: {
+    attestations: {
+      id: string
+      account: string
+      tweetID: string
+      timestamp: number
+    }[]
   }
 }
 
@@ -44,7 +57,9 @@ export function fetchDelegates(client: any, key: string, library: Web3Provider):
         fetchPolicy: 'cache-first'
       })
       .then(async (res: DelegateResponse) => {
-        res.data.delegates.push({
+        const testData = res.data.delegates
+
+        testData[0] = {
           id: '0x74Aa01d162E6dC6A657caC857418C403D48E2D77',
           delegatedVotes: 30000000,
           delegatedVotesRaw: 200000000000000000000,
@@ -52,7 +67,7 @@ export function fetchDelegates(client: any, key: string, library: Web3Provider):
           votes: [],
           EOA: true,
           handle: 'sybiltester'
-        })
+        }
 
         // check if account is EOA or not
         const typed = await Promise.all(
@@ -60,19 +75,34 @@ export function fetchDelegates(client: any, key: string, library: Web3Provider):
             return library?.getCode(d.id)
           })
         )
-        /**
-         * @TODO fetch verified handles for delegates
-         */
-        // const handles = await Promise.all(
-        //   res.data.delegates.map(d => {
-        //     // return fetchSingleVerifiedHandle(d.id)
-        //     return undefined
-        //   })
-        // )
-        return res.data.delegates.map((d, i) => {
+
+        // get all handles related to delegates found
+        const handlesResponse: HandlesResponse = await sybilClient.query({
+          query: HANDLES_BULK,
+          variables: {
+            accounts: testData.map(d => d.id.toLowerCase())
+          }
+        })
+
+        // for each handle attestation - verify which ones are legit,
+        const handles = await Promise.all(
+          handlesResponse.data.attestations.map(async (a: any) => {
+            const handle = await verifyHandleForAddress(a.account, a.tweetID)
+            const profileData = handle ? await fetchProfileData(handle) : undefined
+            return {
+              account: a.account,
+              handle,
+              imageURL: profileData?.data?.profile_image_url
+            }
+          })
+        )
+
+        return testData.map((d, i) => {
           return {
             ...d,
-            EOA: typed[i] === '0x'
+            EOA: typed[i] === '0x',
+            handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
+            imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
           }
         })
       }))

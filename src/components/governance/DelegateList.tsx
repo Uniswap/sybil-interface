@@ -16,6 +16,7 @@ import { ApplicationModal } from '../../state/application/actions'
 import DelegateModal from '../vote/DelegateModal'
 import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
+import { RoundedProfileImage } from '../twitter/ProfileCard'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -77,12 +78,20 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           <DataRow key={d.id}>
             <AutoRow gap="10px">
               <NoWrap>{i + 1}</NoWrap>
-              <WrappedListLogo src={EmptyProfile} />
+              {d.imageURL ? (
+                <RoundedProfileImage>
+                  <img src={d.imageURL} alt="profile" />
+                </RoundedProfileImage>
+              ) : (
+                <WrappedListLogo src={EmptyProfile} />
+              )}
               <FixedAddressSize gap="6px">
                 <ExternalLink href={getEtherscanLink(chainId, d.id, 'address')}>
-                  <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
+                  <TYPE.black>{d.handle ? `@${d.handle}` : shortenAddress(d.id)}</TYPE.black>
                 </ExternalLink>
-                <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
+                <TYPE.black fontSize="12px">
+                  {d.handle ? shortenAddress(d.id) : d.EOA ? 'EOA' : 'Smart Contract'}
+                </TYPE.black>
               </FixedAddressSize>
               <ButtonBlue
                 width="fit-content"

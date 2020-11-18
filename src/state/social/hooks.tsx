@@ -7,82 +7,7 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { client as sybilClient } from '../../apollo/client'
 import { CONTENT_SUBSCRIPTION } from '../../apollo/queries'
 import { useSubscription } from 'react-apollo'
-
-const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
-const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
-
-export interface HandleResponse {
-  data: [
-    {
-      handle: string
-    }
-  ]
-}
-
-export async function fetchSingleVerifiedHandle(address: string): Promise<string | undefined> {
-  if (!isAddress(address)) return Promise.reject(new Error('Invalid address'))
-
-  return fetch(`${VERIFICATION_WORKER_URL}/api/accounts?address=${address}`).then(async res => {
-    if (res.status === 200) {
-      return res.json().then(data => data.handle)
-    }
-    return Promise.reject(new Error('Invalid response'))
-  })
-}
-
-export interface LatestTweetResponse {
-  data: [
-    {
-      id: string
-      text: string
-    }
-  ]
-}
-
-// dont save responses as user may need to tweet multiple times
-export async function fetchLatestTweet(handle: string): Promise<LatestTweetResponse | null> {
-  const url = `${TWITTER_WORKER_URL}/user/latest-tweet?handle=` + handle
-  return fetch(url)
-    .then(async res => {
-      if (res.status === 200) {
-        return res.json()
-      } else {
-        return null
-      }
-    })
-    .catch(error => {
-      console.error('Failed to get claim data', error)
-    })
-}
-
-interface ProfileDataResponse {
-  data: {
-    id: number
-    name: string
-    username: string
-    profile_image_url: string
-  }
-}
-const PROFILE_DATA_PROMISES: { [key: string]: Promise<ProfileDataResponse | null> } = {}
-
-function fetchProfileData(handle: string): Promise<ProfileDataResponse | null> {
-  const key = `${handle}`
-  const url = `${TWITTER_WORKER_URL}/user?handle=${handle}`
-  return (PROFILE_DATA_PROMISES[key] =
-    PROFILE_DATA_PROMISES[key] ??
-    fetch(url)
-      .then(async res => {
-        if (res.status === 200) {
-          return res.json()
-        } else {
-          console.debug(`No handle found`)
-          return null
-        }
-      })
-      .catch(error => {
-        console.error('Failed to get claim data', error)
-      }))
-}
+import { verifyHandleForAddress, fetchProfileData, ProfileDataResponse } from '../../data/social'
 
 interface TwitterProfileData {
   name: string
@@ -193,7 +118,7 @@ export function useSubgraphEntries(address: string | undefined | null): Attestat
 }
 
 interface HandleEntry {
-  handle: string
+  handle: string | undefined
   timestamp: number
 }
 
@@ -217,18 +142,10 @@ export function useVerifiedHandles(account: string | null | undefined): HandleEn
         entries &&
         (await Promise.all(
           entries?.map(async entry => {
-            try {
-              return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${entry.account}&id=${entry.tweetID}`).then(
-                async res => {
-                  if (res.status === 200) {
-                    const handle = await res.text()
-                    return { handle, timestamp: entry.timestamp }
-                  }
-                  return undefined
-                }
-              )
-            } catch {
-              return Promise.reject(new Error('Invalid response'))
+            const handle = await verifyHandleForAddress(entry.account, entry.tweetID)
+            return {
+              handle,
+              timestamp: entry.timestamp
             }
           })
         ))
