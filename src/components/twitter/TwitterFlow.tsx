@@ -11,6 +11,8 @@ import { Tweet } from 'react-twitter-widgets'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Dots } from '../../theme/components'
+import { useTwitterAccount } from '../../state/user/hooks'
+import { useActiveProtocol } from '../../state/governance/hooks'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -24,8 +26,13 @@ const TweetWrapper = styled.div`
     word-break: break-word;
 `
 
-export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandle: string; onDismiss: () => void }) {
+export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const { account, library } = useActiveWeb3React()
+
+  const [twitterHandle] = useTwitterAccount()
+
+  // get active protocol to format tweet copy
+  const [activeProtocol] = useActiveProtocol()
 
   // fetch tweet id either with watcher or manual trigger for last tweet @todo (which one)
   const [tweetID, setTweetID] = useState<undefined | string>()
@@ -101,26 +108,17 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
       })
   }
 
-  const tweetCopy = `Announcing myself as a delegate on UNI governance. Address:${account}. Signature:${signedMessage ??
-    ''}`
+  const tweetCopy = `Verifying identity for ${
+    activeProtocol?.token.symbol
+  } governance. Address:${account}. Signature:${signedMessage ?? ''}`
 
   // twitter watcher
-  const [watcher, setWatcher] = useState<NodeJS.Timeout | undefined>()
   const [tweetError, setTweetError] = useState<string | undefined>()
 
-  function resetTweetWatcher() {
-    if (watcher) {
-      clearInterval(watcher)
-    }
-    setWatcher(undefined)
-    setTweetID(undefined)
-  }
-
-  // start watching and open window
-  function checkForTweet() {
-    window.open('https://twitter.com/intent/tweet?text=' + tweetCopy)
-    const watcher = setInterval(function() {
-      if (twitterHandle) {
+  const [watch, setWatch] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (twitterHandle && watch) {
         fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
           console.log('fetching latest tweet ')
           if (res?.data[0]) {
@@ -130,26 +128,34 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
             const passedRegex = tweetData.text === tweetCopy
             if (passedRegex) {
               setTweetID(tweetData.id)
+              setTweetError(undefined)
             } else {
-              resetTweetWatcher()
-              setTweetError('Tweet format incorrect, try again with exact message.')
+              setWatch(false)
+              setTweetError('Tweet not found, try again with exact message.')
             }
           } else {
-            resetTweetWatcher()
+            setWatch(false)
             setTweetError('Tweet not found, try again')
           }
         })
       }
     }, 6000)
-    setWatcher(watcher)
+    return () => clearTimeout(timer)
+  }, [tweetCopy, twitterHandle, watch])
+
+  // start watching and open window
+  function checkForTweet() {
+    setTweetError(undefined)
+    window.open('https://twitter.com/intent/tweet?text=' + tweetCopy, 'tweetWindow', 'height=400,width=800')
+    setWatch(true)
   }
 
   // reset watcher if tweet found
   useEffect(() => {
-    if (tweetID && watcher) {
-      clearInterval(watcher)
+    if (tweetID && watch) {
+      setWatch(false)
     }
-  }, [tweetID, watcher])
+  }, [tweetID, watch])
 
   return (
     <ModalContentWrapper>
@@ -196,7 +202,7 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
           </RowBetween>
           <TweetWrapper>{tweetCopy}</TweetWrapper>
           <ButtonPrimary onClick={checkForTweet}>
-            {watcher ? <Dots>Looking for tweet</Dots> : 'Tweet This'}
+            {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Try again' : 'Tweet This'}
           </ButtonPrimary>
           {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
         </AutoColumn>
@@ -204,7 +210,13 @@ export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandl
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
-              <BackArrowSimple onClick={resetTweetWatcher} />
+              <BackArrowSimple
+                onClick={() => {
+                  setTweetID(undefined)
+                  setRequestError(undefined)
+                  setWatch(false)
+                }}
+              />
               <TYPE.mediumHeader ml="6px">3/3 Submit</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />

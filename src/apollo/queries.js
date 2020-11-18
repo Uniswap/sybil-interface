@@ -11,6 +11,17 @@ export const HANDLES_BULK = gql`
   }
 `
 
+export const ATTESTATIONS_QUERY = gql`
+  query attestations($account: Bytes!) {
+    attestations(where: { account: $account }) {
+      id
+      account
+      tweetID
+      timestamp
+    }
+  }
+`
+
 export const CONTENT_SUBSCRIPTION = gql`
   subscription onContetUpdate($account: Bytes!) {
     attestations(where: { account: $account }) {

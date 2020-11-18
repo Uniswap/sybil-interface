@@ -15,7 +15,7 @@ export interface TransactionDetails {
   approval?: { tokenAddress: string; spender: string }
   summary?: string
   claim?: { recipient: string }
-  social?: { username: string }
+  social?: { username: string; account: string }
   receipt?: SerializableTransactionReceipt
   lastCheckedBlockNumber?: number
   addedTime: number

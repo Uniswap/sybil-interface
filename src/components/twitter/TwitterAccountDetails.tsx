@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import Row, { RowBetween, RowFixed } from '../Row'
 import { Link, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -9,12 +9,13 @@ import Modal from '../Modal'
 import TwitterFlow from './TwitterFlow'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 import { useActiveWeb3React } from '../../hooks'
-import { useAllTransactions, isTransactionRecent } from '../../state/transactions/hooks'
-import { TransactionDetails } from '../../state/transactions/reducer'
+import { useUserPendingUsername } from '../../state/transactions/hooks'
 import { LoaderSecondary } from '../Loader'
 import ProfileCard from './ProfileCard'
 import { useTwitterAccount } from '../../state/user/hooks'
 import moment from 'moment'
+import { ButtonBasic } from '../Button'
+import useParsedQueryString from '../../hooks/useParsedQueryString'
 
 const Wrapper = styled.div`
   padding: 1rem;
@@ -76,8 +77,8 @@ const PendingFlag = styled.div<{ verified: boolean }>`
   font-size: 12px;
 
   :hover {
-    cursor: pointer;
-    opacity: 0.6;
+    cursor: ${({ verified }) => !verified && 'pointer'};
+    opacity: ${({ verified }) => !verified && '0.6'};
   }
 `
 
@@ -86,11 +87,6 @@ const StyledClose = styled(CloseIcon)`
   height: 16px;
   width: 16px;
 `
-
-// we want the latest one to come first, so return negative if a is after b
-export function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
-  return b.addedTime - a.addedTime
-}
 
 function TwitterAccountDetails() {
   const { account } = useActiveWeb3React()
@@ -101,13 +97,7 @@ function TwitterAccountDetails() {
   const [twitterAccount, setTwitterAccount] = useTwitterAccount()
 
   // monitor for pending attempt to verify, pull out profile if so
-  const allTransactions = useAllTransactions()
-  const sortedRecentTransactions: TransactionDetails[] = useMemo(() => {
-    const txs = Object.values(allTransactions)
-    return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
-  }, [allTransactions])
-  const pendingVerifications = sortedRecentTransactions.filter(tx => !tx.receipt && tx.social)
-  const pendingProfile = pendingVerifications?.[0]?.social?.username
+  const { pendingProfile } = useUserPendingUsername()
 
   // get any verified handles for this user + timestamps they were created at
   const handles = useVerifiedHandles(account)
@@ -124,11 +114,53 @@ function TwitterAccountDetails() {
     ? moment.unix(verifiedHandleEntry.timestamp).format('MMM Do YYYY')
     : undefined
 
+  // on redirect from twitter, if signed in, not verified, and no loading, show modal
+  const [loaded, setLoaded] = useState(false)
+  const { username: usernameQuery } = useParsedQueryString()
+  useEffect(() => {
+    if (twitterAccount && !verified && handles && !loaded && usernameQuery) {
+      setShowTwitterFlow(true)
+      setLoaded(true)
+    }
+  }, [handles, twitterAccount, verified, loaded, usernameQuery])
+
+  function getFlagOrButton() {
+    // data not loaded yet and nothing verified
+    if (!handles && !pendingProfile && !verified) {
+      return (
+        <PendingFlag verified={verified}>
+          Checking verification <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
+        </PendingFlag>
+      )
+    }
+    // pending handle, waiting for txn confirmation
+    if (pendingProfile) {
+      return (
+        <PendingFlag verified={verified}>
+          Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
+        </PendingFlag>
+      )
+    }
+    // verified handle
+    if (verified) {
+      return <PendingFlag verified={verified}>Verfied</PendingFlag>
+    }
+    // data is loaded but not handle mappings yet
+    if (!verified && !pendingProfile && handles) {
+      return (
+        <ButtonBasic onClick={() => setShowTwitterFlow(true)} padding="4px 8px" borderRadius="10px">
+          <TYPE.white fontSize="12px">Verifiy identity</TYPE.white>
+        </ButtonBasic>
+      )
+    }
+    return null
+  }
+
   return (
     <>
       {twitterAccount && (
         <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
-          <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} twitterHandle={twitterAccount} />
+          <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
         </Modal>
       )}
       {!twitterAccount && !verifiedHandleEntry ? (
@@ -136,7 +168,7 @@ function TwitterAccountDetails() {
           <ProfileCard name={profileData?.name} handle={profileData?.handle} imageURL={profileData?.profileURL} />
           <VerifyButton href="http://localhost:8080/login/twitter">
             <RowBetween>
-              <TYPE.white>Connect to twitter</TYPE.white>
+              <TYPE.white>Verify identity with twitter</TYPE.white>
               <TwitterLogo src={TwitterIcon} />
             </RowBetween>
           </VerifyButton>
@@ -154,22 +186,7 @@ function TwitterAccountDetails() {
                     <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
                       @{profileData.handle}
                     </TYPE.body>
-                    {!handles && !pendingProfile && !verified && (
-                      <PendingFlag verified={verified}>
-                        Checking verification <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
-                      </PendingFlag>
-                    )}
-                    {pendingProfile && (
-                      <PendingFlag verified={verified}>
-                        Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
-                      </PendingFlag>
-                    )}
-                    {verified && <PendingFlag verified={verified}>Verfied</PendingFlag>}
-                    {!verified && !pendingProfile && handles && (
-                      <PendingFlag verified={verified} onClick={() => setShowTwitterFlow(true)}>
-                        Verify
-                      </PendingFlag>
-                    )}
+                    {getFlagOrButton()}
                   </RowFixed>
                   {verificationDate ? (
                     <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>

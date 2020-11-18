@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { isAddress, calculateGasMargin } from '../../utils'
+import { isAddress, calculateGasMargin, notEmpty } from '../../utils'
 import { useSybilContract } from '../../hooks/useContract'
-import { useTransactionAdder } from '../transactions/hooks'
+import { useTransactionAdder, useVerifcationConfirmed } from '../transactions/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { TransactionResponse } from '@ethersproject/providers'
 import { client as sybilClient } from '../../apollo/client'
-import { CONTENT_SUBSCRIPTION } from '../../apollo/queries'
+import { CONTENT_SUBSCRIPTION, ATTESTATIONS_QUERY } from '../../apollo/queries'
 import { useSubscription } from 'react-apollo'
 import { verifyHandleForAddress, fetchProfileData, ProfileDataResponse } from '../../data/social'
 
@@ -14,7 +14,7 @@ interface TwitterProfileData {
   handle: string
   profileURL: string
 }
-
+// get handle and profile image from twitter
 export function useTwitterProfileData(handle: string | undefined | null): TwitterProfileData | undefined {
   const [formattedData, setFormattedData] = useState<TwitterProfileData | undefined>()
 
@@ -66,7 +66,8 @@ export function useAttestCallBack(
             addTransaction(response, {
               summary: `Verifying @${username}`,
               social: {
-                username
+                username,
+                account
               }
             })
             return response.hash
@@ -84,7 +85,13 @@ interface Attestation {
   timestamp: number
 }
 
-interface AttestationResponse {
+interface AttestationQueryResponse {
+  data?: {
+    attestations: Attestation[]
+  }
+}
+
+interface AttestationSubscriptionResponse {
   subscriptionData: {
     data?: {
       attestations: Attestation[]
@@ -92,13 +99,33 @@ interface AttestationResponse {
   }
 }
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined
-}
-
 // fetch any on chain mappings from address -> social content (not gauranteed verified)
 export function useSubgraphEntries(address: string | undefined | null): Attestation[] | undefined {
   const [entries, setEntries] = useState<Attestation[]>()
+
+  const newConfirmation = useVerifcationConfirmed()
+
+  // backup to fetch new entries on confirmation change if socket stalls
+  useEffect(() => {
+    if (newConfirmation) {
+      try {
+        sybilClient
+          .query({
+            query: ATTESTATIONS_QUERY,
+            variables: {
+              account: address?.toLocaleLowerCase()
+            }
+          })
+          .then((res: AttestationQueryResponse) => {
+            if (res.data) {
+              setEntries(res.data.attestations)
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }, [address, newConfirmation])
 
   try {
     useSubscription(CONTENT_SUBSCRIPTION, {
@@ -106,7 +133,7 @@ export function useSubgraphEntries(address: string | undefined | null): Attestat
       variables: {
         account: address?.toLocaleLowerCase()
       },
-      onSubscriptionData: (res: AttestationResponse) => {
+      onSubscriptionData: (res: AttestationSubscriptionResponse) => {
         setEntries(res?.subscriptionData?.data?.attestations)
       }
     })
@@ -122,8 +149,9 @@ interface HandleEntry {
   timestamp: number
 }
 
+// use verification service to return all verified handles for an account
 export function useVerifiedHandles(account: string | null | undefined): HandleEntry[] | undefined {
-  // fetch list of attested handles for this account
+  // fetch list of attested handles for this account from subgraph
   const entries = useSubgraphEntries(account)
   const entryAmount = entries?.length // used to detect changes in subgraph
 
