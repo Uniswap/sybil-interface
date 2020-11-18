@@ -74,7 +74,7 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
 `
 
 const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
-  color: ${({ pending, theme }) => (pending ? theme.white : theme.text1)};
+  color: ${({ theme }) => theme.text1};
   font-weight: 500;
   border: none;
 
@@ -168,7 +168,7 @@ function Web3StatusInner() {
       <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
         {hasPendingTransactions ? (
           <RowBetween>
-            <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
+            <Text>{pending?.length} Pending</Text> <Loader stroke="#2172E5" />
           </RowBetween>
         ) : (
           <>

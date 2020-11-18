@@ -19,6 +19,7 @@ export const updateUserExpertMode = createAction<{ userExpertMode: boolean }>('u
 export const updateUserSlippageTolerance = createAction<{ userSlippageTolerance: number }>(
   'user/updateUserSlippageTolerance'
 )
+export const updateTwitterAccount = createAction<{ twitterAccount: string | undefined }>('user/updateTwitterAccount¸')
 export const updateUserDeadline = createAction<{ userDeadline: number }>('user/updateUserDeadline')
 export const addSerializedToken = createAction<{ serializedToken: SerializedToken }>('user/addSerializedToken')
 export const removeSerializedToken = createAction<{ chainId: number; address: string }>('user/removeSerializedToken')

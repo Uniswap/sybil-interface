@@ -11,8 +11,6 @@ import { useSubscription } from 'react-apollo'
 const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
-// @todo add typed query response
-
 export interface HandleResponse {
   data: [
     {
@@ -30,23 +28,6 @@ export async function fetchSingleVerifiedHandle(address: string): Promise<string
     }
     return Promise.reject(new Error('Invalid response'))
   })
-}
-
-// for an ethereum address, fetch a verified handle if it exists
-// undefined means no verification yet
-export function useVerifiedHandle(address: string | null | undefined): string | undefined {
-  const [handle, setHandle] = useState<string | undefined>()
-
-  useEffect(() => {
-    if (!address) {
-      setHandle(undefined)
-    } else {
-      fetchSingleVerifiedHandle(address).then(handle => {
-        setHandle(handle)
-      })
-    }
-  }, [address])
-  return handle
 }
 
 export interface LatestTweetResponse {
@@ -137,51 +118,6 @@ export interface VerifyResult {
   readonly error?: string
 }
 
-const VERIFY_PROMISES: { [key: string]: Promise<VerifyResult> } = {}
-
-export function useVerifyCallback(tweetID: string | undefined): { verifyCallback: () => Promise<VerifyResult> } {
-  const verifyCallback = useCallback(() => {
-    if (!tweetID) return Promise.reject(new Error('Invalid address'))
-    const key = tweetID
-
-    const url = `${VERIFICATION_WORKER_URL}/api/verify?id=${tweetID}`
-
-    return (VERIFY_PROMISES[key] =
-      VERIFY_PROMISES[key] ??
-      fetch(url)
-        .then(async res => {
-          if (res.status === 200) {
-            return {
-              success: true
-            }
-          } else {
-            const errorText = await res.text()
-            if (res.status === 400 && errorText === 'Invalid tweet format.') {
-              return {
-                success: false,
-                error: 'Invalid tweet format'
-              }
-            }
-            if (res.status === 400 && errorText === 'Invalid tweet id.') {
-              return {
-                success: false,
-                error: 'Invalid tweet id'
-              }
-            }
-            return {
-              success: false,
-              error: 'Unknown error, please try again.'
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Failed to get claim data', error)
-        }))
-  }, [tweetID])
-
-  return { verifyCallback }
-}
-
 // Send transaction on chain to add address -> content mapping
 export function useAttestCallBack(
   username: string | undefined
@@ -220,11 +156,14 @@ interface Attestation {
   id: string
   account: string
   tweetID: string
+  timestamp: number
 }
 
 interface AttestationResponse {
-  data: {
-    attestations: Attestation[]
+  subscriptionData: {
+    data?: {
+      attestations: Attestation[]
+    }
   }
 }
 
@@ -235,31 +174,42 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 // fetch any on chain mappings from address -> social content (not gauranteed verified)
 export function useSubgraphEntries(address: string | undefined | null): Attestation[] | undefined {
   const [entries, setEntries] = useState<Attestation[]>()
-  useSubscription(CONTENT_SUBSCRIPTION, {
-    client: sybilClient,
-    variables: {
-      account: address?.toLocaleLowerCase()
-    },
-    onSubscriptionData: (res: any) => {
-      setEntries(res?.subscriptionData?.data?.attestations)
-    }
-  })
+
+  try {
+    useSubscription(CONTENT_SUBSCRIPTION, {
+      client: sybilClient,
+      variables: {
+        account: address?.toLocaleLowerCase()
+      },
+      onSubscriptionData: (res: AttestationResponse) => {
+        setEntries(res?.subscriptionData?.data?.attestations)
+      }
+    })
+  } catch (e) {
+    console.log(e)
+  }
 
   return entries ? entries.filter(notEmpty) : undefined
 }
 
-export function useVerifiedHandles(account: string | null | undefined): string[] | undefined {
+interface HandleEntry {
+  handle: string
+  timestamp: number
+}
+
+export function useVerifiedHandles(account: string | null | undefined): HandleEntry[] | undefined {
   // fetch list of attested handles for this account
   const entries = useSubgraphEntries(account)
+  const entryAmount = entries?.length // used to detect changes in subgraph
 
   // list of verified handles for account based on subgraph list
-  const [handles, setHandles] = useState<(string | undefined)[]>()
+  const [handles, setHandles] = useState<(HandleEntry | undefined)[]>()
 
   // if new entries, refetch handles
   useEffect(() => {
     console.log('New subgraph entry')
     setHandles(undefined)
-  }, [entries?.length])
+  }, [entryAmount])
 
   useEffect(() => {
     async function fetchHandles() {
@@ -267,13 +217,12 @@ export function useVerifiedHandles(account: string | null | undefined): string[]
         entries &&
         (await Promise.all(
           entries?.map(async entry => {
-            console.log('fetching')
             try {
               return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${entry.account}&id=${entry.tweetID}`).then(
                 async res => {
                   if (res.status === 200) {
                     const handle = await res.text()
-                    return handle
+                    return { handle, timestamp: entry.timestamp }
                   }
                   return undefined
                 }

@@ -10,6 +10,15 @@ export const CONTENT_LOOKUP_FOR_ADDRESS = gql`
     }
   }
 `
+export const CONTENT_QUERY = gql`
+  query content($account: Bytes!) {
+    attestations(where: { account: $account }) {
+      id
+      account
+      tweetID
+    }
+  }
+`
 
 export const CONTENT_SUBSCRIPTION = gql`
   subscription onContetUpdate($account: Bytes!) {
@@ -17,6 +26,7 @@ export const CONTENT_SUBSCRIPTION = gql`
       id
       account
       tweetID
+      timestamp
     }
   }
 `

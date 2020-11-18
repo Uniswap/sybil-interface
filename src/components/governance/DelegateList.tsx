@@ -5,7 +5,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import { DelegateData, useActiveProtocol } from '../../state/governance/hooks'
+import { DelegateData, useActiveProtocol, useGlobalData } from '../../state/governance/hooks'
 import { WrappedListLogo } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
@@ -64,6 +64,9 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // used to calculate % ownership of votes
   const [activeProtocol] = useActiveProtocol()
 
+  // get global data to calculate vote %
+  const globalData = useGlobalData()
+
   const delegateList = useMemo(() => {
     return (
       chainId &&
@@ -93,7 +96,10 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
             </AutoRow>
             <NoWrap textAlign="end">{d.votes.length}</NoWrap>
             <NoWrap textAlign="end">
-              {new Percent(JSBI.BigInt(d.delegatedVotesRaw), activeProtocol.token.totalSupply).toFixed(3) + '%'}
+              {globalData
+                ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
+                  '%'
+                : '-'}
             </NoWrap>
             <NoWrap textAlign="end">
               {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
@@ -102,7 +108,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
         )
       })
     )
-  }, [activeProtocol, chainId, toggelDelegateModal, topDelegates])
+  }, [activeProtocol, chainId, globalData, toggelDelegateModal, topDelegates])
 
   return (
     <GreyCard padding="2rem 0">

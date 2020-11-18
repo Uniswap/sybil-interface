@@ -1,4 +1,4 @@
-import { ChainId, JSBI, BigintIsh } from '@uniswap/sdk'
+import { ChainId } from '@uniswap/sdk'
 import { updateActiveProtocol } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/unilogo.svg'
@@ -15,7 +15,6 @@ export interface GovernanceInfo {
     name: string
     symbol: string
     decimals: number
-    totalSupply: BigintIsh
   }
   governanceAddress: { [chainId in ChainId]: string }
   subgraphClientURL: string
@@ -44,8 +43,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
     },
     name: 'Uniswap',
     symbol: 'UNI',
-    decimals: 18,
-    totalSupply: JSBI.BigInt(1000000000 * 1e18) // used for % calculation
+    decimals: 18
   },
   governanceAddress: {
     [ChainId.MAINNET]: UNI_GOVERNANCE_ADDRESS,
@@ -73,8 +71,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
     },
     name: 'Compound Governance Token',
     symbol: 'COMP',
-    decimals: 18,
-    totalSupply: JSBI.BigInt('10000000000000000000000000') // used for % calculation
+    decimals: 18
   },
   governanceAddress: {
     [ChainId.MAINNET]: COMP_GOVERNANCE_ADDRESS,

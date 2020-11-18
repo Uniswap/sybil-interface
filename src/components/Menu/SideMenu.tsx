@@ -25,7 +25,7 @@ const FlippedText = styled.div`
 `
 
 export default function SideMenu() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   return (
     // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/30451

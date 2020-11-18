@@ -13,7 +13,8 @@ import {
   updateUserExpertMode,
   updateUserSlippageTolerance,
   updateUserDeadline,
-  toggleURLWarning
+  toggleURLWarning,
+  updateTwitterAccount
 } from './actions'
 
 const currentTimestamp = () => new Date().getTime()
@@ -21,6 +22,8 @@ const currentTimestamp = () => new Date().getTime()
 export interface UserState {
   // the timestamp of the last updateVersion action
   lastUpdateVersionTimestamp?: number
+
+  twitterAccount?: string
 
   userDarkMode: boolean | null // the user's choice for dark mode or light mode
   matchesDarkMode: boolean // whether the dark mode media query matches
@@ -134,5 +137,8 @@ export default createReducer(initialState, builder =>
     })
     .addCase(toggleURLWarning, state => {
       state.URLWarningVisible = !state.URLWarningVisible
+    })
+    .addCase(updateTwitterAccount, (state, { payload: { twitterAccount } }) => {
+      state.twitterAccount = twitterAccount
     })
 )

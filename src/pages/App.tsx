@@ -11,6 +11,7 @@ import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import Overview from './Governance'
 import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 import SideMenu from '../components/Menu/SideMenu'
+import TwitterAccountQueryParamReader from '../state/social/TwitterAccountQueryParamReader'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -62,6 +63,7 @@ export default function App() {
     <Suspense fallback={null}>
       <Route component={GoogleAnalyticsReporter} />
       <Route component={DarkModeQueryParamReader} />
+      <Route component={TwitterAccountQueryParamReader} />
       <SiteWrapper>
         <SideMenu />
         <AppWrapper>

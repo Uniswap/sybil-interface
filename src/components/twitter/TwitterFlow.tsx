@@ -6,13 +6,7 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import TwitterAccountView from './ProfileCard'
-import {
-  LatestTweetResponse,
-  useTwitterProfileData,
-  fetchLatestTweet,
-  useAttestCallBack
-} from '../../state/social/hooks'
+import { LatestTweetResponse, fetchLatestTweet, useAttestCallBack } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
 import { LoadingView, SubmittedView } from '../ModalViews'
 
@@ -28,21 +22,8 @@ const TweetWrapper = styled.div`
     word-break: break-word;
 `
 
-const StyledTextInput = styled.input`
-  padding: 0.5rem;
-  border: 1px solid ${({ theme }) => theme.bg3};
-  font-size: 1rem;
-`
-
-export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
+export default function TwitterFlow({ twitterHandle, onDismiss }: { twitterHandle: string; onDismiss: () => void }) {
   const { account, library } = useActiveWeb3React()
-
-  // monitor input or login @todo (which one?) for twitter handle
-  const [twitterHandle, setTwitterHandle] = useState<string | undefined>()
-  const [typedTwitterHandle, setTypedTwitterHandle] = useState<string>('')
-
-  // fetch profile info for display
-  const profileData = useTwitterProfileData(typedTwitterHandle)
 
   // fetch tweet id either with watcher or manual trigger for last tweet @todo (which one)
   const [tweetID, setTweetID] = useState<undefined | string>()
@@ -159,39 +140,17 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             <ButtonPrimary onClick={wrappedOndismiss}>Close</ButtonPrimary>
           </AutoColumn>
         </SubmittedView>
-      ) : !twitterHandle ? (
-        <AutoColumn gap="lg">
-          <RowBetween>
-            <TYPE.mediumHeader>1/4 Enter Twitter handle</TYPE.mediumHeader>
-            <CloseIcon onClick={onDismiss} />
-          </RowBetween>
-          <TYPE.black>This will link this handle with your ethereum address.</TYPE.black>
-          <StyledTextInput
-            value={typedTwitterHandle}
-            onChange={e => setTypedTwitterHandle(e.target.value)}
-            placeholder={'@example'}
-          />
-          <TwitterAccountView
-            name={profileData?.name}
-            handle={profileData?.handle}
-            imageURL={profileData?.profileURL}
-          />
-          <ButtonPrimary onClick={() => setTwitterHandle(typedTwitterHandle)} disabled={!profileData}>
-            Next
-          </ButtonPrimary>
-        </AutoColumn>
       ) : !signedMessage ? (
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
-              <BackArrowSimple onClick={() => setTwitterHandle(undefined)} />
-              <TYPE.mediumHeader ml="6px">2/4 Sign Message</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">1/3 Sign Message</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TYPE.black>
-            Sign a mesage that will be used to veirfy your address on chain. The signature will be derived from the
-            following data:{' '}
+            Sign a mesage that will be used to link your address with Twitter handle. The signature will be derived from
+            the following data:{' '}
           </TYPE.black>
           <TweetWrapper>
             <AutoColumn gap="md">
@@ -205,7 +164,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           <RowBetween>
             <RowFixed>
               <BackArrowSimple onClick={() => setSignedMessage(undefined)} />
-              <TYPE.mediumHeader ml="6px">3/4 Announce</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">2/3 Announce</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
@@ -221,12 +180,12 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           <RowBetween>
             <RowFixed>
               <BackArrowSimple onClick={() => setTweetID(undefined)} />
-              <TYPE.mediumHeader ml="6px">4/4 Submit</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">3/3 Submit</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <Tweet tweetId={tweetID} />
-          <TYPE.black>Submit a transaction with your tweet location to be verified on chain.</TYPE.black>
+          <TYPE.black>Post your tweet content location on-chain for off-chain verifiers to use.</TYPE.black>
           <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>
             Submit
           </ButtonPrimary>

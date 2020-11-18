@@ -1,8 +1,11 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal } from './actions'
+import { useActiveProtocol } from '../governance/hooks'
+import { UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE } from '../governance/reducer'
+import { uniswapClient, compoundClient } from '../../apollo/client'
 
 export function useBlockNumber(): number | undefined {
   const { chainId } = useActiveWeb3React()
@@ -66,4 +69,25 @@ export function useRemovePopup(): (key: string) => void {
 export function useActivePopups(): AppState['application']['popupList'] {
   const list = useSelector((state: AppState) => state.application.popupList)
   return useMemo(() => list.filter(item => item.show), [list])
+}
+
+export function useSubgraphClient() {
+  const [activeProtocol] = useActiveProtocol()
+
+  const [client, setClient] = useState(uniswapClient)
+
+  useEffect(() => {
+    switch (activeProtocol) {
+      case UNISWAP_GOVERNANCE:
+        setClient(uniswapClient)
+        // code block
+        break
+      case COMPOUND_GOVERNANCE:
+        setClient(compoundClient)
+        // code block
+        break
+    }
+  }, [activeProtocol])
+
+  return client
 }
