@@ -39,7 +39,7 @@ const BodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding-top: 20px;
+  padding-top: 64px;
   align-items: center;
   flex: 1;
   overflow-y: auto;
@@ -68,9 +68,9 @@ export default function App() {
         <SideMenu />
         <AppWrapper>
           <URLWarning />
-          <HeaderWrapper>
+          {/* <HeaderWrapper>
             <Header />
-          </HeaderWrapper>
+          </HeaderWrapper> */}
           <BodyWrapper>
             <Popups />
             <Polling />

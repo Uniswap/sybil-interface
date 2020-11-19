@@ -13,6 +13,7 @@ import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
+import TwitterAccountPreview from '../../components/twitter/TwitterAccountPreview'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -108,9 +109,11 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       })
   }
 
+  const tweetHashTag = `${activeProtocol?.token.symbol}governance`
+
   const tweetCopy = `Verifying identity for ${
     activeProtocol?.token.symbol
-  } governance. Address:${account}. Signature:${signedMessage ?? ''}`
+  } governance - addr:${account} - sig:${signedMessage ?? ''}`
 
   // twitter watcher
   const [tweetError, setTweetError] = useState<string | undefined>()
@@ -146,7 +149,11 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   // start watching and open window
   function checkForTweet() {
     setTweetError(undefined)
-    window.open('https://twitter.com/intent/tweet?text=' + tweetCopy, 'tweetWindow', 'height=400,width=800')
+    window.open(
+      `https://twitter.com/intent/tweet?text=${tweetCopy}&hashtags=${tweetHashTag && tweetHashTag}`,
+      'tweetWindow',
+      'height=400,width=800'
+    )
     setWatch(true)
   }
 
@@ -184,11 +191,13 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             Sign a mesage that will be used to link your address with Twitter handle. The signature will be derived from
             the following data:{' '}
           </TYPE.black>
-          <TweetWrapper>
+          <TwitterAccountPreview />
+
+          {/* <TweetWrapper>
             <AutoColumn gap="md">
               <TYPE.black>handle: @{twitterHandle ?? ''}</TYPE.black>
             </AutoColumn>
-          </TweetWrapper>
+          </TweetWrapper> */}
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
         </AutoColumn>
       ) : !tweetID ? (
@@ -200,7 +209,9 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TweetWrapper>{tweetCopy}</TweetWrapper>
+          <TwitterAccountPreview />
+
+          <TweetWrapper>{tweetCopy + ' #' + tweetHashTag}</TweetWrapper>
           <ButtonPrimary onClick={checkForTweet}>
             {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Try again' : 'Tweet This'}
           </ButtonPrimary>
@@ -221,6 +232,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
+          <TwitterAccountPreview />
+
           <Tweet tweetId={tweetID} />
           <TYPE.black>Post your tweet content location on-chain for off-chain verifiers to use.</TYPE.black>
           <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>
