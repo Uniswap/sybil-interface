@@ -105,12 +105,12 @@ export default function Overview({
                     <AutoColumn gap="10px">
                       <TYPE.main fontSize="20px">Your Address</TYPE.main>
                       <TYPE.main fontSize="12px">
-                        Connect a wallet to see your votes or announce yourself as a delegate.
+                        Connect wallet to see your votes or announce yourself as a delegate.
                       </TYPE.main>
                     </AutoColumn>
                   </RowFixed>
                   <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-                    Connect a wallet
+                    Connect wallet
                   </ButtonBasic>
                 </RowBetween>
               )}
@@ -162,7 +162,7 @@ export default function Overview({
                   </AutoColumn>
                 </RowBetween>
               )}
-              <TwitterAccountDetails />
+              {account && <TwitterAccountDetails />}
             </AutoColumn>
           </BlurredCard>
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />

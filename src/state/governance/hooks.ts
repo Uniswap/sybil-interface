@@ -112,7 +112,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
         console.log(e)
       }
     }
-    if (!delegates) {
+    if (!delegates && client) {
       fetchTopDelegates()
     }
   }, [library, client, key, delegates])
@@ -137,6 +137,20 @@ export interface ProposalData {
   startBlock: number
   endBlock: number
   details: ProposalDetail[]
+  forVotes: {
+    support: boolean
+    votes: string
+    voter: {
+      id: string
+    }
+  }[]
+  againstVotes: {
+    support: boolean
+    votes: string
+    voter: {
+      id: string
+    }
+  }[]
 }
 
 // get count of all proposals made
@@ -169,7 +183,12 @@ export function useAllProposals() {
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
   const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids, NEVER_RELOAD)
+  const counts = useSingleContractMultipleData(
+    amount ? govContract : undefined,
+    'proposals',
+    ids,
+    NEVER_RELOAD
+  ).reverse()
   const states = useSingleContractMultipleData(amount ? govContract : undefined, 'state', ids, NEVER_RELOAD).reverse()
 
   // subgraphs only store ids in lowercase, format

@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 
 export const HANDLES_BULK = gql`
   query governance($accounts: [Bytes]!) {
-    attestations(where: { account_in: $accounts }) {
+    attestations(where: { account_in: $accounts }, sortBy: timestamp, sortDirection: desc) {
       id
       account
       tweetID
@@ -13,7 +13,7 @@ export const HANDLES_BULK = gql`
 
 export const ATTESTATIONS_QUERY = gql`
   query attestations($account: Bytes!) {
-    attestations(where: { account: $account }) {
+    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
       id
       account
       tweetID
@@ -24,7 +24,7 @@ export const ATTESTATIONS_QUERY = gql`
 
 export const CONTENT_SUBSCRIPTION = gql`
   subscription onContetUpdate($account: Bytes!) {
-    attestations(where: { account: $account }) {
+    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
       id
       account
       tweetID
@@ -76,6 +76,20 @@ export const PROPOSALS = gql`
       endBlock
       proposer {
         id
+      }
+      forVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: true }) {
+        support
+        votes
+        voter {
+          id
+        }
+      }
+      againstVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: false }) {
+        support
+        votes
+        voter {
+          id
+        }
       }
     }
   }

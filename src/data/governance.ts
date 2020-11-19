@@ -30,6 +30,9 @@ interface HandlesResponse {
 }
 
 export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
+  if (!client) {
+    return null
+  }
   return client
     .query({
       query: GLOBAL_DATA,
@@ -126,6 +129,20 @@ interface ProposalResponse {
       calldatas: string[]
       startBlock: string
       endBlock: string
+      forVotes: {
+        support: boolean
+        votes: string
+        voter: {
+          id: string
+        }
+      }[]
+      againstVotes: {
+        support: boolean
+        votes: string
+        voter: {
+          id: string
+        }
+      }[]
     }[]
   }
 }
@@ -158,6 +175,8 @@ export function fetchProposals(client: any, key: string): Promise<ProposalData[]
             againstCount: 0, // initialize as 0
             startBlock: parseInt(p.startBlock),
             endBlock: parseInt(p.endBlock),
+            forVotes: p.forVotes,
+            againstVotes: p.againstVotes,
             details: p.targets.map((t, i) => {
               const signature = p.signatures[i]
               const [name, types] = signature.substr(0, signature.length - 1).split('(')

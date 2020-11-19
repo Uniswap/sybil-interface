@@ -24,6 +24,11 @@ const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
   42: 'kovan.'
 }
 
+export function getTwitterProfileLink(accountName: string): string {
+  const urlBase = 'https://twitter.com/'
+  return urlBase + accountName
+}
+
 export function getEtherscanLink(
   chainId: ChainId,
   data: string,

@@ -74,20 +74,13 @@ export function useActivePopups(): AppState['application']['popupList'] {
 export function useSubgraphClient() {
   const [activeProtocol] = useActiveProtocol()
 
-  const [client, setClient] = useState(uniswapClient)
+  if (activeProtocol?.id === UNISWAP_GOVERNANCE.id) {
+    return uniswapClient
+  }
 
-  useEffect(() => {
-    switch (activeProtocol) {
-      case UNISWAP_GOVERNANCE:
-        setClient(uniswapClient)
-        // code block
-        break
-      case COMPOUND_GOVERNANCE:
-        setClient(compoundClient)
-        // code block
-        break
-    }
-  }, [activeProtocol])
+  if (activeProtocol?.id === COMPOUND_GOVERNANCE.id) {
+    return compoundClient
+  }
 
-  return client
+  return undefined
 }
