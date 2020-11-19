@@ -27,7 +27,7 @@ import { ApplicationModal } from '../../state/application/actions'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { TokenAmount, JSBI } from '@uniswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
-import { BlurredCard } from '../../components/Card'
+import { GreyCard } from '../../components/Card'
 import { RowBetween, RowFixed, AutoRow } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
 import { ButtonBasic } from '../../components/Button'
@@ -46,6 +46,11 @@ const EmptyCircle = styled.div`
   background: ${({ theme }) => theme.bg3};
   border-radius: 50%;
   margin-right: 1rem;
+`
+
+const AccountCard = styled(GreyCard)`
+  padding-top: 56px;
+  margin-top: -48px;
 `
 
 export enum ActiveTab {
@@ -96,7 +101,7 @@ export default function Overview({
       <SectionWrapper>
         <AutoColumn gap="1rem">
           <Dropdown />
-          <BlurredCard>
+          <AccountCard>
             <AutoColumn gap="lg">
               {!account && (
                 <RowBetween>
@@ -162,9 +167,9 @@ export default function Overview({
                   </AutoColumn>
                 </RowBetween>
               )}
-              <TwitterAccountDetails />
+              {account && <TwitterAccountDetails />}
             </AutoColumn>
-          </BlurredCard>
+          </AccountCard>
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
           {activeTab === ActiveTab.DELEGATES ? (
             <DelegateList topDelegates={topDelegates} />

@@ -18,8 +18,9 @@ import { ButtonBasic } from '../Button'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 
 const Wrapper = styled.div`
-  /* padding: 1rem; */
+  padding: 1rem;
   border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.05);
 `
 
 const FixedRowHeight = styled(Row)`
@@ -29,8 +30,8 @@ const FixedRowHeight = styled(Row)`
 const RoundedProfileImage = styled.div`
   display: flex;
   justify-content: center;
-  height: 36px;
-  width: 36px;
+  height: 24px;
+  width: 24px;
   border-radius: 50%;
   margin-right: 1rem;
 
@@ -85,7 +86,7 @@ const StyledClose = styled(CloseIcon)`
   width: 16px;
 `
 
-function TwitterAccountDetails() {
+function TwitterAccountPreview() {
   const { account } = useActiveWeb3React()
 
   // toggle modal for twitter verification
@@ -172,34 +173,32 @@ function TwitterAccountDetails() {
         </RowBetween>
       ) : profileData ? (
         <Wrapper>
-          <FixedRowHeight>
-            <RowBetween>
-              <RowFixed>
-                <RoundedProfileImage>
-                  <img src={profileData.profileURL} alt="profile" />
-                </RoundedProfileImage>
-                <AutoColumn gap="0.5rem">
-                  <RowFixed>
-                    <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
-                      @{profileData.handle}
-                    </TYPE.body>
-                    {getFlagOrButton()}
-                  </RowFixed>
-                  {verificationDate ? (
-                    <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>
-                  ) : (
-                    <TYPE.black fontSize={12}></TYPE.black>
-                  )}
-                </AutoColumn>
-              </RowFixed>
-              {/* <RowFixed>
+          <RowBetween>
+            <RowFixed>
+              <RoundedProfileImage>
+                <img src={profileData.profileURL} alt="profile" />
+              </RoundedProfileImage>
+              <AutoColumn>
+                <RowFixed>
+                  <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
+                    @{profileData.handle}
+                  </TYPE.body>
+                  <PendingFlag verified={verified}>Unverified</PendingFlag>
+                </RowFixed>
+                {verificationDate ? (
+                  <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>
+                ) : (
+                  <TYPE.black fontSize={12}></TYPE.black>
+                )}
+              </AutoColumn>
+            </RowFixed>
+            {/* <RowFixed>
                 <TwitterLogo src={TwitterIcon} />
                 <Link to="/uniswap">
                   <StyledClose onClick={() => setTwitterAccount(undefined)} />
                 </Link>
               </RowFixed> */}
-            </RowBetween>
-          </FixedRowHeight>
+          </RowBetween>
         </Wrapper>
       ) : (
         ''
@@ -208,4 +207,4 @@ function TwitterAccountDetails() {
   )
 }
 
-export default withRouter(TwitterAccountDetails)
+export default withRouter(TwitterAccountPreview)
