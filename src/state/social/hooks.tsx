@@ -149,14 +149,18 @@ interface HandleEntry {
   timestamp: number
 }
 
-// use verification service to return all verified handles for an account
+export function validVerification(value: HandleEntry): value is HandleEntry {
+  return value !== null && value !== undefined && value.handle !== undefined
+}
+
+// use verification service to return all verified handles for an account, undefined means loading
 export function useVerifiedHandles(account: string | null | undefined): HandleEntry[] | undefined {
   // fetch list of attested handles for this account from subgraph
   const entries = useSubgraphEntries(account)
   const entryAmount = entries?.length // used to detect changes in subgraph
 
   // list of verified handles for account based on subgraph list
-  const [handles, setHandles] = useState<(HandleEntry | undefined)[]>()
+  const [handles, setHandles] = useState<HandleEntry[] | undefined>()
 
   // if new entries, refetch handles
   useEffect(() => {
@@ -184,5 +188,5 @@ export function useVerifiedHandles(account: string | null | undefined): HandleEn
     }
   }, [entries, handles])
 
-  return handles ? handles.filter(notEmpty) : undefined
+  return handles ? handles.filter(validVerification) : undefined
 }

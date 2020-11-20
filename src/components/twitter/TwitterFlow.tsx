@@ -14,6 +14,7 @@ import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import TwitterAccountPreview from '../../components/twitter/TwitterAccountPreview'
+import TwitterLoginButton from './TwitterLoginButton'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -29,22 +30,16 @@ const TweetWrapper = styled.div`
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const { account, library } = useActiveWeb3React()
-
-  const [twitterHandle] = useTwitterAccount()
-
-  // get active protocol to format tweet copy
   const [activeProtocol] = useActiveProtocol()
 
-  // fetch tweet id either with watcher or manual trigger for last tweet @todo (which one)
+  // monitor user inputs
+  const [twitterHandle] = useTwitterAccount()
   const [tweetID, setTweetID] = useState<undefined | string>()
-
-  // keep track of signed message
   const [signedMessage, setSignedMessage] = useState<undefined | string>()
 
+  // monitor on chain submission
   const attestCallback = useAttestCallBack(twitterHandle)
   const [requestError, setRequestError] = useState<string | undefined>()
-
-  // monitor call to help UI loading state
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
 
@@ -57,17 +52,14 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   async function onVerify() {
     setAttempting(true)
-
     // if callback not returned properly ignore
     if (!attestCallback || !account || !tweetID) return
-
     // try delegation and store hash
     const hash = await attestCallback(account, tweetID)?.catch(error => {
       setAttempting(false)
       setRequestError('Error submitting verification')
       console.log(error)
     })
-
     if (hash) {
       setAttempting(false)
       setHash(hash)
@@ -128,7 +120,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             const tweetData = res?.data?.[0]
 
             // @TODO add regex for format check
-            const passedRegex = tweetData.text === tweetCopy
+            const passedRegex = tweetData.text.includes(tweetCopy)
             if (passedRegex) {
               setTweetID(tweetData.id)
               setTweetError(undefined)
@@ -179,6 +171,18 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             <ButtonPrimary onClick={wrappedOndismiss}>Close</ButtonPrimary>
           </AutoColumn>
         </SubmittedView>
+      ) : !twitterHandle ? (
+        <AutoColumn gap="lg">
+          <RowBetween>
+            <RowFixed>
+              <TYPE.mediumHeader ml="6px">Connect Twitter</TYPE.mediumHeader>
+            </RowFixed>
+            <CloseIcon onClick={onDismiss} />
+          </RowBetween>
+          <TYPE.black>Sign in with Twitter to start connecting your identity with your Ethereum address.</TYPE.black>
+          <TwitterAccountPreview />
+          <TwitterLoginButton text="Connect Twitter" />
+        </AutoColumn>
       ) : !signedMessage ? (
         <AutoColumn gap="lg">
           <RowBetween>
@@ -189,15 +193,9 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </RowBetween>
           <TYPE.black>
             Sign a mesage that will be used to link your address with Twitter handle. The signature will be derived from
-            the following data:{' '}
+            the following data:
           </TYPE.black>
           <TwitterAccountPreview />
-
-          {/* <TweetWrapper>
-            <AutoColumn gap="md">
-              <TYPE.black>handle: @{twitterHandle ?? ''}</TYPE.black>
-            </AutoColumn>
-          </TweetWrapper> */}
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
         </AutoColumn>
       ) : !tweetID ? (
@@ -211,7 +209,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </RowBetween>
           <TwitterAccountPreview />
 
-          <TweetWrapper>{tweetCopy + ' #' + tweetHashTag}</TweetWrapper>
+          <TweetWrapper>{tweetCopy + `#${tweetHashTag}`}</TweetWrapper>
           <ButtonPrimary onClick={checkForTweet}>
             {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Try again' : 'Tweet This'}
           </ButtonPrimary>
@@ -233,7 +231,6 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TwitterAccountPreview />
-
           <Tweet tweetId={tweetID} />
           <TYPE.black>Post your tweet content location on-chain for off-chain verifiers to use.</TYPE.black>
           <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>

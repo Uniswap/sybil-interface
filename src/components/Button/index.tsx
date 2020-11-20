@@ -153,7 +153,7 @@ export const ButtonSecondary = styled(Base)`
   padding: ${({ padding }) => (padding ? padding : '10px')};
 
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => theme.primary1};
+    box-shadow: 0 0 0 0.5pt ${({ theme }) => theme.primary1};
     border: 1px solid ${({ theme }) => theme.primary1};
   }
   &:hover {

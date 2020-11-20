@@ -52,63 +52,67 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 const DELEGATE_PROMISES: { [key: string]: Promise<DelegateData[] | null> } = {}
 
 export function fetchDelegates(client: any, key: string, library: Web3Provider): Promise<DelegateData[] | null> {
-  return (DELEGATE_PROMISES[key] =
-    DELEGATE_PROMISES[key] ??
-    client
-      .query({
-        query: TOP_DELEGATES,
-        fetchPolicy: 'cache-first'
-      })
-      .then(async (res: DelegateResponse) => {
-        const testData = res.data.delegates
-
-        testData[0] = {
-          id: '0x74Aa01d162E6dC6A657caC857418C403D48E2D77',
-          delegatedVotes: 30000000,
-          delegatedVotesRaw: 200000000000000000000,
-          votePercent: new Percent('10', '20'),
-          votes: [],
-          EOA: true,
-          handle: 'sybiltester'
-        }
-
-        // check if account is EOA or not
-        const typed = await Promise.all(
-          res.data.delegates.map(d => {
-            return library?.getCode(d.id)
-          })
-        )
-
-        // get all handles related to delegates found
-        const handlesResponse: HandlesResponse = await sybilClient.query({
-          query: HANDLES_BULK,
-          variables: {
-            accounts: testData.map(d => d.id.toLowerCase())
-          }
+  try {
+    return (DELEGATE_PROMISES[key] =
+      DELEGATE_PROMISES[key] ??
+      client
+        .query({
+          query: TOP_DELEGATES,
+          fetchPolicy: 'cache-first'
         })
+        .then(async (res: DelegateResponse) => {
+          const testData = res.data.delegates
 
-        // for each handle attestation - verify which ones are legit,
-        const handles = await Promise.all(
-          handlesResponse.data.attestations.map(async (a: any) => {
-            const handle = await verifyHandleForAddress(a.account, a.tweetID)
-            const profileData = handle ? await fetchProfileData(handle) : undefined
-            return {
-              account: a.account,
-              handle,
-              imageURL: profileData?.data?.profile_image_url
+          testData[0] = {
+            id: '0x74Aa01d162E6dC6A657caC857418C403D48E2D77',
+            delegatedVotes: 30000000,
+            delegatedVotesRaw: 200000000000000000000,
+            votePercent: new Percent('10', '20'),
+            votes: [],
+            EOA: true,
+            handle: 'sybiltester'
+          }
+
+          // check if account is EOA or not
+          const typed = await Promise.all(
+            res.data.delegates.map(d => {
+              return library?.getCode(d.id)
+            })
+          )
+
+          // get all handles related to delegates found
+          const handlesResponse: HandlesResponse = await sybilClient.query({
+            query: HANDLES_BULK,
+            variables: {
+              accounts: testData.map(d => d.id.toLowerCase())
             }
           })
-        )
 
-        return testData.map((d, i) => {
-          return {
-            ...d,
-            EOA: typed[i] === '0x',
-            handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
-            imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
-          }
-        })
-      }))
+          // for each handle attestation - verify which ones are legit,
+          const handles = await Promise.all(
+            handlesResponse.data.attestations.map(async (a: any) => {
+              const handle = await verifyHandleForAddress(a.account, a.tweetID)
+              const profileData = handle ? await fetchProfileData(handle) : undefined
+              return {
+                account: a.account,
+                handle,
+                imageURL: profileData?.data?.profile_image_url
+              }
+            })
+          )
+
+          return testData.map((d, i) => {
+            return {
+              ...d,
+              EOA: typed[i] === '0x',
+              handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
+              imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
+            }
+          })
+        }))
+  } catch (e) {
+    return Promise.reject(new Error('Unable to fetch delegates'))
+  }
 }
 
 /**

@@ -32,8 +32,8 @@ import { RowBetween, RowFixed, AutoRow } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
 import { ButtonBasic } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import CopyHelper from '../../components/AccountDetails/Copy'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
+import { Settings } from 'react-feather'
 
 const SectionWrapper = styled.div`
   display: grid;
@@ -51,6 +51,17 @@ const EmptyCircle = styled.div`
 const AccountCard = styled(GreyCard)`
   padding-top: 56px;
   margin-top: -48px;
+`
+
+const StyledSettings = styled(Settings)`
+  stroke: ${({ theme }) => theme.text3};
+  height: 18px;
+  width: 18px;
+
+  :hover {
+    cursor: pointer;
+    stroke: ${({ theme }) => theme.text2};
+  }
 `
 
 export enum ActiveTab {
@@ -119,41 +130,26 @@ export default function Overview({
                   </ButtonBasic>
                 </RowBetween>
               )}
-              {account && showUnlockVoting && (
-                <RowBetween>
-                  <AutoColumn gap="sm">
-                    <AutoRow gap="6px">
+              <RowBetween>
+                <AutoColumn gap="sm">
+                  {account && chainId && (
+                    <AutoRow gap="6px" style={{ width: 'fit-content' }}>
                       <TYPE.mediumHeader mr="6px">{shortenAddress(account)}</TYPE.mediumHeader>
-                      {account && chainId && (
-                        <>
-                          <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
-                          <CopyHelper toCopy={account} />
-                        </>
-                      )}
+                      <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
+                      <StyledSettings onClick={toggleWalletModal} stroke="black" />
                     </AutoRow>
-                    {ensName ?? ''}
+                  )}
+                  {ensName ?? ''}
+                  {account && showUnlockVoting && (
                     <TYPE.darkYellow fontSize="12px">Unlock voting to participate in governance</TYPE.darkYellow>
-                  </AutoColumn>
+                  )}
+                </AutoColumn>
+                {account && showUnlockVoting ? (
                   <RowFixed>
                     <TYPE.main mr="1rem">{govTokenBalance?.toFixed(0)} Votes</TYPE.main>
                     <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
                   </RowFixed>
-                </RowBetween>
-              )}
-              {account && !showUnlockVoting && (
-                <RowBetween>
-                  <AutoColumn gap="sm">
-                    <RowBetween>
-                      <TYPE.mediumHeader mr="6px">{shortenAddress(account)}</TYPE.mediumHeader>
-                      {account && chainId && (
-                        <>
-                          <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
-                          <CopyHelper toCopy={account} />
-                        </>
-                      )}
-                    </RowBetween>
-                    {ensName ?? ''}
-                  </AutoColumn>
+                ) : (
                   <AutoColumn gap="sm" justify="flex-end">
                     {availableVotes ? <TYPE.body>{availableVotes?.toFixed(0)} Total Votes</TYPE.body> : ''}
                     {userDelegatee === account && (
@@ -165,8 +161,8 @@ export default function Overview({
                       </RowFixed>
                     )}
                   </AutoColumn>
-                </RowBetween>
-              )}
+                )}
+              </RowBetween>
               {account && <TwitterAccountDetails />}
             </AutoColumn>
           </AccountCard>

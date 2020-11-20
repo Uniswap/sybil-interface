@@ -1,20 +1,38 @@
 import React from 'react'
-import { ButtonPrimary } from '../Button'
+import styled from 'styled-components'
+import { RowBetween } from '../Row'
+import { TYPE } from '../../theme'
+import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 
-export default function TwitterLoginButton() {
-  const REQUEST_TOKEN_ENDPOINT = 'http://localhost:8080/login/twitter'
+export const VerifyButton = styled.a`
+  background-color: ${({ theme }) => theme.blue1};
+  padding: 4px 16px;
+  outline: none;
+  border: 1px solid transparent;
+  width: fit-content;
+  border-radius: 12px;
+  white-space: nowrap;
+  text-decoration: none;
+  font-size: 14px;
 
-  async function tryLogin() {
-    fetch(REQUEST_TOKEN_ENDPOINT, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
-    }).then(res => {
-      console.log(res)
-    })
+  :hover {
+    cursor: pointer;
+    opacity: 0.8;
   }
+`
 
-  return <ButtonPrimary onClick={tryLogin}>Login with twitter</ButtonPrimary>
+const TwitterLogo = styled.img`
+  height: 24px;
+  width: 24px;
+`
+
+export default function TwitterLoginButton({ text }: { text: string }) {
+  return (
+    <VerifyButton href="http://localhost:8080/login/twitter">
+      <RowBetween>
+        <TYPE.white fontSize="14px">{text}</TYPE.white>
+        <TwitterLogo src={TwitterIcon} />
+      </RowBetween>
+    </VerifyButton>
+  )
 }

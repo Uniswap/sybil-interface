@@ -2,10 +2,16 @@ import { Web3Provider } from '@ethersproject/providers'
 import { ChainId } from '@uniswap/sdk'
 import { useWeb3React as useWeb3ReactCore } from '@web3-react/core'
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
 import { NetworkContextName } from '../constants'
+import { ThemeContext } from 'styled-components'
+
+export function useTheme() {
+  const theme = useContext(ThemeContext)
+  return theme
+}
 
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
   const context = useWeb3ReactCore<Web3Provider>()

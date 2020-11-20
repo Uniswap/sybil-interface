@@ -2,7 +2,6 @@ import React, { Suspense } from 'react'
 import { Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
-import Header from '../components/Header'
 import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
@@ -12,6 +11,7 @@ import Overview from './Governance'
 import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 import SideMenu from '../components/Menu/SideMenu'
 import TwitterAccountQueryParamReader from '../state/social/TwitterAccountQueryParamReader'
+import Web3Status from '../components/Web3Status'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -27,12 +27,6 @@ const AppWrapper = styled.div`
   flex-flow: column;
   align-items: flex-start;
   overflow-x: hidden;
-`
-
-const HeaderWrapper = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
-  width: 100%;
-  justify-content: space-between;
 `
 
 const BodyWrapper = styled.div`
@@ -68,10 +62,8 @@ export default function App() {
         <SideMenu />
         <AppWrapper>
           <URLWarning />
-          {/* <HeaderWrapper>
-            <Header />
-          </HeaderWrapper> */}
           <BodyWrapper>
+            <Web3Status />
             <Popups />
             <Polling />
             <Web3ReactManager>

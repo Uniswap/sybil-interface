@@ -7,6 +7,22 @@ export const WrappedListLogo = styled.img`
   margin-right: 1rem;
 `
 
+export const RoundedProfileImage = styled.div`
+  display: flex;
+  align-items; 
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 1rem;
+
+  & > img {
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+  }
+`
+
 const handleColorType = (status?: any, theme?: any) => {
   switch (status) {
     case 'pending':

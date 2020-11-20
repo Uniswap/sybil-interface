@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import Row, { RowBetween, RowFixed } from '../Row'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-import { TYPE, CloseIcon } from '../../theme'
+import { TYPE } from '../../theme'
 import { useTwitterProfileData, useVerifiedHandles } from '../../state/social/hooks'
 import Modal from '../Modal'
 import TwitterFlow from './TwitterFlow'
-import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
-import { useActiveWeb3React } from '../../hooks'
+
+import { useActiveWeb3React, useTheme } from '../../hooks'
 import { useUserPendingUsername } from '../../state/transactions/hooks'
 import { LoaderSecondary } from '../Loader'
-import ProfileCard from './ProfileCard'
 import { useTwitterAccount } from '../../state/user/hooks'
 import moment from 'moment'
-import { ButtonBasic } from '../Button'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
+import { ButtonBasic } from '../Button'
+import TwitterLoginButton from './TwitterLoginButton'
+import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 
 const Wrapper = styled.div`
-  /* padding: 1rem; */
   border-radius: 10px;
 `
 
@@ -46,23 +46,6 @@ const TwitterLogo = styled.img`
   width: 24px;
 `
 
-const VerifyButton = styled.a`
-  background-color: ${({ theme }) => theme.blue1};
-  padding: 4px 1rem;
-  outline: none;
-  border: none;
-  width: fit-content;
-  border-radius: 12px;
-  white-space: nowrap;
-  text-decoration: none;
-  font-size: 14px;
-
-  :hover {
-    cursor: pointer;
-    opacity: 0.8;
-  }
-`
-
 const PendingFlag = styled.div<{ verified: boolean }>`
   display: flex;
   align-items: center;
@@ -79,33 +62,38 @@ const PendingFlag = styled.div<{ verified: boolean }>`
   }
 `
 
-const StyledClose = styled(CloseIcon)`
-  margin-left: 1rem;
-  height: 16px;
-  width: 16px;
+const LoadingFlag = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid ${({ theme }) => theme.text3};
+  color: ${({ theme }) => theme.text3};
+  padding: 4px 8px;
+  width: 180px;
+  border-radius: 10px;
+  font-size: 12px;
 `
 
 function TwitterAccountDetails() {
   const { account } = useActiveWeb3React()
+  const theme = useTheme()
 
   // toggle modal for twitter verification
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  const [twitterAccount, setTwitterAccount] = useTwitterAccount()
+  // get logged in account
+  const [twitterAccount] = useTwitterAccount()
 
-  // monitor for pending attempt to verify, pull out profile if so
+  // detect any pending profile attestations
   const { pendingProfile } = useUserPendingUsername()
 
   // get any verified handles for this user + timestamps they were created at
   const handles = useVerifiedHandles(account)
-  const verifiedHandleEntry = handles && twitterAccount ? handles?.find(h => h.handle === twitterAccount) : undefined
+  const verifiedHandleEntry = handles ? handles?.[0] : undefined
   const verified = Boolean(verifiedHandleEntry && !pendingProfile)
 
   // if pending, wait on that, then if verified handle use that, otherwise wait for logged in username
-  const handle = pendingProfile ?? verifiedHandleEntry?.handle ?? twitterAccount
-
-  // get profile data based on handle being used
-  const profileData = useTwitterProfileData(handle)
+  const profileData = useTwitterProfileData(pendingProfile ?? verifiedHandleEntry?.handle)
 
   const verificationDate = verifiedHandleEntry
     ? moment.unix(verifiedHandleEntry.timestamp).format('MMM Do YYYY')
@@ -121,55 +109,26 @@ function TwitterAccountDetails() {
     }
   }, [handles, twitterAccount, verified, loaded, usernameQuery])
 
-  function getFlagOrButton() {
-    // data not loaded yet and nothing verified
-    if (!handles && !pendingProfile && !verified) {
-      return (
-        <PendingFlag verified={verified}>
-          Checking verification <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
-        </PendingFlag>
-      )
-    }
-    // pending handle, waiting for txn confirmation
-    if (pendingProfile) {
-      return (
-        <PendingFlag verified={verified}>
-          Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
-        </PendingFlag>
-      )
-    }
-    // verified handle
-    if (verified) {
-      return <PendingFlag verified={verified}>Verfied</PendingFlag>
-    }
-    // data is loaded but not handle mappings yet
-    if (!verified && !pendingProfile && handles) {
-      return (
-        <ButtonBasic onClick={() => setShowTwitterFlow(true)} padding="4px 8px" borderRadius="10px">
-          <TYPE.white fontSize="12px">Verifiy identity</TYPE.white>
-        </ButtonBasic>
-      )
-    }
-    return null
-  }
-
   return (
     <>
-      {twitterAccount && (
-        <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
-          <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
-        </Modal>
-      )}
-      {!twitterAccount && !verifiedHandleEntry ? (
-        <RowBetween>
-          <ProfileCard name={profileData?.name} handle={profileData?.handle} imageURL={profileData?.profileURL} />
-          <VerifyButton href="http://localhost:8080/login/twitter">
+      <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
+        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
+      </Modal>
+      {!handles ? (
+        <LoadingFlag>
+          Loading social data <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} stroke={theme.text3} />
+        </LoadingFlag>
+      ) : !verifiedHandleEntry ? (
+        !twitterAccount ? (
+          <TwitterLoginButton text="Announce yourself as a delegate" />
+        ) : (
+          <ButtonBasic onClick={() => setShowTwitterFlow(true)} padding="4px 1rem">
             <RowBetween>
-              <TYPE.white>Announce yourseld as a delegate</TYPE.white>
+              <TYPE.white fontSize="14px">Announce yourself as a delegate</TYPE.white>
               <TwitterLogo src={TwitterIcon} />
             </RowBetween>
-          </VerifyButton>
-        </RowBetween>
+          </ButtonBasic>
+        )
       ) : profileData ? (
         <Wrapper>
           <FixedRowHeight>
@@ -183,21 +142,17 @@ function TwitterAccountDetails() {
                     <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
                       @{profileData.handle}
                     </TYPE.body>
-                    {getFlagOrButton()}
+                    {pendingProfile ? (
+                      <PendingFlag verified={verified}>
+                        Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
+                      </PendingFlag>
+                    ) : (
+                      <PendingFlag verified={verified}>Verfied</PendingFlag>
+                    )}
                   </RowFixed>
-                  {verificationDate ? (
-                    <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>
-                  ) : (
-                    <TYPE.black fontSize={12}></TYPE.black>
-                  )}
+                  {verificationDate && <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>}
                 </AutoColumn>
               </RowFixed>
-              {/* <RowFixed>
-                <TwitterLogo src={TwitterIcon} />
-                <Link to="/uniswap">
-                  <StyledClose onClick={() => setTwitterAccount(undefined)} />
-                </Link>
-              </RowFixed> */}
             </RowBetween>
           </FixedRowHeight>
         </Wrapper>

@@ -1,5 +1,3 @@
-import { isAddress } from '../utils'
-
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
@@ -14,9 +12,11 @@ export async function verifyHandleForAddress(account: string, tweetID: string): 
       return undefined
     })
   } catch {
-    return Promise.reject(new Error('Invalid response'))
+    return undefined
   }
 }
+
+//https://example.com/api?berify?account=0xCe1712Bb45C1D8CdAFFa1F242Bc0bc79F8D1352C&id=1329517739363463168
 
 export interface ProfileDataResponse {
   data: {
@@ -68,25 +68,6 @@ export async function fetchLatestTweet(handle: string): Promise<LatestTweetRespo
       }
     })
     .catch(error => {
-      console.error('Failed to get claim data', error)
+      return Promise.reject(new Error(error))
     })
-}
-
-export interface HandleResponse {
-  data: [
-    {
-      handle: string
-    }
-  ]
-}
-
-export async function fetchSingleVerifiedHandle(address: string): Promise<string | undefined> {
-  if (!isAddress(address)) return Promise.reject(new Error('Invalid address'))
-
-  return fetch(`${VERIFICATION_WORKER_URL}/api/accounts?address=${address}`).then(async res => {
-    if (res.status === 200) {
-      return res.json().then(data => data.handle)
-    }
-    return Promise.reject(new Error('Invalid response'))
-  })
 }
