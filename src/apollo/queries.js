@@ -1,22 +1,34 @@
 import gql from 'graphql-tag'
 
-// check subgraph if address has an announced handle
-export const CONTENT_LOOKUP_FOR_ADDRESS = gql`
-  query attestations($account: Bytes!) {
-    attestations(where: { account: $account }) {
+export const HANDLES_BULK = gql`
+  query governance($accounts: [Bytes]!) {
+    attestations(where: { account_in: $accounts }, sortBy: timestamp, sortDirection: desc) {
       id
       account
       tweetID
+      timestamp
+    }
+  }
+`
+
+export const ATTESTATIONS_QUERY = gql`
+  query attestations($account: Bytes!) {
+    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
+      id
+      account
+      tweetID
+      timestamp
     }
   }
 `
 
 export const CONTENT_SUBSCRIPTION = gql`
   subscription onContetUpdate($account: Bytes!) {
-    attestations(where: { account: $account }) {
+    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
       id
       account
       tweetID
+      timestamp
     }
   }
 `
@@ -64,6 +76,20 @@ export const PROPOSALS = gql`
       endBlock
       proposer {
         id
+      }
+      forVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: true }) {
+        support
+        votes
+        voter {
+          id
+        }
+      }
+      againstVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: false }) {
+        support
+        votes
+        voter {
+          id
+        }
       }
     }
   }

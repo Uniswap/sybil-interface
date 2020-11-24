@@ -129,6 +129,7 @@
     "fetch-tweets": "^0.1.7",
     "graphql": "^15.3.0",
     "graphql-tag": "^2.11.0",
+    "moment": "^2.29.1",
     "react-apollo": "^3.1.5",
     "react-twitter-auth": "^0.0.13",
     "react-twitter-embed": "^3.0.3",

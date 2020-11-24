@@ -14,7 +14,8 @@ import {
   updateUserDeadline,
   updateUserExpertMode,
   updateUserSlippageTolerance,
-  toggleURLWarning
+  toggleURLWarning,
+  updateTwitterAccount
 } from './actions'
 
 function serializeToken(token: Token): SerializedToken {
@@ -76,6 +77,21 @@ export function useExpertModeManager(): [boolean, () => void] {
   }, [expertMode, dispatch])
 
   return [expertMode, toggleSetExpertMode]
+}
+
+// use for twitter login passed through query param
+export function useTwitterAccount(): [string | undefined, (newAccount: string | undefined) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const twitterAccount = useSelector<AppState, AppState['user']['twitterAccount']>(state => state.user.twitterAccount)
+
+  // set new or reset account
+  const setTwitterAccount = useCallback(
+    (newAccount: string | undefined) => {
+      dispatch(updateTwitterAccount({ twitterAccount: newAccount }))
+    },
+    [dispatch]
+  )
+  return [twitterAccount, setTwitterAccount]
 }
 
 export function useUserSlippageTolerance(): [number, (slippage: number) => void] {

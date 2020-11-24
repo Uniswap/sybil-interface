@@ -10,7 +10,7 @@ import { ProposalStatus } from './styled'
 import { DateTime } from 'luxon'
 import { useTimestampFromBlock } from '../../hooks/useTimestampFromBlock'
 import { PROPOSAL_LENGTH_IN_DAYS } from '../../constants'
-import { isAddress, getEtherscanLink } from '../../utils'
+import { isAddress, getEtherscanLink, shortenAddress } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
@@ -100,6 +100,10 @@ const DetailText = styled.div`
   word-break: break-all;
 `
 
+const TopVoterWrapper = styled.div`
+  padding: 1rem 0 0 0;
+`
+
 export default function ProposalDetails({ id, onBack }: { id: string; onBack: () => void }) {
   const { chainId } = useActiveWeb3React()
 
@@ -157,7 +161,6 @@ export default function ProposalDetails({ id, onBack }: { id: string; onBack: ()
                 <WrapSmall>
                   <TYPE.black fontWeight={600}>For</TYPE.black>
                   <TYPE.black fontWeight={600}>
-                    {' '}
                     {proposalData?.forCount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </TYPE.black>
                 </WrapSmall>
@@ -165,6 +168,31 @@ export default function ProposalDetails({ id, onBack }: { id: string; onBack: ()
               <ProgressWrapper>
                 <Progress status={'for'} percentageString={forPercentage} />
               </ProgressWrapper>
+              <TopVoterWrapper>
+                <AutoColumn gap="1rem">
+                  <RowBetween>
+                    <TYPE.main fontWeight={400} fontSize="14px">
+                      Top Voters
+                    </TYPE.main>
+                    <div />
+                  </RowBetween>
+                  {proposalData?.forVotes?.map((p, i) => {
+                    return (
+                      <RowBetween key={'vote-for-' + i}>
+                        <TYPE.black fontWeight={400} fontSize="14px">
+                          {shortenAddress(p.voter.id)}
+                        </TYPE.black>
+                        <TYPE.black fontWeight={400} fontSize="14px">
+                          {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </TYPE.black>
+                      </RowBetween>
+                    )
+                  })}
+                  <TYPE.black fontWeight={600} fontSize="14px" textAlign="center">
+                    View All
+                  </TYPE.black>
+                </AutoColumn>
+              </TopVoterWrapper>
             </CardSection>
           </StyledDataCard>
           <StyledDataCard>
@@ -180,6 +208,31 @@ export default function ProposalDetails({ id, onBack }: { id: string; onBack: ()
               <ProgressWrapper>
                 <Progress status={'against'} percentageString={againstPercentage} />
               </ProgressWrapper>
+              <TopVoterWrapper>
+                <AutoColumn gap="1rem">
+                  <RowBetween>
+                    <TYPE.main fontWeight={400} fontSize="14px">
+                      Top Voters
+                    </TYPE.main>
+                    <div />
+                  </RowBetween>
+                  {proposalData?.againstVotes?.map((p, i) => {
+                    return (
+                      <RowBetween key={'vote-for-' + i}>
+                        <TYPE.black fontWeight={400} fontSize="14px">
+                          {shortenAddress(p.voter.id)}
+                        </TYPE.black>
+                        <TYPE.black fontWeight={400} fontSize="14px">
+                          {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        </TYPE.black>
+                      </RowBetween>
+                    )
+                  })}
+                  <TYPE.black fontWeight={600} fontSize="14px" textAlign="center">
+                    View All
+                  </TYPE.black>
+                </AutoColumn>
+              </TopVoterWrapper>
             </CardSection>
           </StyledDataCard>
         </CardWrapper>

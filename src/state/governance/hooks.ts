@@ -3,17 +3,38 @@ import { TokenAmount, Token, Percent } from '@uniswap/sdk'
 import { updateActiveProtocol } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE } from './reducer'
+import { GovernanceInfo } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import { TOP_DELEGATES, GLOBAL_DATA, PROPOSALS } from '../../apollo/queries'
 import { useGovernanceContract, useGovTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
-import { uniswapClient, compoundClient } from '../../apollo/client'
-import { Web3Provider } from '@ethersproject/providers'
-import { fetchSingleVerifiedHandle } from '../social/hooks'
+import { useSubgraphClient } from '../application/hooks'
+import { fetchDelegates, fetchProposals, enumerateProposalState, fetchGlobalData } from '../../data/governance'
+
+export interface GlobaData {
+  id: string
+  totalTokenHolders: number
+  totalDelegates: number
+  delegatedVotes: number
+  delegatedVotesRaw: number
+}
+
+export interface DelegateData {
+  id: string
+  delegatedVotes: number
+  delegatedVotesRaw: number
+  votePercent: Percent
+  votes: {
+    id: string
+    support: boolean
+    votes: number
+  }[]
+  EOA: boolean | undefined //
+  handle: string | undefined // twitter handle
+  imageURL?: string | undefined
+}
 
 export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtocol: GovernanceInfo) => void] {
   const dispatch = useDispatch<AppDispatch>()
@@ -44,61 +65,6 @@ export function useGovernanceToken(): Token | undefined {
     : undefined
 }
 
-export function useSubgraphClient() {
-  const [activeProtocol] = useActiveProtocol()
-
-  const [client, setClient] = useState(uniswapClient)
-
-  useEffect(() => {
-    switch (activeProtocol) {
-      case UNISWAP_GOVERNANCE:
-        setClient(uniswapClient)
-        // code block
-        break
-      case COMPOUND_GOVERNANCE:
-        setClient(compoundClient)
-        // code block
-        break
-    }
-  }, [activeProtocol])
-
-  return client
-}
-
-export interface GlobaData {
-  id: string
-  totalTokenHolders: number
-  totalDelegates: number
-  delegatedVotes: number
-  delegatedVotesRaw: number
-}
-
-interface GlobalResponse {
-  data: {
-    governances: GlobaData[]
-  }
-}
-
-export interface DelegateData {
-  id: string
-  delegatedVotes: number
-  delegatedVotesRaw: number
-  votePercent: Percent
-  votes: {
-    id: string
-    support: boolean
-    votes: number
-  }[]
-  EOA: boolean | undefined //
-  handle: string | undefined // twitter handle
-}
-
-interface DelegateResponse {
-  data: {
-    delegates: DelegateData[]
-  }
-}
-
 // @todo add typed query response
 export function useGlobalData(): GlobaData | undefined {
   const { library } = useActiveWeb3React()
@@ -107,54 +73,17 @@ export function useGlobalData(): GlobaData | undefined {
 
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
-    try {
-      client
-        .query({
-          query: GLOBAL_DATA,
-
-          fetchPolicy: 'cache-first'
-        })
-        .then(async (res: GlobalResponse) => {
-          if (res) {
-            setGlobalData(res.data.governances[0])
-          }
-        })
-    } catch (e) {
-      console.log(e)
-    }
+    fetchGlobalData(client).then((data: GlobaData | null) => {
+      if (data) {
+        setGlobalData(data)
+      }
+    })
   }, [library, client])
 
   return globalData
 }
 
-// @todo add typed query response
-const DELEGATE_PROMISES: { [key: string]: Promise<DelegateData[] | null> } = {}
-
-function fetchDelegates(client: any, key: string, library: Web3Provider): Promise<DelegateData[] | null> {
-  return (DELEGATE_PROMISES[key] =
-    DELEGATE_PROMISES[key] ??
-    client
-      .query({
-        query: TOP_DELEGATES,
-        fetchPolicy: 'cache-first'
-      })
-      .then(async (res: DelegateResponse) => {
-        // check if account is EOA or not
-        const typed = await Promise.all(
-          res.data.delegates.map(d => {
-            return library?.getCode(d.id)
-          })
-        )
-        return res.data.delegates.map((d, i) => {
-          return {
-            ...d,
-            EOA: typed[i] === '0x'
-          }
-        })
-      }))
-}
-
-export function useTopDelegates() {
+export function useTopDelegates(): DelegateData[] | undefined {
   const { library } = useActiveWeb3React()
 
   const [delegates, setDelegates] = useState<DelegateData[] | undefined>()
@@ -176,35 +105,14 @@ export function useTopDelegates() {
         library &&
           fetchDelegates(client, key, library).then(async delegateData => {
             if (delegateData) {
-              // check if account is EOA or not
-              const typed = await Promise.all(
-                delegateData.map(d => {
-                  return library?.getCode(d.id)
-                })
-              )
-              // get handles for any delegates that have it
-              // @todo update with bulk call to worker
-              const handles = await Promise.all(
-                delegateData.map(d => {
-                  return fetchSingleVerifiedHandle(d.id)
-                })
-              )
-              setDelegates(
-                delegateData.map((d, i) => {
-                  return {
-                    ...d,
-                    EOA: typed[i] === '0x',
-                    handle: handles[i]
-                  }
-                })
-              )
+              setDelegates(delegateData)
             }
           })
       } catch (e) {
         console.log(e)
       }
     }
-    if (!delegates) {
+    if (!delegates && client) {
       fetchTopDelegates()
     }
   }, [library, client, key, delegates])
@@ -218,28 +126,6 @@ interface ProposalDetail {
   callData: string
 }
 
-/**
- * @todo replace with auto generated grapql format
- */
-interface ProposalResponse {
-  data: {
-    proposals: {
-      id: string
-      proposer: {
-        [id: string]: string
-      }
-      description: string
-      status: string
-      targets: string[]
-      values: string[]
-      signatures: string[]
-      calldatas: string[]
-      startBlock: string
-      endBlock: string
-    }[]
-  }
-}
-
 export interface ProposalData {
   id: string
   title: string
@@ -251,11 +137,20 @@ export interface ProposalData {
   startBlock: number
   endBlock: number
   details: ProposalDetail[]
-}
-
-const enumerateProposalState = (state: number) => {
-  const proposalStates = ['pending', 'active', 'canceled', 'defeated', 'succeeded', 'queued', 'expired', 'executed']
-  return proposalStates[state]
+  forVotes: {
+    support: boolean
+    votes: string
+    voter: {
+      id: string
+    }
+  }[]
+  againstVotes: {
+    support: boolean
+    votes: string
+    voter: {
+      id: string
+    }
+  }[]
 }
 
 // get count of all proposals made
@@ -268,7 +163,6 @@ export function useProposalCount(): number | undefined {
   return undefined
 }
 
-// @todo add typed query response
 export function useAllProposals() {
   const [proposals, setProposals] = useState<ProposalData[] | undefined>()
 
@@ -288,52 +182,34 @@ export function useAllProposals() {
 
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
-
   const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-
-  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids, NEVER_RELOAD)
+  const counts = useSingleContractMultipleData(
+    amount ? govContract : undefined,
+    'proposals',
+    ids,
+    NEVER_RELOAD
+  ).reverse()
   const states = useSingleContractMultipleData(amount ? govContract : undefined, 'state', ids, NEVER_RELOAD).reverse()
 
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
     async function fetchData() {
       try {
-        govClient
-          .query({
-            query: PROPOSALS,
-            fetchPolicy: 'cache-first'
-          })
-          .then((res: ProposalResponse) => {
+        if (govToken) {
+          fetchProposals(govClient, govToken.address).then((res: ProposalData[] | null) => {
             if (res) {
-              const formattedProposals: ProposalData[] | undefined = res.data.proposals.map(p => ({
-                id: p.id,
-                title: p.description?.split(/# |\n/g)[1] || 'Untitled',
-                description: p.description?.split(/# /)[1] || 'No description.',
-                proposer: p.proposer.id,
-                status: enumerateProposalState(0), // initialize as 0
-                forCount: 0, // initialize as 0
-                againstCount: 0, // initialize as 0
-                startBlock: parseInt(p.startBlock),
-                endBlock: parseInt(p.endBlock),
-                details: p.targets.map((t, i) => {
-                  return {
-                    target: p.targets[i],
-                    functionSig: p.signatures[i],
-                    callData: p.calldatas[i]
-                  }
-                })
-              }))
-              setProposals(formattedProposals)
+              setProposals(res)
             }
           })
+        }
       } catch (e) {
         console.log(e)
       }
     }
-    if (!proposals) {
+    if (!proposals && govToken) {
       fetchData()
     }
-  }, [govClient, proposals, states])
+  }, [govClient, govToken, proposals, states])
 
   useEffect(() => {
     if (counts && proposals && govToken) {
@@ -362,6 +238,7 @@ export function useAllProposals() {
 
 export function useProposalData(id: string): ProposalData | undefined {
   const allProposalData = useAllProposals()
+
   return allProposalData?.find(p => p.id === id)
 }
 

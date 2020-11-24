@@ -1,114 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
-import { isAddress, calculateGasMargin } from '../../utils'
+import { isAddress, calculateGasMargin, notEmpty } from '../../utils'
 import { useSybilContract } from '../../hooks/useContract'
-import { useTransactionAdder } from '../transactions/hooks'
+import { useTransactionAdder, useVerifcationConfirmed } from '../transactions/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { TransactionResponse } from '@ethersproject/providers'
 import { client as sybilClient } from '../../apollo/client'
-import { CONTENT_SUBSCRIPTION } from '../../apollo/queries'
+import { CONTENT_SUBSCRIPTION, ATTESTATIONS_QUERY } from '../../apollo/queries'
 import { useSubscription } from 'react-apollo'
-
-const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
-const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
-
-// @todo add typed query response
-
-export interface HandleResponse {
-  data: [
-    {
-      handle: string
-    }
-  ]
-}
-
-export async function fetchSingleVerifiedHandle(address: string): Promise<string | undefined> {
-  if (!isAddress(address)) return Promise.reject(new Error('Invalid address'))
-
-  return fetch(`${VERIFICATION_WORKER_URL}/api/accounts?address=${address}`).then(async res => {
-    if (res.status === 200) {
-      return res.json().then(data => data.handle)
-    }
-    return Promise.reject(new Error('Invalid response'))
-  })
-}
-
-// for an ethereum address, fetch a verified handle if it exists
-// undefined means no verification yet
-export function useVerifiedHandle(address: string | null | undefined): string | undefined {
-  const [handle, setHandle] = useState<string | undefined>()
-
-  useEffect(() => {
-    if (!address) {
-      setHandle(undefined)
-    } else {
-      fetchSingleVerifiedHandle(address).then(handle => {
-        setHandle(handle)
-      })
-    }
-  }, [address])
-  return handle
-}
-
-export interface LatestTweetResponse {
-  data: [
-    {
-      id: string
-      text: string
-    }
-  ]
-}
-
-// dont save responses as user may need to tweet multiple times
-export async function fetchLatestTweet(handle: string): Promise<LatestTweetResponse | null> {
-  const url = `${TWITTER_WORKER_URL}/user/latest-tweet?handle=` + handle
-  return fetch(url)
-    .then(async res => {
-      if (res.status === 200) {
-        return res.json()
-      } else {
-        return null
-      }
-    })
-    .catch(error => {
-      console.error('Failed to get claim data', error)
-    })
-}
-
-interface ProfileDataResponse {
-  data: {
-    id: number
-    name: string
-    username: string
-    profile_image_url: string
-  }
-}
-const PROFILE_DATA_PROMISES: { [key: string]: Promise<ProfileDataResponse | null> } = {}
-
-function fetchProfileData(handle: string): Promise<ProfileDataResponse | null> {
-  const key = `${handle}`
-  const url = `${TWITTER_WORKER_URL}/user?handle=${handle}`
-  return (PROFILE_DATA_PROMISES[key] =
-    PROFILE_DATA_PROMISES[key] ??
-    fetch(url)
-      .then(async res => {
-        if (res.status === 200) {
-          return res.json()
-        } else {
-          console.debug(`No handle found`)
-          return null
-        }
-      })
-      .catch(error => {
-        console.error('Failed to get claim data', error)
-      }))
-}
+import { verifyHandleForAddress, fetchProfileData, ProfileDataResponse } from '../../data/social'
 
 interface TwitterProfileData {
   name: string
   handle: string
   profileURL: string
 }
-
+// get handle and profile image from twitter
 export function useTwitterProfileData(handle: string | undefined | null): TwitterProfileData | undefined {
   const [formattedData, setFormattedData] = useState<TwitterProfileData | undefined>()
 
@@ -137,51 +43,6 @@ export interface VerifyResult {
   readonly error?: string
 }
 
-const VERIFY_PROMISES: { [key: string]: Promise<VerifyResult> } = {}
-
-export function useVerifyCallback(tweetID: string | undefined): { verifyCallback: () => Promise<VerifyResult> } {
-  const verifyCallback = useCallback(() => {
-    if (!tweetID) return Promise.reject(new Error('Invalid address'))
-    const key = tweetID
-
-    const url = `${VERIFICATION_WORKER_URL}/api/verify?id=${tweetID}`
-
-    return (VERIFY_PROMISES[key] =
-      VERIFY_PROMISES[key] ??
-      fetch(url)
-        .then(async res => {
-          if (res.status === 200) {
-            return {
-              success: true
-            }
-          } else {
-            const errorText = await res.text()
-            if (res.status === 400 && errorText === 'Invalid tweet format.') {
-              return {
-                success: false,
-                error: 'Invalid tweet format'
-              }
-            }
-            if (res.status === 400 && errorText === 'Invalid tweet id.') {
-              return {
-                success: false,
-                error: 'Invalid tweet id'
-              }
-            }
-            return {
-              success: false,
-              error: 'Unknown error, please try again.'
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Failed to get claim data', error)
-        }))
-  }, [tweetID])
-
-  return { verifyCallback }
-}
-
 // Send transaction on chain to add address -> content mapping
 export function useAttestCallBack(
   username: string | undefined
@@ -205,7 +66,8 @@ export function useAttestCallBack(
             addTransaction(response, {
               summary: `Verifying @${username}`,
               social: {
-                username
+                username,
+                account
               }
             })
             return response.hash
@@ -220,46 +82,91 @@ interface Attestation {
   id: string
   account: string
   tweetID: string
+  timestamp: number
 }
 
-interface AttestationResponse {
-  data: {
+interface AttestationQueryResponse {
+  data?: {
     attestations: Attestation[]
   }
 }
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined
+interface AttestationSubscriptionResponse {
+  subscriptionData: {
+    data?: {
+      attestations: Attestation[]
+    }
+  }
 }
 
 // fetch any on chain mappings from address -> social content (not gauranteed verified)
 export function useSubgraphEntries(address: string | undefined | null): Attestation[] | undefined {
   const [entries, setEntries] = useState<Attestation[]>()
-  useSubscription(CONTENT_SUBSCRIPTION, {
-    client: sybilClient,
-    variables: {
-      account: address?.toLocaleLowerCase()
-    },
-    onSubscriptionData: (res: any) => {
-      setEntries(res?.subscriptionData?.data?.attestations)
+
+  const newConfirmation = useVerifcationConfirmed()
+
+  // backup to fetch new entries on confirmation change if socket stalls
+  useEffect(() => {
+    if (newConfirmation) {
+      try {
+        sybilClient
+          .query({
+            query: ATTESTATIONS_QUERY,
+            variables: {
+              account: address?.toLocaleLowerCase()
+            }
+          })
+          .then((res: AttestationQueryResponse) => {
+            if (res.data) {
+              setEntries(res.data.attestations)
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
     }
-  })
+  }, [address, newConfirmation])
+
+  try {
+    useSubscription(CONTENT_SUBSCRIPTION, {
+      client: sybilClient,
+      variables: {
+        account: address?.toLocaleLowerCase()
+      },
+      onSubscriptionData: (res: AttestationSubscriptionResponse) => {
+        setEntries(res?.subscriptionData?.data?.attestations)
+      }
+    })
+  } catch (e) {
+    console.log(e)
+  }
 
   return entries ? entries.filter(notEmpty) : undefined
 }
 
-export function useVerifiedHandles(account: string | null | undefined): string[] | undefined {
-  // fetch list of attested handles for this account
+interface HandleEntry {
+  handle: string | undefined
+  timestamp: number
+}
+
+export function validVerification(value: HandleEntry): value is HandleEntry {
+  return value !== null && value !== undefined && value.handle !== undefined
+}
+
+// use verification service to return all verified handles for an account, undefined means loading
+export function useVerifiedHandles(account: string | null | undefined): HandleEntry[] | undefined {
+  // fetch list of attested handles for this account from subgraph
   const entries = useSubgraphEntries(account)
+  const entryAmount = entries?.length // used to detect changes in subgraph
 
   // list of verified handles for account based on subgraph list
-  const [handles, setHandles] = useState<(string | undefined)[]>()
+  const [handles, setHandles] = useState<HandleEntry[] | undefined>()
 
   // if new entries, refetch handles
   useEffect(() => {
     console.log('New subgraph entry')
     setHandles(undefined)
-  }, [entries?.length])
+  }, [entryAmount])
 
   useEffect(() => {
     async function fetchHandles() {
@@ -267,19 +174,10 @@ export function useVerifiedHandles(account: string | null | undefined): string[]
         entries &&
         (await Promise.all(
           entries?.map(async entry => {
-            console.log('fetching')
-            try {
-              return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${entry.account}&id=${entry.tweetID}`).then(
-                async res => {
-                  if (res.status === 200) {
-                    const handle = await res.text()
-                    return handle
-                  }
-                  return undefined
-                }
-              )
-            } catch {
-              return Promise.reject(new Error('Invalid response'))
+            const handle = await verifyHandleForAddress(entry.account, entry.tweetID)
+            return {
+              handle,
+              timestamp: entry.timestamp
             }
           })
         ))
@@ -290,5 +188,5 @@ export function useVerifiedHandles(account: string | null | undefined): string[]
     }
   }, [entries, handles])
 
-  return handles ? handles.filter(notEmpty) : undefined
+  return handles ? handles.filter(validVerification) : undefined
 }

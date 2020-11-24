@@ -24,6 +24,11 @@ const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
   42: 'kovan.'
 }
 
+export function getTwitterProfileLink(accountName: string): string {
+  const urlBase = 'https://twitter.com/'
+  return urlBase + accountName
+}
+
 export function getEtherscanLink(
   chainId: ChainId,
   data: string,
@@ -103,4 +108,8 @@ export function getRouterContract(_: number, library: Web3Provider, account?: st
 
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined
 }

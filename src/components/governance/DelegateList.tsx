@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react'
 import { AutoColumn } from '../Column'
 
 import { TYPE, ExternalLink } from '../../theme'
-import Row, { AutoRow } from '../Row'
+import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
-import { shortenAddress, getEtherscanLink } from '../../utils'
-import { DelegateData, useActiveProtocol } from '../../state/governance/hooks'
-import { WrappedListLogo } from './styled'
+import { shortenAddress, getEtherscanLink, getTwitterProfileLink } from '../../utils'
+import { DelegateData, useActiveProtocol, useGlobalData, useUserVotes } from '../../state/governance/hooks'
+import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
 import { ButtonBlue } from '../Button'
@@ -16,6 +16,8 @@ import { ApplicationModal } from '../../state/application/actions'
 import DelegateModal from '../vote/DelegateModal'
 import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
+import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
+import { BIG_INT_ZERO } from '../../constants'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -29,6 +31,12 @@ const FixedAddressSize = styled(AutoColumn)`
   width: 120px;
 `
 
+const TwitterLogo = styled.img`
+  height: 24px;
+  width: 24px;
+  margin-left: 4px;
+`
+
 const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 140px 100px 160px;
@@ -40,7 +48,6 @@ const DataRow = styled.div`
 
   :hover {
     border-left: 3px solid ${({ theme }) => theme.primary1};
-    cursor: pointer;
   }
 
   &:first-child {
@@ -64,45 +71,71 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // used to calculate % ownership of votes
   const [activeProtocol] = useActiveProtocol()
 
+  // get global data to calculate vote %
+  const globalData = useGlobalData()
+
+  const availableVotes = useUserVotes()
+  const showDelegateButton = availableVotes ? JSBI.greaterThan(availableVotes?.raw, BIG_INT_ZERO) : false
+
   const delegateList = useMemo(() => {
-    return (
-      chainId &&
-      topDelegates &&
-      activeProtocol &&
-      topDelegates.map((d, i) => {
-        return (
-          <DataRow key={d.id}>
-            <AutoRow gap="10px">
-              <NoWrap>{i + 1}</NoWrap>
-              <WrappedListLogo src={EmptyProfile} />
-              <FixedAddressSize gap="6px">
-                <ExternalLink href={getEtherscanLink(chainId, d.id, 'address')}>
-                  <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
-                </ExternalLink>
-                <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
-              </FixedAddressSize>
-              <ButtonBlue
-                width="fit-content"
-                onClick={() => {
-                  setPrefilledDelegate(d.id)
-                  toggelDelegateModal()
-                }}
-              >
-                Delegate
-              </ButtonBlue>
-            </AutoRow>
-            <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-            <NoWrap textAlign="end">
-              {new Percent(JSBI.BigInt(d.delegatedVotesRaw), activeProtocol.token.totalSupply).toFixed(3) + '%'}
-            </NoWrap>
-            <NoWrap textAlign="end">
-              {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
-            </NoWrap>
-          </DataRow>
-        )
-      })
-    )
-  }, [activeProtocol, chainId, toggelDelegateModal, topDelegates])
+    return chainId && topDelegates && activeProtocol
+      ? topDelegates.map((d, i) => {
+          return (
+            <DataRow key={d.id}>
+              <AutoRow gap="10px">
+                <NoWrap>{i + 1}</NoWrap>
+                {d.imageURL ? (
+                  <RoundedProfileImage>
+                    <img src={d.imageURL} alt="profile" />
+                  </RoundedProfileImage>
+                ) : (
+                  <WrappedListLogo src={EmptyProfile} />
+                )}
+                <FixedAddressSize gap="6px">
+                  <RowFixed>
+                    <ExternalLink
+                      href={d.handle ? getTwitterProfileLink(d.handle) : getEtherscanLink(chainId, d.id, 'address')}
+                    >
+                      <TYPE.black>{d.handle ? `@${d.handle}` : shortenAddress(d.id)}</TYPE.black>
+                    </ExternalLink>
+                    {d.handle && <TwitterLogo src={TwitterIcon} />}
+                  </RowFixed>
+                  {d.handle ? (
+                    <ExternalLink href={getEtherscanLink(chainId, d.id, 'address')}>
+                      <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                    </ExternalLink>
+                  ) : (
+                    <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
+                  )}
+                </FixedAddressSize>
+                {showDelegateButton && (
+                  <ButtonBlue
+                    width="fit-content"
+                    onClick={() => {
+                      setPrefilledDelegate(d.id)
+                      toggelDelegateModal()
+                    }}
+                  >
+                    Delegate
+                  </ButtonBlue>
+                )}
+              </AutoRow>
+              <NoWrap textAlign="end">{d.votes.length}</NoWrap>
+              <NoWrap textAlign="end">
+                {globalData
+                  ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(
+                      3
+                    ) + '%'
+                  : '-'}
+              </NoWrap>
+              <NoWrap textAlign="end">
+                {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
+              </NoWrap>
+            </DataRow>
+          )
+        })
+      : null
+  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates])
 
   return (
     <GreyCard padding="2rem 0">
@@ -127,6 +160,13 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
             <Loader />
           </Row>
         )}
+        {/* {delegateList ?? (
+          <AutoColumn gap="1rem">
+            <CardLoader />
+            <CardLoader />
+            <CardLoader />
+          </AutoColumn>
+        )} */}
       </AutoColumn>
     </GreyCard>
   )

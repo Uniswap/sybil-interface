@@ -13,6 +13,14 @@ const Card = styled(Box)<{ padding?: string; border?: string; borderRadius?: str
 `
 export default Card
 
+export const BlurredCard = styled(Card)<{ bgColor?: string }>`
+  background-color: ${({ bgColor }) => (bgColor ? bgColor : 'rgba(255, 255, 255, 0.15)')};
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0px 4.7px -16px rgba(0, 0, 0, 0.017), 0 0px 11.3px -16px rgba(0, 0, 0, 0.024),
+    0 0px 21.3px -16px rgba(0, 0, 0, 0.03), 0 0px 38px -16px rgba(0, 0, 0, 0.036), 0 0px 71px -16px rgba(0, 0, 0, 0.043),
+    0 0px 170px -16px rgba(0, 0, 0, 0.06);
+`
+
 export const LightCard = styled(Card)`
   border: 1px solid ${({ theme }) => theme.bg2};
   background-color: ${({ theme }) => theme.bg1};
