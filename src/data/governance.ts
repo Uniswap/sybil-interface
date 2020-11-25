@@ -1,10 +1,11 @@
+import { HandleEntry } from './../state/social/hooks'
 import { Web3Provider } from '@ethersproject/providers'
 import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, HANDLES_BULK } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
 import { Percent } from '@uniswap/sdk'
 import { client as sybilClient } from '../apollo/client'
-import { verifyHandleForAddress, fetchProfileData } from './social'
+import { fetchProfileData } from './social'
 
 interface DelegateResponse {
   data: {
@@ -51,7 +52,12 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 // @todo add typed query response
 const DELEGATE_PROMISES: { [key: string]: Promise<DelegateData[] | null> } = {}
 
-export function fetchDelegates(client: any, key: string, library: Web3Provider): Promise<DelegateData[] | null> {
+export function fetchDelegates(
+  client: any,
+  key: string,
+  library: Web3Provider,
+  allVerifiedHandles: { [key: string]: HandleEntry } | undefined
+): Promise<DelegateData[] | null> {
   try {
     return (DELEGATE_PROMISES[key] =
       DELEGATE_PROMISES[key] ??
@@ -91,7 +97,7 @@ export function fetchDelegates(client: any, key: string, library: Web3Provider):
           // for each handle attestation - verify which ones are legit,
           const handles = await Promise.all(
             handlesResponse.data.attestations.map(async (a: any) => {
-              const handle = await verifyHandleForAddress(a.account, a.tweetID)
+              const handle = allVerifiedHandles?.[a.account]?.handle
               const profileData = handle ? await fetchProfileData(handle) : undefined
               return {
                 account: a.account,

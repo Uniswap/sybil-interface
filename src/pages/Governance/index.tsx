@@ -32,8 +32,8 @@ import { RowBetween, RowFixed, AutoRow } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
 import { ButtonBasic } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
 import { Settings } from 'react-feather'
+import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
 
 const SectionWrapper = styled.div`
   display: grid;

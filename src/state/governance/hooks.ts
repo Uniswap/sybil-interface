@@ -12,6 +12,7 @@ import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
 import { fetchDelegates, fetchProposals, enumerateProposalState, fetchGlobalData } from '../../data/governance'
+import { useAllVerifiedHandles } from '../social/hooks'
 
 export interface GlobaData {
   id: string
@@ -91,6 +92,8 @@ export function useTopDelegates(): DelegateData[] | undefined {
   // get graphql client for active protocol
   const client = useSubgraphClient()
 
+  const allVerifiedHandles = useAllVerifiedHandles()
+
   // reset list on active protocol change
   const [activeProtocol] = useActiveProtocol()
   useEffect(() => {
@@ -103,7 +106,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
     async function fetchTopDelegates() {
       try {
         library &&
-          fetchDelegates(client, key, library).then(async delegateData => {
+          fetchDelegates(client, key, library, allVerifiedHandles).then(async delegateData => {
             if (delegateData) {
               setDelegates(delegateData)
             }
@@ -112,10 +115,10 @@ export function useTopDelegates(): DelegateData[] | undefined {
         console.log(e)
       }
     }
-    if (!delegates && client) {
+    if (!delegates && client && allVerifiedHandles) {
       fetchTopDelegates()
     }
-  }, [library, client, key, delegates])
+  }, [library, client, key, delegates, allVerifiedHandles])
 
   return delegates
 }

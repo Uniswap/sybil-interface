@@ -1,18 +1,31 @@
+import { HandleEntry } from './../state/social/hooks'
+
+// Endpoints
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
+const VERIFIED_GIST_URL = 'https://api.github.com/gists/8f49a55280deaef631d360891a71e9c0'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
-// verify a mapping - return undefined if invalid
-export async function verifyHandleForAddress(account: string, tweetID: string): Promise<string | undefined> {
+interface GithubData {
+  files: {
+    ['sybil-attestations.json']: {
+      content: string
+    }
+  }
+}
+
+export async function fetchAllVerifiedHandles(): Promise<{ [address: string]: HandleEntry } | undefined> {
   try {
-    return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`).then(async res => {
-      if (res.status === 200) {
-        const handle = await res.text()
-        return handle
+    return fetch(VERIFIED_GIST_URL).then(async res => {
+      if (!res || res.status !== 200) {
+        return Promise.reject(new Error('Unable to fetch verified handles'))
+      } else {
+        return res.json().then((data: GithubData) => {
+          return JSON.parse(data.files['sybil-attestations.json'].content)
+        })
       }
-      return undefined
     })
-  } catch {
-    return undefined
+  } catch (e) {
+    return Promise.reject(new Error(e))
   }
 }
 

@@ -4,12 +4,11 @@ import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../theme'
-import { useTwitterProfileData, useVerifiedHandles } from '../../state/social/hooks'
+import { useTwitterProfileData, useVerifiedHandle } from '../../state/social/hooks'
 import Modal from '../Modal'
 import TwitterFlow from './TwitterFlow'
 
 import { useActiveWeb3React, useTheme } from '../../hooks'
-import { useUserPendingUsername } from '../../state/transactions/hooks'
 import { LoaderSecondary } from '../Loader'
 import { useTwitterAccount } from '../../state/user/hooks'
 import moment from 'moment'
@@ -81,44 +80,43 @@ function TwitterAccountDetails() {
   // toggle modal for twitter verification
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  // get logged in account
-  const [twitterAccount] = useTwitterAccount()
-
-  // detect any pending profile attestations
-  const { pendingProfile } = useUserPendingUsername()
+  // hardcore account if verified in current session
+  const [accountOverride, setAccountOverride] = useState<string | undefined>()
 
   // get any verified handles for this user + timestamps they were created at
-  const handles = useVerifiedHandles(account)
-  const verifiedHandleEntry = handles ? handles?.[0] : undefined
-  const verified = Boolean(verifiedHandleEntry && !pendingProfile)
+  const [twitterAccount] = useTwitterAccount()
+  const verifiedHandleEntry = useVerifiedHandle(account)
 
-  // if pending, wait on that, then if verified handle use that, otherwise wait for logged in username
-  const profileData = useTwitterProfileData(pendingProfile ?? verifiedHandleEntry?.handle)
+  const loadingVerifiedHandles = verifiedHandleEntry === null
+  const profileData = useTwitterProfileData(accountOverride ?? verifiedHandleEntry?.handle)
 
+  const verified = !!accountOverride || !!verifiedHandleEntry
+
+  // parse verfication date, returned in ms convert to seconds
   const verificationDate = verifiedHandleEntry
-    ? moment.unix(verifiedHandleEntry.timestamp).format('MMM Do YYYY')
+    ? moment.unix(verifiedHandleEntry.timestamp / 1000).format('MMM Do YYYY')
     : undefined
 
   // on redirect from twitter, if signed in, not verified, and no loading, show modal
   const [loaded, setLoaded] = useState(false)
   const { username: usernameQuery } = useParsedQueryString()
   useEffect(() => {
-    if (twitterAccount && !verified && handles && !loaded && usernameQuery) {
+    if (twitterAccount && !verifiedHandleEntry && !loadingVerifiedHandles && !loaded && usernameQuery) {
       setShowTwitterFlow(true)
       setLoaded(true)
     }
-  }, [handles, twitterAccount, verified, loaded, usernameQuery])
+  }, [loadingVerifiedHandles, twitterAccount, loaded, usernameQuery, verifiedHandleEntry])
 
   return (
     <>
       <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
-        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
+        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} setAccountOverride={setAccountOverride} />
       </Modal>
-      {!handles ? (
+      {loadingVerifiedHandles ? (
         <LoadingFlag>
           Loading social data <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} stroke={theme.text3} />
         </LoadingFlag>
-      ) : !verifiedHandleEntry ? (
+      ) : !verified ? (
         !twitterAccount ? (
           <TwitterLoginButton text="Announce yourself as a delegate" />
         ) : (
@@ -142,13 +140,7 @@ function TwitterAccountDetails() {
                     <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
                       @{profileData.handle}
                     </TYPE.body>
-                    {pendingProfile ? (
-                      <PendingFlag verified={verified}>
-                        Verifying <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} />
-                      </PendingFlag>
-                    ) : (
-                      <PendingFlag verified={verified}>Verfied</PendingFlag>
-                    )}
+                    <PendingFlag verified={!!verifiedHandleEntry || !!accountOverride}>Verfied</PendingFlag>
                   </RowFixed>
                   {verificationDate && <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>}
                 </AutoColumn>

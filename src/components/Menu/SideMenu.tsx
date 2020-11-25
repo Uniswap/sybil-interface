@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { RowBetween } from '../Row'
-import { TYPE, CloseIcon, ExternalLink } from '../../theme'
+import { TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
 import { Book, Code, HelpCircle, ChevronLeft } from 'react-feather'

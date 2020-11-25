@@ -1,19 +1,16 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { addTransaction } from './actions'
 import { TransactionDetails } from './reducer'
-import { useTwitterAccount } from '../user/hooks'
-import { newTransactionsFirst } from '../../components/Web3Status'
 
 export interface CustomData {
   summary?: string
   approval?: { tokenAddress: string; spender: string }
   claim?: { recipient: string }
-  social?: { username: string; account: string }
 }
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -22,7 +19,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
   const dispatch = useDispatch<AppDispatch>()
 
   return useCallback(
-    (response: TransactionResponse, { summary, approval, claim, social }: CustomData = {}) => {
+    (response: TransactionResponse, { summary, approval, claim }: CustomData = {}) => {
       if (!account) return
       if (!chainId) return
 
@@ -30,7 +27,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
       if (!hash) {
         throw Error('No transaction hash found.')
       }
-      dispatch(addTransaction({ hash, from: account, chainId, approval, summary, claim, social }))
+      dispatch(addTransaction({ hash, from: account, chainId, approval, summary, claim }))
     },
     [dispatch, chainId, account]
   )
@@ -100,62 +97,4 @@ export function useUserHasSubmittedClaim(
   }, [account, allTransactions])
 
   return { claimSubmitted: Boolean(claimTxn), claimTxn }
-}
-
-export function useVerifcationConfirmed(): boolean | undefined {
-  // get account info to check against
-  const { account } = useActiveWeb3React()
-  const [twitterAccount] = useTwitterAccount()
-
-  // monitor for pending attempt to verify, pull out profile if so
-  const allTransactions = useAllTransactions()
-
-  const [pending, setPending] = useState<TransactionDetails | undefined>()
-
-  const sortedRecentTransactions: TransactionDetails[] = useMemo(() => {
-    return Object.values(allTransactions)
-      .filter(isTransactionRecent)
-      .sort(newTransactionsFirst)
-  }, [allTransactions])
-
-  const relevantTxns = sortedRecentTransactions.filter(
-    tx => tx.social && tx.social.account === account && tx.social.username === twitterAccount
-  )
-  const pendingVerifications = sortedRecentTransactions.filter(tx => !tx.receipt && tx.social)
-  const pendingVerification = pendingVerifications?.[0]
-
-  useEffect(() => {
-    if (pendingVerification) {
-      setPending(pendingVerification)
-    }
-  }, [pendingVerification])
-
-  const recentlyVerified = relevantTxns.filter(t => !!t.receipt)?.[0]
-
-  return !!pending && !!recentlyVerified
-}
-
-export function useUserPendingUsername(): { pendingProfile: string | undefined } {
-  // get account info to check against
-  const { account } = useActiveWeb3React()
-  const [twitterAccount] = useTwitterAccount()
-
-  // monitor for pending attempt to verify, pull out profile if so
-  const allTransactions = useAllTransactions()
-
-  const sortedRecentTransactions: TransactionDetails[] = useMemo(() => {
-    return Object.values(allTransactions)
-      .filter(isTransactionRecent)
-      .sort(newTransactionsFirst)
-  }, [allTransactions])
-
-  const relevantTxns = sortedRecentTransactions.filter(
-    tx => tx.social && tx.social.account === account && tx.social.username === twitterAccount
-  )
-  const pendingVerifications = relevantTxns.filter(tx => !tx.receipt && tx.social)
-  const pendingProfile = pendingVerifications?.[0]?.social?.username
-
-  return {
-    pendingProfile
-  }
 }

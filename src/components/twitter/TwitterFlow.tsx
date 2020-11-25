@@ -6,15 +6,15 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import { useAttestCallBack } from '../../state/social/hooks'
+import { useVerifyCallback } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
-import { LoadingView, SubmittedView } from '../ModalViews'
 import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import TwitterAccountPreview from '../../components/twitter/TwitterAccountPreview'
 import TwitterLoginButton from './TwitterLoginButton'
+import { OffChainRequestModal } from '../TransactionConfirmationModal'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -28,7 +28,13 @@ const TweetWrapper = styled.div`
     word-break: break-word;
 `
 
-export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
+export default function TwitterFlow({
+  onDismiss,
+  setAccountOverride
+}: {
+  onDismiss: () => void
+  setAccountOverride: (account: string) => void
+}) {
   const { account, library } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
@@ -38,31 +44,23 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const [signedMessage, setSignedMessage] = useState<undefined | string>()
 
   // monitor on chain submission
-  const attestCallback = useAttestCallBack(twitterHandle)
+  const { verifyCallback } = useVerifyCallback(tweetID)
   const [requestError, setRequestError] = useState<string | undefined>()
-  const [hash, setHash] = useState<string | undefined>()
+  const [verified, setVerified] = useState(false)
   const [attempting, setAttempting] = useState(false)
-
-  // wrapper to reset state on modal close
-  function wrappedOndismiss() {
-    setHash(undefined)
-    setAttempting(false)
-    onDismiss()
-  }
 
   async function onVerify() {
     setAttempting(true)
     // if callback not returned properly ignore
-    if (!attestCallback || !account || !tweetID) return
+    if (!verifyCallback || !account || !tweetID) return
     // try delegation and store hash
-    const hash = await attestCallback(account, tweetID)?.catch(error => {
-      setAttempting(false)
-      setRequestError('Error submitting verification')
-      console.log(error)
-    })
-    if (hash) {
-      setAttempting(false)
-      setHash(hash)
+    const res = await verifyCallback()
+
+    if (res.error) {
+      setRequestError(res.error)
+    } else if (res.success && twitterHandle) {
+      setAccountOverride(twitterHandle)
+      setVerified(true)
     }
   }
 
@@ -105,7 +103,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   const tweetCopy = `Verifying identity for ${
     activeProtocol?.token.symbol
-  } governance - addr:${account} - sig:${signedMessage ?? ''}`
+  } governance - addr:${account} - Signature:${signedMessage ?? ''}`
 
   // twitter watcher
   const [tweetError, setTweetError] = useState<string | undefined>()
@@ -158,20 +156,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <ModalContentWrapper>
-      {attempting && !hash ? (
-        <LoadingView onDismiss={wrappedOndismiss}>
-          <AutoColumn gap="2rem" justify={'center'}>
-            <TYPE.largeHeader>Submitting social data</TYPE.largeHeader>
-          </AutoColumn>
-        </LoadingView>
-      ) : hash ? (
-        <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
-          <AutoColumn gap="2rem" justify={'center'}>
-            <TYPE.largeHeader>Verification Submitted</TYPE.largeHeader>
-            <ButtonPrimary onClick={wrappedOndismiss}>Close</ButtonPrimary>
-          </AutoColumn>
-        </SubmittedView>
-      ) : !twitterHandle ? (
+      {!twitterHandle ? (
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
@@ -215,7 +200,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </ButtonPrimary>
           {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
         </AutoColumn>
-      ) : (
+      ) : !verified && !attempting ? (
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
@@ -238,6 +223,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </ButtonPrimary>
           {requestError && <TYPE.error error={true}>{requestError}</TYPE.error>}
         </AutoColumn>
+      ) : (
+        <OffChainRequestModal onDismiss={onDismiss} success={verified} />
       )}
     </ModalContentWrapper>
   )

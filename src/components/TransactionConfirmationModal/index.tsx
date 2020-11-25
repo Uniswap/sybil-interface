@@ -6,19 +6,19 @@ import { ExternalLink } from '../../theme'
 import { Text } from 'rebass'
 import { CloseIcon, CustomLightSpinner } from '../../theme/components'
 import { RowBetween } from '../Row'
-import { AlertTriangle, ArrowUpCircle } from 'react-feather'
+import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn, ColumnCenter } from '../Column'
 import Circle from '../../assets/images/blue-loader.svg'
 
 import { getEtherscanLink } from '../../utils'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveWeb3React, useTheme } from '../../hooks'
 
 const Wrapper = styled.div`
   width: 100%;
 `
 const Section = styled(AutoColumn)`
-  padding: 24px;
+  padding: 1rem;
 `
 
 const BottomSection = styled(Section)`
@@ -28,7 +28,7 @@ const BottomSection = styled(Section)`
 `
 
 const ConfirmedIcon = styled(ColumnCenter)`
-  padding: 60px 0;
+  padding: 2rem 0;
 `
 
 function ConfirmationPendingContent({ onDismiss, pendingText }: { onDismiss: () => void; pendingText: string }) {
@@ -60,14 +60,16 @@ function ConfirmationPendingContent({ onDismiss, pendingText }: { onDismiss: () 
   )
 }
 
-function TransactionSubmittedContent({
+export function TransactionSubmittedContent({
   onDismiss,
   chainId,
-  hash
+  hash,
+  confirmationText
 }: {
   onDismiss: () => void
-  hash: string | undefined
-  chainId: ChainId
+  hash?: string | undefined
+  chainId?: ChainId
+  confirmationText?: string
 }) {
   const theme = useContext(ThemeContext)
 
@@ -83,7 +85,7 @@ function TransactionSubmittedContent({
         </ConfirmedIcon>
         <AutoColumn gap="12px" justify={'center'}>
           <Text fontWeight={500} fontSize={20}>
-            Transaction Submitted
+            {confirmationText ?? 'Transaction Submitted'}
           </Text>
           {chainId && hash && (
             <ExternalLink href={getEtherscanLink(chainId, hash, 'transaction')}>
@@ -187,5 +189,50 @@ export default function TransactionConfirmationModal({
         content()
       )}
     </Modal>
+  )
+}
+
+export function OffChainRequestModal({ success, onDismiss }: { success: boolean; onDismiss: () => void }) {
+  const theme = useTheme()
+
+  return success ? (
+    <Wrapper>
+      <AutoColumn>
+        <RowBetween>
+          <div />
+          <CloseIcon onClick={onDismiss} />
+        </RowBetween>
+        <ConfirmedIcon>
+          <CheckCircle strokeWidth={0.5} size={90} color={theme.primary1} />
+        </ConfirmedIcon>
+        <AutoColumn gap="12px" justify={'center'}>
+          <Text fontWeight={500} fontSize={20}>
+            Verification Successful
+          </Text>
+          <ButtonPrimary onClick={onDismiss} style={{ margin: '20px 0 0 0' }}>
+            <Text fontWeight={500} fontSize={20}>
+              Close
+            </Text>
+          </ButtonPrimary>
+        </AutoColumn>
+      </AutoColumn>
+    </Wrapper>
+  ) : (
+    <Wrapper>
+      <AutoColumn>
+        <RowBetween>
+          <div />
+          <CloseIcon onClick={onDismiss} />
+        </RowBetween>
+        <ConfirmedIcon>
+          <CustomLightSpinner src={Circle} alt="loader" size={'90px'} />
+        </ConfirmedIcon>
+        <AutoColumn gap="12px" justify={'center'}>
+          <Text fontWeight={500} fontSize={16} color="" textAlign="center">
+            Attempting Verification
+          </Text>
+        </AutoColumn>
+      </AutoColumn>
+    </Wrapper>
   )
 }
