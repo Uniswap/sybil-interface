@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Row, { RowBetween, RowFixed } from '../Row'
-import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-import { TYPE } from '../../theme'
+import { TYPE, ExternalLink } from '../../theme'
 import { useTwitterProfileData, useVerifiedHandle } from '../../state/social/hooks'
 import Modal from '../Modal'
 import TwitterFlow from './TwitterFlow'
@@ -73,18 +72,18 @@ const LoadingFlag = styled.div`
   font-size: 12px;
 `
 
-function TwitterAccountDetails() {
+export default function TwitterAccountDetails() {
   const { account } = useActiveWeb3React()
   const theme = useTheme()
 
   // toggle modal for twitter verification
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  // hardcore account if verified in current session
+  // hardcode account if verified in current session
   const [accountOverride, setAccountOverride] = useState<string | undefined>()
 
   // get any verified handles for this user + timestamps they were created at
-  const [twitterAccount] = useTwitterAccount()
+  const [twitterAccount] = useTwitterAccount() // logged in account
   const verifiedHandleEntry = useVerifiedHandle(account)
 
   const loadingVerifiedHandles = verifiedHandleEntry === null
@@ -95,6 +94,8 @@ function TwitterAccountDetails() {
   // parse verfication date, returned in ms convert to seconds
   const verificationDate = verifiedHandleEntry
     ? moment.unix(verifiedHandleEntry.timestamp / 1000).format('MMM Do YYYY')
+    : accountOverride
+    ? moment.unix(moment.now() / 1000).format('MMM Do YYYY')
     : undefined
 
   // on redirect from twitter, if signed in, not verified, and no loading, show modal
@@ -137,9 +138,11 @@ function TwitterAccountDetails() {
                 </RoundedProfileImage>
                 <AutoColumn gap="0.5rem">
                   <RowFixed>
-                    <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
-                      @{profileData.handle}
-                    </TYPE.body>
+                    <ExternalLink href={'https://twitter.com/' + profileData.handle}>
+                      <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
+                        @{profileData.handle}
+                      </TYPE.body>
+                    </ExternalLink>
                     <PendingFlag verified={!!verifiedHandleEntry || !!accountOverride}>Verfied</PendingFlag>
                   </RowFixed>
                   {verificationDate && <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>}
@@ -154,5 +157,3 @@ function TwitterAccountDetails() {
     </>
   )
 }
-
-export default withRouter(TwitterAccountDetails)

@@ -5,7 +5,14 @@ import { TYPE, ExternalLink } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, getEtherscanLink, getTwitterProfileLink } from '../../utils'
-import { DelegateData, useActiveProtocol, useGlobalData, useUserVotes } from '../../state/governance/hooks'
+import {
+  DelegateData,
+  useActiveProtocol,
+  useGlobalData,
+  useUserVotes,
+  useGovernanceToken,
+  useUserDelegatee
+} from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
@@ -18,6 +25,7 @@ import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 import { BIG_INT_ZERO } from '../../constants'
+import { useTokenBalance } from '../../state/wallet/hooks'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -28,13 +36,29 @@ const NoWrap = styled(TYPE.black)`
 `
 
 const FixedAddressSize = styled(AutoColumn)`
-  width: 120px;
+  width: 140px;
 `
 
 const TwitterLogo = styled.img`
   height: 24px;
   width: 24px;
   margin-left: 4px;
+`
+
+const OnlyAboveLarge = styled.div`
+  display: initial;
+
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+  display: none;
+  `};
+`
+
+const OnlyAboveSmall = styled.div`
+  display: initial;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `};
 `
 
 const DataRow = styled.div`
@@ -56,10 +80,34 @@ const DataRow = styled.div`
       cursor: initial;
     }
   }
+
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    grid-template-columns: 1fr 160px;
+
+  `};
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  grid-template-columns: 1fr 160px;
+    margin: 0;
+    padding: 0 1.5rem;
+  `};
+`
+
+const DelegateButton = styled(ButtonBlue)`
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    font-size: 12px;
+    margin-top: 0px !important;
+  `};
+`
+
+const VoteText = styled(NoWrap)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 12px;
+  `};
 `
 
 export default function DelegateList({ topDelegates }: { topDelegates: DelegateData[] | undefined }) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
 
   // toggle for showing delegation modal
   const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
@@ -75,7 +123,17 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   const globalData = useGlobalData()
 
   const availableVotes = useUserVotes()
-  const showDelegateButton = availableVotes ? JSBI.greaterThan(availableVotes?.raw, BIG_INT_ZERO) : false
+  const userDelegatee = useUserDelegatee()
+  const govToken = useGovernanceToken()
+  const govTokenBalance = useTokenBalance(account ?? undefined, govToken)
+
+  // show delegate button if they have available votes or if theyve delegated to someone else
+  const showDelegateButton =
+    userDelegatee && govTokenBalance && userDelegatee !== account
+      ? JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO)
+      : availableVotes
+      ? JSBI.greaterThan(availableVotes?.raw, BIG_INT_ZERO)
+      : false
 
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
@@ -83,14 +141,18 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           return (
             <DataRow key={d.id}>
               <AutoRow gap="10px">
-                <NoWrap>{i + 1}</NoWrap>
-                {d.imageURL ? (
-                  <RoundedProfileImage>
-                    <img src={d.imageURL} alt="profile" />
-                  </RoundedProfileImage>
-                ) : (
-                  <WrappedListLogo src={EmptyProfile} />
-                )}
+                <OnlyAboveSmall>
+                  <NoWrap>{i + 1}</NoWrap>
+                </OnlyAboveSmall>
+                <OnlyAboveSmall>
+                  {d.imageURL ? (
+                    <RoundedProfileImage>
+                      <img src={d.imageURL} alt="profile" />
+                    </RoundedProfileImage>
+                  ) : (
+                    <WrappedListLogo src={EmptyProfile} />
+                  )}
+                </OnlyAboveSmall>
                 <FixedAddressSize gap="6px">
                   <RowFixed>
                     <ExternalLink
@@ -109,7 +171,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                   )}
                 </FixedAddressSize>
                 {showDelegateButton && (
-                  <ButtonBlue
+                  <DelegateButton
                     width="fit-content"
                     onClick={() => {
                       setPrefilledDelegate(d.id)
@@ -117,20 +179,24 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                     }}
                   >
                     Delegate
-                  </ButtonBlue>
+                  </DelegateButton>
                 )}
               </AutoRow>
-              <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-              <NoWrap textAlign="end">
-                {globalData
-                  ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(
-                      3
-                    ) + '%'
-                  : '-'}
-              </NoWrap>
-              <NoWrap textAlign="end">
+              <OnlyAboveLarge>
+                <NoWrap textAlign="end">{d.votes.length}</NoWrap>
+              </OnlyAboveLarge>
+              <OnlyAboveLarge>
+                <NoWrap textAlign="end">
+                  {globalData
+                    ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(
+                        3
+                      ) + '%'
+                    : '-'}
+                </NoWrap>
+              </OnlyAboveLarge>
+              <VoteText textAlign="end">
                 {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
-              </NoWrap>
+              </VoteText>
             </DataRow>
           )
         })
@@ -151,8 +217,12 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
       <AutoColumn gap="lg">
         <DataRow>
           <ColumnLabel>Rank</ColumnLabel>
-          <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
-          <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
+          <OnlyAboveLarge>
+            <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
+          </OnlyAboveLarge>
+          <OnlyAboveLarge>
+            <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
+          </OnlyAboveLarge>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
         {delegateList ?? (
@@ -160,13 +230,6 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
             <Loader />
           </Row>
         )}
-        {/* {delegateList ?? (
-          <AutoColumn gap="1rem">
-            <CardLoader />
-            <CardLoader />
-            <CardLoader />
-          </AutoColumn>
-        )} */}
       </AutoColumn>
     </GreyCard>
   )

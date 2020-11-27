@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useActiveProtocol } from '../../state/governance/hooks'
@@ -7,6 +7,7 @@ import { WrappedListLogo } from './styled'
 import { TYPE } from '../../theme'
 import { ChevronDown } from 'react-feather'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
+import useOnClickOutside from '../../hooks/useClickOutside'
 
 const Wrapper = styled.div<{ backgroundColor?: string; open: boolean }>`
   width: 100%;
@@ -43,8 +44,11 @@ export default function Dropdown() {
 
   const [open, setOpen] = useState(false)
 
+  const ref = useRef(null)
+  useOnClickOutside(ref, () => setOpen(false))
+
   return (
-    <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open}>
+    <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open} ref={ref}>
       <RowBetween>
         <RowFixed>
           <WrappedListLogo src={activeProtocol?.logo} />
@@ -60,7 +64,7 @@ export default function Dropdown() {
             <Flyout
               key={i}
               backgroundColor={SUPPORTED_PROTOCOLS[k].secondaryColor}
-              to={`/${SUPPORTED_PROTOCOLS[k].id}`}
+              to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
             >
               <RowBetween>
                 <RowFixed>

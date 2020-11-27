@@ -23,6 +23,10 @@ const Wrapper = styled.div<{ open: boolean }>`
   :hover {
     cursor: ${({ open }) => (open ? 'unset' : 'pointer')};
   }
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    display: none;
+  `};
 `
 
 const FlippedText = styled.div`

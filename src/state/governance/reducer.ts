@@ -91,11 +91,11 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
 
 export interface GovernanceState {
   // the selected option from supported protocol options
-  activeProtocol: GovernanceInfo | undefined
+  activeProtocol: GovernanceInfo
 }
 
 export const initialState: GovernanceState = {
-  activeProtocol: undefined
+  activeProtocol: UNISWAP_GOVERNANCE
 }
 
 export default createReducer(initialState, builder =>

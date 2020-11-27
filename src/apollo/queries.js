@@ -1,38 +1,5 @@
 import gql from 'graphql-tag'
 
-export const HANDLES_BULK = gql`
-  query governance($accounts: [Bytes]!) {
-    attestations(where: { account_in: $accounts }, sortBy: timestamp, sortDirection: desc) {
-      id
-      account
-      tweetID
-      timestamp
-    }
-  }
-`
-
-export const ATTESTATIONS_QUERY = gql`
-  query attestations($account: Bytes!) {
-    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
-      id
-      account
-      tweetID
-      timestamp
-    }
-  }
-`
-
-export const CONTENT_SUBSCRIPTION = gql`
-  subscription onContetUpdate($account: Bytes!) {
-    attestations(where: { account: $account }, sortBy: timestamp, sortDirection: desc) {
-      id
-      account
-      tweetID
-      timestamp
-    }
-  }
-`
-
 export const GLOBAL_DATA = gql`
   query governance {
     governances(first: 1) {
@@ -91,6 +58,22 @@ export const PROPOSALS = gql`
           id
         }
       }
+    }
+  }
+`
+
+export const ALL_VOTERS = gql`
+  query voters($proposalID: String!, $support: Boolean!) {
+    votes(
+      first: 1000
+      where: { support: $support, proposal: $proposalID, votes_gt: 1 }
+      orderBy: votes
+      orderDirection: desc
+    ) {
+      voter {
+        id
+      }
+      votes
     }
   }
 `

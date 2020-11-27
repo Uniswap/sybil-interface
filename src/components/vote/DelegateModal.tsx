@@ -11,9 +11,10 @@ import { useActiveWeb3React } from '../../hooks'
 import AddressInputPanel from '../AddressInputPanel'
 import { isAddress } from 'ethers/lib/utils'
 import useENS from '../../hooks/useENS'
-import { useDelegateCallback, useGovernanceToken } from '../../state/governance/hooks'
+import { useDelegateCallback, useGovernanceToken, useActiveProtocol } from '../../state/governance/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { LoadingView, SubmittedView } from '../ModalViews'
+import { Text } from 'rebass'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -65,6 +66,8 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
   const activeDelegate = usingDelegate ? typed : account
   const { address: parsedAddress } = useENS(activeDelegate)
 
+  const [activeProtocol] = useActiveProtocol()
+
   const govToken = useGovernanceToken()
 
   // get the number of votes available to delegate
@@ -90,9 +93,8 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
     if (!delegateCallback) return
 
     // try delegation and store hash
-    const hash = await delegateCallback(parsedAddress ?? undefined)?.catch(error => {
+    const hash = await delegateCallback(parsedAddress ?? undefined)?.catch(() => {
       setAttempting(false)
-      console.log(error)
     })
 
     if (hash) {
@@ -109,7 +111,9 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
               <TYPE.mediumHeader fontWeight={500}>{title}</TYPE.mediumHeader>
               <StyledClosed stroke="black" onClick={wrappedOndismiss} />
             </RowBetween>
-            <TYPE.body>Earned UNI tokens represent voting shares in Uniswap governance.</TYPE.body>
+            <TYPE.body>
+              Earned {activeProtocol.token.symbol} tokens represent voting shares in Uniswap governance.
+            </TYPE.body>
             <TYPE.body>
               You can either vote on each proposal yourself or delegate your votes to a third party.
             </TYPE.body>
@@ -137,7 +141,14 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.main fontSize={36}>{govTokenBalance?.toSignificant(4)} Votes Delegated</TYPE.main>
+            <TYPE.main fontSize={36} textAlign="center">
+              {govTokenBalance?.toSignificant(4)} Votes Delegated
+            </TYPE.main>
+            <ButtonPrimary onClick={wrappedOndismiss} style={{ margin: '20px 0 0 0' }}>
+              <Text fontWeight={500} fontSize={20}>
+                Close
+              </Text>
+            </ButtonPrimary>
           </AutoColumn>
         </SubmittedView>
       )}

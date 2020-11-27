@@ -13,6 +13,7 @@ import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
 import { fetchDelegates, fetchProposals, enumerateProposalState, fetchGlobalData } from '../../data/governance'
 import { useAllVerifiedHandles } from '../social/hooks'
+import { ALL_VOTERS } from '../../apollo/queries'
 
 export interface GlobaData {
   id: string
@@ -37,7 +38,7 @@ export interface DelegateData {
   imageURL?: string | undefined
 }
 
-export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtocol: GovernanceInfo) => void] {
+export function useActiveProtocol(): [GovernanceInfo, (activeProtocol: GovernanceInfo) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const activeProtocol = useSelector<AppState, AppState['governance']['activeProtocol']>(state => {
     return state.governance.activeProtocol
@@ -72,7 +73,6 @@ export function useGlobalData(): GlobaData | undefined {
   const client = useSubgraphClient()
   const [globalData, setGlobalData] = useState<GlobaData | undefined>()
 
-  // subgraphs only store ids in lowercase, format
   useEffect(() => {
     fetchGlobalData(client).then((data: GlobaData | null) => {
       if (data) {
@@ -231,7 +231,7 @@ export function useAllProposals() {
   useEffect(() => {
     if (states && proposals && govToken) {
       proposals.map((p, i) => {
-        return (p.status = enumerateProposalState(states?.[i]?.result?.[0] ?? 0))
+        return (p.status = enumerateProposalState(states?.[i]?.result?.[0] ?? undefined))
       })
     }
   }, [counts, govToken, proposals, states])
@@ -330,4 +330,64 @@ export function useVoteCallback(): {
     [account, addTransaction, govContract]
   )
   return { voteCallback }
+}
+
+export function useAllVotersForProposal(
+  proposalID: string,
+  support: boolean
+):
+  | {
+      votes: string
+      voter: {
+        id: string
+      }
+    }[]
+  | undefined {
+  const subgraphClient = useSubgraphClient()
+
+  const [voters, setVoters] = useState<
+    | {
+        votes: string
+        voter: {
+          id: string
+        }
+      }[]
+    | undefined
+  >()
+
+  useEffect(() => {
+    setVoters(undefined)
+  }, [proposalID, subgraphClient])
+
+  useEffect(() => {
+    async function fetchData() {
+      subgraphClient
+        ?.query({
+          query: ALL_VOTERS,
+          variables: {
+            proposalID,
+            support
+          }
+        })
+        .then(
+          (res: {
+            data: {
+              votes: {
+                votes: string
+                voter: {
+                  id: string
+                }
+              }[]
+            }
+          }) => {
+            setVoters(res.data.votes)
+          }
+        )
+    }
+    if (!voters) {
+      fetchData()
+    }
+  })
+
+  return voters
 }

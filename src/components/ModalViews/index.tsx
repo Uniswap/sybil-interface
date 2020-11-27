@@ -13,11 +13,11 @@ import { ExternalLink } from '../../theme/components'
 
 const ConfirmOrLoadingWrapper = styled.div`
   width: 100%;
-  padding: 1rem;
+  padding: 2rem;
 `
 
 const ConfirmedIcon = styled(ColumnCenter)`
-  padding: 60px 0;
+  padding: 1rem 0;
 `
 
 export function LoadingView({ children, onDismiss }: { children: any; onDismiss: () => void }) {

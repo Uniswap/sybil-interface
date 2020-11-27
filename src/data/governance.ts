@@ -1,11 +1,11 @@
 import { HandleEntry } from './../state/social/hooks'
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, HANDLES_BULK } from '../apollo/queries'
+import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
 import { Percent } from '@uniswap/sdk'
-import { client as sybilClient } from '../apollo/client'
 import { fetchProfileData } from './social'
+import { isAddress } from '../utils'
 
 interface DelegateResponse {
   data: {
@@ -86,21 +86,16 @@ export function fetchDelegates(
             })
           )
 
-          // get all handles related to delegates found
-          const handlesResponse: HandlesResponse = await sybilClient.query({
-            query: HANDLES_BULK,
-            variables: {
-              accounts: testData.map(d => d.id.toLowerCase())
-            }
-          })
-
           // for each handle attestation - verify which ones are legit,
           const handles = await Promise.all(
-            handlesResponse.data.attestations.map(async (a: any) => {
-              const handle = allVerifiedHandles?.[a.account]?.handle
+            testData.map(async (a: DelegateData) => {
+              const checksummed = isAddress(a.id)
+
+              const handle = checksummed ? allVerifiedHandles?.[checksummed]?.handle : undefined
+
               const profileData = handle ? await fetchProfileData(handle) : undefined
               return {
-                account: a.account,
+                account: a.id,
                 handle,
                 imageURL: profileData?.data?.profile_image_url
               }
@@ -132,7 +127,7 @@ interface ProposalResponse {
         [id: string]: string
       }
       description: string
-      status: string
+      status: string | undefined
       targets: string[]
       values: string[]
       signatures: string[]
@@ -180,7 +175,7 @@ export function fetchProposals(client: any, key: string): Promise<ProposalData[]
             title: p.description?.split(/# |\n/g)[1] || 'Untitled',
             description: p.description?.split(/# /)[1] || 'No description.',
             proposer: p.proposer.id,
-            status: enumerateProposalState(0), // initialize as 0
+            status: undefined, // initialize as 0
             forCount: 0, // initialize as 0
             againstCount: 0, // initialize as 0
             startBlock: parseInt(p.startBlock),

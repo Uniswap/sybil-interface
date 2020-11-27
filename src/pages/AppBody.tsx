@@ -4,6 +4,10 @@ import styled from 'styled-components'
 export const BodyWrapper = styled.div`
   position: relative;
   width: 80%;
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    width: 90%;
+  `};
 `
 
 /**

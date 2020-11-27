@@ -1,36 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { BodyWrapper } from '../AppBody'
 import { AutoColumn } from '../../components/Column'
 import styled from 'styled-components'
-import {
-  useActiveProtocol,
-  useTopDelegates,
-  DelegateData,
-  useAllProposals,
-  ProposalData,
-  useGovernanceToken,
-  useUserVotes,
-  useUserDelegatee
-} from '../../state/governance/hooks'
-import { RouteComponentProps } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../state'
-import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
+import { useGovernanceToken, useUserVotes, useUserDelegatee } from '../../state/governance/hooks'
+
 import Dropdown from '../../components/governance/Dropdown'
-import DelegateList from '../../components/governance/DelegateList'
 import Tabs from '../../components/governance/Tabs'
-import Proposals from '../../components/governance/ProposalList'
 import { useToggleModal } from '../../state/application/hooks'
 import useENS from '../../hooks/useENS'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveWeb3React, useTheme } from '../../hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { TokenAmount, JSBI } from '@uniswap/sdk'
-import { ZERO_ADDRESS } from '../../constants'
+import { TokenAmount, JSBI, Token, ChainId } from '@uniswap/sdk'
+import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../constants'
 import { GreyCard } from '../../components/Card'
 import { RowBetween, RowFixed, AutoRow } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
-import { ButtonBasic } from '../../components/Button'
+import { ButtonBasic, ButtonSecondary } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import { Settings } from 'react-feather'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
@@ -39,6 +25,7 @@ const SectionWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 1.5em;
+  margin-bottom: 1rem;
 `
 const EmptyCircle = styled.div`
   height: 48px;
@@ -64,38 +51,61 @@ const StyledSettings = styled(Settings)`
   }
 `
 
-export enum ActiveTab {
-  DELEGATES,
-  PROPOSALS
-}
+const UpdateButton = styled(ButtonSecondary)`
+  font-size: 12px;
+  color: ${({ theme }) => theme.text3}
+  border-color: ${({ theme }) => theme.text3}
+  width: fit-content;
+  padding:  4px;
 
-export default function Overview({
-  match: {
-    params: { protocolId }
+  :hover {
+    border-color: ${({ theme }) => theme.text2}
+    color: ${({ theme }) => theme.text2}
   }
-}: RouteComponentProps<{ protocolId: string }>) {
-  // if valid protocol id passed in, update global active protocol
-  const dispatch = useDispatch<AppDispatch>()
-  const [, setActiveProtocol] = useActiveProtocol()
-  useEffect(() => {
-    if (Object.keys(SUPPORTED_PROTOCOLS).includes(protocolId)) {
-      setActiveProtocol(SUPPORTED_PROTOCOLS[protocolId])
-    }
-  }, [dispatch, protocolId, setActiveProtocol])
+
+  &:active, &:focus {
+    border-color: ${({ theme }) => theme.text3}
+    box-shadow: 0 0 0 0.5pt ${({ theme }) => theme.text3};
+  }
+`
+
+const ResponsiveRow = styled.div`
+  width: 100%;
+  display: flex;
+  padding: 0;
+  align-items: flex-start;
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  `};
+`
+
+const MobilePadding = styled.div`
+  padding: 0;
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    padding: 2rem 0;
+    justify-content: flex-start;
+  `};
+`
+
+export default function Overview() {
+  const theme = useTheme()
 
   // account details
   const { chainId, account } = useActiveWeb3React()
   const { name: ensName } = useENS(account)
 
   // UI views
-  const [activeTab, setActiveTab] = useState<ActiveTab>(ActiveTab.DELEGATES)
   const toggleWalletModal = useToggleModal(ApplicationModal.WALLET)
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
 
-  //  global gov data
-  const topDelegates: DelegateData[] | undefined = useTopDelegates()
-  const allProposals: ProposalData[] | undefined = useAllProposals()
-  const govToken = useGovernanceToken()
+  const govToken: Token | undefined = useGovernanceToken()
 
   // user gov data
   const availableVotes: TokenAmount | undefined = useUserVotes()
@@ -104,8 +114,14 @@ export default function Overview({
 
   // show delegation option if they have have a balance, but have not delegated
   const showUnlockVoting = Boolean(
-    govTokenBalance && JSBI.notEqual(govTokenBalance.raw, JSBI.BigInt(0)) && userDelegatee === ZERO_ADDRESS
+    govTokenBalance && JSBI.notEqual(govTokenBalance.raw, BIG_INT_ZERO) && userDelegatee === ZERO_ADDRESS
   )
+
+  // if delegate that isnt user or 0 address, show balance delegated
+  const showDelegatedCount = userDelegatee && account && userDelegatee !== ZERO_ADDRESS
+
+  // hide update button if no votes
+  const hideUpdateButton = govTokenBalance && JSBI.equal(govTokenBalance.raw, BIG_INT_ZERO)
 
   return (
     <BodyWrapper>
@@ -130,48 +146,66 @@ export default function Overview({
                   </ButtonBasic>
                 </RowBetween>
               )}
-              <RowBetween>
+              <ResponsiveRow>
                 <AutoColumn gap="sm">
                   {account && chainId && (
-                    <AutoRow gap="6px" style={{ width: 'fit-content' }}>
-                      <TYPE.mediumHeader mr="6px">{shortenAddress(account)}</TYPE.mediumHeader>
-                      <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>↗</ExternalLink>
+                    <RowFixed style={{ width: 'fit-content' }}>
+                      <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>
+                        <TYPE.mediumHeader mr="10px" color={theme.text1}>
+                          {shortenAddress(account)}
+                        </TYPE.mediumHeader>
+                      </ExternalLink>
                       <StyledSettings onClick={toggleWalletModal} stroke="black" />
-                    </AutoRow>
+                    </RowFixed>
                   )}
                   {ensName ?? ''}
                   {account && showUnlockVoting && (
                     <TYPE.darkYellow fontSize="12px">Unlock voting to participate in governance</TYPE.darkYellow>
                   )}
                 </AutoColumn>
-                {account && showUnlockVoting ? (
-                  <RowFixed>
-                    <TYPE.main mr="1rem">{govTokenBalance?.toFixed(0)} Votes</TYPE.main>
-                    <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
-                  </RowFixed>
-                ) : (
-                  <AutoColumn gap="sm" justify="flex-end">
-                    {availableVotes ? <TYPE.body>{availableVotes?.toFixed(0)} Total Votes</TYPE.body> : ''}
-                    {userDelegatee === account && (
-                      <RowFixed>
-                        <TYPE.green>You are self delegated</TYPE.green>
-                        <TYPE.green ml="4px" onClick={() => toggelDelegateModal()}>
-                          (update)
-                        </TYPE.green>
-                      </RowFixed>
-                    )}
-                  </AutoColumn>
-                )}
-              </RowBetween>
+                <MobilePadding>
+                  {account && !showUnlockVoting && userDelegatee && userDelegatee !== account && (
+                    <RowFixed>
+                      <TYPE.main mr="8px">{govTokenBalance?.toFixed(0)} votes</TYPE.main>
+                      {showDelegatedCount && (
+                        <RowFixed>
+                          delegated to
+                          <ExternalLink
+                            style={{ margin: '0 6px' }}
+                            href={getEtherscanLink(ChainId.MAINNET, userDelegatee, 'address')}
+                          >
+                            {shortenAddress(userDelegatee)}
+                          </ExternalLink>
+                        </RowFixed>
+                      )}
+                      {!hideUpdateButton && <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>}
+                    </RowFixed>
+                  )}
+                  {account && showUnlockVoting && (
+                    <RowFixed>
+                      <TYPE.main mr="1rem">{govTokenBalance?.toFixed(0)} Votes</TYPE.main>
+                      <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
+                    </RowFixed>
+                  )}
+                  {account && !showUnlockVoting && userDelegatee === account && (
+                    <AutoColumn gap="sm" justify="flex-end">
+                      {availableVotes ? <TYPE.main>{availableVotes?.toFixed(0)} Votes</TYPE.main> : ''}
+                      {userDelegatee === account && (
+                        <RowFixed>
+                          <TYPE.green mr="8px">You are self delegated</TYPE.green>
+                          {!hideUpdateButton && (
+                            <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>
+                          )}
+                        </RowFixed>
+                      )}
+                    </AutoColumn>
+                  )}
+                </MobilePadding>
+              </ResponsiveRow>
               {account && <TwitterAccountDetails />}
             </AutoColumn>
           </AccountCard>
-          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-          {activeTab === ActiveTab.DELEGATES ? (
-            <DelegateList topDelegates={topDelegates} />
-          ) : (
-            <Proposals allProposals={allProposals} />
-          )}
+          <Tabs />
         </AutoColumn>
       </SectionWrapper>
     </BodyWrapper>

@@ -12,6 +12,9 @@ import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 import SideMenu from '../components/Menu/SideMenu'
 import TwitterAccountQueryParamReader from '../state/social/TwitterAccountQueryParamReader'
 import Web3Status from '../components/Web3Status'
+import Delegates from './Delegates'
+import Proposals from './Proposals'
+import ProposalDetails from '../components/governance/ProposalDetails'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -20,6 +23,10 @@ const SiteWrapper = styled.div`
   grid-template-columns: auto 1fr;
   grid-gap: 1.5em;
   overflow: auto;
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    grid-template-columns: 1fr;
+  `};
 `
 
 const AppWrapper = styled.div`
@@ -29,7 +36,7 @@ const AppWrapper = styled.div`
   overflow-x: hidden;
 `
 
-const BodyWrapper = styled.div`
+const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -41,7 +48,7 @@ const BodyWrapper = styled.div`
   z-index: 10;
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    padding: 16px;
+    padding: 0px;
     padding-top: 2rem;
   `};
 
@@ -62,18 +69,21 @@ export default function App() {
         <SideMenu />
         <AppWrapper>
           <URLWarning />
-          <BodyWrapper>
+          <ContentWrapper>
             <Web3Status />
             <Popups />
             <Polling />
+            <Overview />
             <Web3ReactManager>
               <Switch>
-                <Route exact strict path="/:protocolId" component={Overview} />
-                <Route exact strict path="/" component={RedirectWithUpdatedGovernance} />
+                <Route exact strict path="/delegates/:protocolID" component={Delegates} />
+                <Route exact strict path="/proposals/:protocolID" component={Proposals} />
+                <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+                <Route path="/" component={RedirectWithUpdatedGovernance} />
               </Switch>
             </Web3ReactManager>
             <Marginer />
-          </BodyWrapper>
+          </ContentWrapper>
         </AppWrapper>
       </SiteWrapper>
     </Suspense>

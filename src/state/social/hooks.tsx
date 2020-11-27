@@ -47,19 +47,18 @@ export function validVerification(value: HandleEntry): value is HandleEntry {
   return value !== null && value !== undefined && value.handle !== undefined
 }
 
-// @todo add typed query response
-export function useAllVerifiedHandles(): { [key: string]: HandleEntry } | undefined {
-  const [handles, setHandles] = useState<{ [key: string]: HandleEntry }>()
+// get entire list of verified handles
+export function useAllVerifiedHandles(): { [address: string]: HandleEntry } | undefined {
+  const [handles, setHandles] = useState<{ [address: string]: HandleEntry }>()
   useEffect(() => {
     async function fetchData() {
-      const results = await fetchAllVerifiedHandles()
+      const results: { [address: string]: HandleEntry } | undefined = await fetchAllVerifiedHandles()
       setHandles(results)
     }
     if (!handles) {
       fetchData()
     }
   }, [handles])
-
   return handles
 }
 
@@ -70,19 +69,23 @@ export function useVerifiedHandle(address: string | null | undefined): HandleEnt
   if (!handles) {
     return null
   }
-
   if (!address) {
     return undefined
   }
-
   return handles[address]
 }
 
+// verify a new adress -> handle mapping
+// returns success if properly inserted into gist and account in tweet matches signed in account
 export function useVerifyCallback(tweetID: string | undefined): { verifyCallback: () => Promise<VerifyResult> } {
   const { account } = useActiveWeb3React()
 
   const verifyCallback = async () => {
-    if (!tweetID) return Promise.reject(new Error('Invalid address'))
+    if (!tweetID)
+      return {
+        success: false,
+        error: 'Invalid tweet id'
+      }
 
     return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`).then(async res => {
       if (res.status === 200) {

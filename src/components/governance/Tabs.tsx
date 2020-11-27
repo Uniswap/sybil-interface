@@ -1,10 +1,10 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import { AutoRow } from '../Row'
 import { GreyCard } from '../Card'
 import { TYPE } from '../../theme'
-import { ActiveTab } from '../../pages/Governance'
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 const TabOption = styled.button<{ selected?: boolean }>`
   padding: 6px;
@@ -12,6 +12,7 @@ const TabOption = styled.button<{ selected?: boolean }>`
   outline: none;
   border: none;
   background-color: ${({ selected, theme }) => (selected ? theme.bg3 : 'transparent')};
+  text-decoration: none;
 
   :hover {
     cursor: pointer;
@@ -23,25 +24,21 @@ const TabOption = styled.button<{ selected?: boolean }>`
   }
 `
 
-export default function Tabs({
-  activeTab,
-  setActiveTab
-}: {
-  activeTab: ActiveTab
-  setActiveTab: Dispatch<SetStateAction<ActiveTab>>
-}) {
+function Tabs({ location }: RouteComponentProps<{ location: string }>) {
   const [activeProtocol] = useActiveProtocol()
 
   return (
     <GreyCard backgroundColor={activeProtocol?.secondaryColor}>
       <AutoRow gap="10px">
-        <TabOption selected={activeTab === ActiveTab.DELEGATES} onClick={() => setActiveTab(ActiveTab.DELEGATES)}>
+        <TabOption as={Link} to={'/delegates/' + activeProtocol?.id} selected={location.pathname.includes('delegates')}>
           <TYPE.black fontSize={'16px'}>Delegates</TYPE.black>
         </TabOption>
-        <TabOption selected={activeTab === ActiveTab.PROPOSALS} onClick={() => setActiveTab(ActiveTab.PROPOSALS)}>
+        <TabOption as={Link} to={'/proposals/' + activeProtocol?.id} selected={location.pathname.includes('proposals')}>
           <TYPE.black fontSize={'16px'}>Proposals</TYPE.black>
         </TabOption>
       </AutoRow>
     </GreyCard>
   )
 }
+
+export default withRouter(Tabs)

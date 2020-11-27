@@ -50,14 +50,19 @@ export default function TwitterFlow({
   const [attempting, setAttempting] = useState(false)
 
   async function onVerify() {
+    //reset error and loading state
     setAttempting(true)
+    setRequestError(undefined)
+
     // if callback not returned properly ignore
     if (!verifyCallback || !account || !tweetID) return
-    // try delegation and store hash
+
     const res = await verifyCallback()
 
+    // if error, display for user, if not update verified handle
     if (res.error) {
       setRequestError(res.error)
+      setAttempting(false)
     } else if (res.success && twitterHandle) {
       setAccountOverride(twitterHandle)
       setVerified(true)

@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { ProposalData } from '../../state/governance/hooks'
+import { ProposalData, useActiveProtocol } from '../../state/governance/hooks'
 import { EmptyProposals, ProposalStatus } from './styled'
 import { TYPE } from '../../theme'
 import { GreyCard } from '../Card'
-import ProposalDetails from './ProposalDetails'
 import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
+import { Link } from 'react-router-dom'
+import Loader from '../Loader'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -16,6 +17,7 @@ const ProposalItem = styled.div`
   border-radius: 12px;
   padding: 1rem;
   background-color: ${({ theme }) => theme.bg1};
+  text-decoration: none;
 
   :hover {
     cursor: pointer;
@@ -24,13 +26,12 @@ const ProposalItem = styled.div`
 `
 
 export default function ProposalList({ allProposals }: { allProposals: ProposalData[] | undefined }) {
-  const [shownProposal, setShownProposal] = useState<string | undefined>()
+  const [activeProtocol] = useActiveProtocol()
 
   return (
     <Wrapper>
       <GreyCard>
-        {shownProposal && <ProposalDetails id={shownProposal} onBack={() => setShownProposal(undefined)} />}
-        {!shownProposal && allProposals?.length === 0 && (
+        {allProposals?.length === 0 && (
           <EmptyProposals>
             <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
             <TYPE.subHeader>
@@ -39,20 +40,19 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
           </EmptyProposals>
         )}
         <AutoColumn gap="1rem">
-          {!shownProposal &&
-            allProposals?.map((p: ProposalData, i) => {
-              return (
-                <ProposalItem key={i} onClick={() => setShownProposal(p.id)}>
-                  <RowBetween>
-                    <RowFixed>
-                      <TYPE.black mr="8px">{p.id}</TYPE.black>
-                      <TYPE.black>{p.title}</TYPE.black>
-                    </RowFixed>
-                    <ProposalStatus status={p.status}>{p.status}</ProposalStatus>
-                  </RowBetween>
-                </ProposalItem>
-              )
-            })}
+          {allProposals?.map((p: ProposalData, i) => {
+            return (
+              <ProposalItem key={i} as={Link} to={activeProtocol.id + '/' + p.id}>
+                <RowBetween>
+                  <RowFixed>
+                    <TYPE.black mr="8px">{p.id}</TYPE.black>
+                    <TYPE.black>{p.title}</TYPE.black>
+                  </RowFixed>
+                  {p.status ? <ProposalStatus status={p.status}>{p.status}</ProposalStatus> : <Loader />}
+                </RowBetween>
+              </ProposalItem>
+            )
+          })}
         </AutoColumn>
       </GreyCard>
     </Wrapper>
