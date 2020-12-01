@@ -3,7 +3,6 @@ import { Web3Provider } from '@ethersproject/providers'
 import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
-import { Percent } from '@uniswap/sdk'
 import { fetchProfileData } from './social'
 import { isAddress } from '../utils'
 
@@ -49,68 +48,51 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
     })
 }
 
-// @todo add typed query response
-const DELEGATE_PROMISES: { [key: string]: Promise<DelegateData[] | null> } = {}
-
-export function fetchDelegates(
+export async function fetchDelegates(
   client: any,
   key: string,
   library: Web3Provider,
   allVerifiedHandles: { [key: string]: HandleEntry } | undefined
 ): Promise<DelegateData[] | null> {
   try {
-    return (DELEGATE_PROMISES[key] =
-      DELEGATE_PROMISES[key] ??
-      client
-        .query({
-          query: TOP_DELEGATES,
-          fetchPolicy: 'cache-first'
-        })
-        .then(async (res: DelegateResponse) => {
-          const testData = res.data.delegates
+    return client
+      .query({
+        query: TOP_DELEGATES,
+        fetchPolicy: 'cache-first'
+      })
+      .then(async (res: DelegateResponse) => {
+        // check if account is EOA or not
+        const typed = await Promise.all(
+          res.data.delegates.map(d => {
+            return library?.getCode(d.id)
+          })
+        )
 
-          testData[0] = {
-            id: '0x74Aa01d162E6dC6A657caC857418C403D48E2D77',
-            delegatedVotes: 30000000,
-            delegatedVotesRaw: 200000000000000000000,
-            votePercent: new Percent('10', '20'),
-            votes: [],
-            EOA: true,
-            handle: 'sybiltester'
-          }
+        // for each handle attestation - verify which ones are legit,
+        const handles = await Promise.all(
+          res.data.delegates.map(async (a: DelegateData) => {
+            const checksummed = isAddress(a.id)
 
-          // check if account is EOA or not
-          const typed = await Promise.all(
-            res.data.delegates.map(d => {
-              return library?.getCode(d.id)
-            })
-          )
+            const handle = checksummed ? allVerifiedHandles?.[checksummed]?.handle : undefined
 
-          // for each handle attestation - verify which ones are legit,
-          const handles = await Promise.all(
-            testData.map(async (a: DelegateData) => {
-              const checksummed = isAddress(a.id)
-
-              const handle = checksummed ? allVerifiedHandles?.[checksummed]?.handle : undefined
-
-              const profileData = handle ? await fetchProfileData(handle) : undefined
-              return {
-                account: a.id,
-                handle,
-                imageURL: profileData?.data?.profile_image_url
-              }
-            })
-          )
-
-          return testData.map((d, i) => {
+            const profileData = handle ? await fetchProfileData(handle) : undefined
             return {
-              ...d,
-              EOA: typed[i] === '0x',
-              handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
-              imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
+              account: a.id,
+              handle,
+              imageURL: profileData?.data?.profile_image_url
             }
           })
-        }))
+        )
+
+        return res.data.delegates.map((d, i) => {
+          return {
+            ...d,
+            EOA: typed[i] === '0x',
+            handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
+            imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
+          }
+        })
+      })
   } catch (e) {
     return Promise.reject(new Error('Unable to fetch delegates'))
   }

@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
-import { fetchProfileData, ProfileDataResponse, fetchAllVerifiedHandles } from '../../data/social'
+import { useState, useEffect, useCallback } from 'react'
+import { fetchProfileData, ProfileDataResponse } from '../../data/social'
 import { useActiveWeb3React } from '../../hooks'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, AppState } from '..'
+import { updateVerifiedHanldes } from './actions'
 
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
@@ -43,29 +46,31 @@ export interface HandleEntry {
   timestamp: number
 }
 
-export function validVerification(value: HandleEntry): value is HandleEntry {
-  return value !== null && value !== undefined && value.handle !== undefined
+// get al verified handles from github file
+export function useAllVerifiedHandles(): [
+  { [address: string]: HandleEntry } | undefined,
+  (verifiedHandles: { [address: string]: HandleEntry }) => void
+] {
+  const dispatch = useDispatch<AppDispatch>()
+  const verifiedHandles = useSelector<AppState, AppState['social']['verifiedHandles']>(
+    state => state.social.verifiedHandles
+  )
+
+  // set new or reset account
+  const setVerifiedHandles = useCallback(
+    (verifiedHandles: { [address: string]: HandleEntry }) => {
+      dispatch(updateVerifiedHanldes({ verifiedHandles }))
+    },
+    [dispatch]
+  )
+
+  return [verifiedHandles, setVerifiedHandles]
 }
 
-// get entire list of verified handles
-export function useAllVerifiedHandles(): { [address: string]: HandleEntry } | undefined {
-  const [handles, setHandles] = useState<{ [address: string]: HandleEntry }>()
-  useEffect(() => {
-    async function fetchData() {
-      const results: { [address: string]: HandleEntry } | undefined = await fetchAllVerifiedHandles()
-      setHandles(results)
-    }
-    if (!handles) {
-      fetchData()
-    }
-  }, [handles])
-  return handles
-}
-
-// for an ethereum address, fetch a verified handle
+// check if address is contained within list of all verified handles
 // undefined is no verification, null is loading
 export function useVerifiedHandle(address: string | null | undefined): HandleEntry | undefined | null {
-  const handles = useAllVerifiedHandles()
+  const [handles] = useAllVerifiedHandles()
   if (!handles) {
     return null
   }

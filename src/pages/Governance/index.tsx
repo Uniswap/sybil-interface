@@ -155,9 +155,7 @@ export default function Overview() {
                       </RowFixed>
                     )}
                     {userDelegatee &&
-                      (userDelegatee === ZERO_ADDRESS &&
-                      govTokenBalance &&
-                      !JSBI.equal(BIG_INT_ZERO, govTokenBalance.raw) ? (
+                      (userDelegatee === ZERO_ADDRESS && govTokenBalance ? (
                         <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
                       ) : (
                         <RowFixed>

@@ -73,7 +73,7 @@ const LoadingFlag = styled.div`
 `
 
 const TwitterButton = styled(ButtonBasic)`
-  padding: 4px 1rem;
+  padding: 6px 1rem;
   white-space: nowrap;
 `
 
@@ -84,23 +84,16 @@ export default function TwitterAccountDetails() {
   // toggle modal for twitter verification
   const [showTwitterFlow, setShowTwitterFlow] = useState<boolean>(false)
 
-  // hardcode account if verified in current session
-  const [accountOverride, setAccountOverride] = useState<string | undefined>()
-
   // get any verified handles for this user + timestamps they were created at
   const [twitterAccount] = useTwitterAccount() // logged in account
   const verifiedHandleEntry = useVerifiedHandle(account)
 
   const loadingVerifiedHandles = verifiedHandleEntry === null
-  const profileData = useTwitterProfileData(accountOverride ?? verifiedHandleEntry?.handle)
-
-  const verified = !!accountOverride || !!verifiedHandleEntry
+  const profileData = useTwitterProfileData(verifiedHandleEntry?.handle)
 
   // parse verfication date, returned in ms convert to seconds
   const verificationDate = verifiedHandleEntry
     ? moment.unix(verifiedHandleEntry.timestamp / 1000).format('MMM Do YYYY')
-    : accountOverride
-    ? moment.unix(moment.now() / 1000).format('MMM Do YYYY')
     : undefined
 
   // on redirect from twitter, if signed in, not verified, and no loading, show modal
@@ -116,13 +109,13 @@ export default function TwitterAccountDetails() {
   return (
     <>
       <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
-        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} setAccountOverride={setAccountOverride} />
+        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
       </Modal>
       {loadingVerifiedHandles ? (
         <LoadingFlag>
           Loading social data <LoaderSecondary size={'12px'} style={{ marginLeft: '6px' }} stroke={theme.text3} />
         </LoadingFlag>
-      ) : !verified ? (
+      ) : !verifiedHandleEntry ? (
         !twitterAccount ? (
           <TwitterLoginButton text="Announce yourself as a delegate" />
         ) : (
@@ -148,7 +141,7 @@ export default function TwitterAccountDetails() {
                         @{profileData.handle}
                       </TYPE.body>
                     </ExternalLink>
-                    <PendingFlag verified={!!verifiedHandleEntry || !!accountOverride}>Verfied</PendingFlag>
+                    <PendingFlag verified={!!verifiedHandleEntry}>Verfied</PendingFlag>
                   </RowFixed>
                   {verificationDate && <TYPE.black fontSize={12}>Verified on {verificationDate}</TYPE.black>}
                 </AutoColumn>

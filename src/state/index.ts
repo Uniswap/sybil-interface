@@ -7,6 +7,7 @@ import { updateVersion } from './global/actions'
 import user from './user/reducer'
 import transactions from './transactions/reducer'
 import multicall from './multicall/reducer'
+import social from './social/reducer'
 
 const PERSISTED_KEYS: string[] = ['user', 'transactions']
 
@@ -16,7 +17,8 @@ const store = configureStore({
     user,
     transactions,
     multicall,
-    governance
+    governance,
+    social
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS })

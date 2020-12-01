@@ -3,6 +3,11 @@ import { RouteComponentProps } from 'react-router-dom'
 import { parse } from 'qs'
 import { useTwitterAccount } from '../user/hooks'
 
+/**
+ * Used for redirects from Twitter oauth server.
+ * If twitter handle passed as query param, set in global state.
+ * @param param0 twitter handle
+ */
 export default function TwitterAccountQueryParamReader({ location: { search } }: RouteComponentProps): null {
   const [, setTwitterAccount] = useTwitterAccount()
 

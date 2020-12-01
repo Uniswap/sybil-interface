@@ -59,13 +59,14 @@ export default function SideMenu() {
         <AutoColumn gap="1rem">
           <TYPE.largeHeader>Social proof for Ethereum Products</TYPE.largeHeader>
           <TYPE.main>
-            This tool connects a wallet address to a digital identity by signing a message on chain.
+            This tool connects wallet addresses to digital indentities. Signed messages are posted publicly, and can be
+            verified for use off-chain.
           </TYPE.main>
           <TYPE.main>
             This mapping can be used for displaying public identies for governance platforms on ethereum or any project
             that wants to connect social idenity to addresses.
           </TYPE.main>
-          <TYPE.main>Open, public, forkable and on chain.</TYPE.main>
+          <TYPE.main>Open, public, and forkable.</TYPE.main>
         </AutoColumn>
       )}
       {open ? (

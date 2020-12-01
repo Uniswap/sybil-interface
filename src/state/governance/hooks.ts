@@ -85,7 +85,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
   // get graphql client for active protocol
   const client = useSubgraphClient()
 
-  const allVerifiedHandles = useAllVerifiedHandles()
+  const [allVerifiedHandles] = useAllVerifiedHandles()
 
   // reset list on active protocol change
   const [activeProtocol] = useActiveProtocol()
@@ -94,6 +94,13 @@ export function useTopDelegates(): DelegateData[] | undefined {
   }, [activeProtocol])
 
   const key = activeProtocol?.id ?? ''
+
+  // if verified handles update, reset
+  useEffect(() => {
+    if (allVerifiedHandles) {
+      setDelegates(undefined)
+    }
+  }, [allVerifiedHandles])
 
   useEffect(() => {
     async function fetchTopDelegates() {

@@ -6,7 +6,7 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import { useVerifyCallback } from '../../state/social/hooks'
+import { useVerifyCallback, useAllVerifiedHandles, HandleEntry } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
 import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Dots } from '../../theme/components'
@@ -28,13 +28,7 @@ const TweetWrapper = styled.div`
     word-break: break-word;
 `
 
-export default function TwitterFlow({
-  onDismiss,
-  setAccountOverride
-}: {
-  onDismiss: () => void
-  setAccountOverride: (account: string) => void
-}) {
+export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const { account, library } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
@@ -48,6 +42,9 @@ export default function TwitterFlow({
   const [requestError, setRequestError] = useState<string | undefined>()
   const [verified, setVerified] = useState(false)
   const [attempting, setAttempting] = useState(false)
+
+  // update verified handles if succesful verification
+  const [verifiedHandles, setVerifiedHandles] = useAllVerifiedHandles()
 
   async function onVerify() {
     //reset error and loading state
@@ -64,7 +61,21 @@ export default function TwitterFlow({
       setRequestError(res.error)
       setAttempting(false)
     } else if (res.success && twitterHandle) {
-      setAccountOverride(twitterHandle)
+      const newVerified: { [address: string]: HandleEntry } = {}
+      verifiedHandles &&
+        Object.keys(verifiedHandles).map(address => {
+          newVerified[address] = verifiedHandles[address]
+          return true
+        })
+
+      // reset global list of verified handles to account for new entry
+      if (newVerified) {
+        newVerified[account] = {
+          handle: twitterHandle,
+          timestamp: Date.now()
+        }
+        setVerifiedHandles(newVerified)
+      }
       setVerified(true)
     }
   }
@@ -118,7 +129,6 @@ export default function TwitterFlow({
     const timer = setTimeout(() => {
       if (twitterHandle && watch) {
         fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
-          console.log('fetching latest tweet ')
           if (res?.data[0]) {
             const tweetData = res?.data?.[0]
 
@@ -133,7 +143,7 @@ export default function TwitterFlow({
             }
           } else {
             setWatch(false)
-            setTweetError('Tweet not found, try again')
+            setTweetError('Tweet not found, try again.')
           }
         })
       }
@@ -169,7 +179,7 @@ export default function TwitterFlow({
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TYPE.black>Sign in with Twitter to start connecting your identity with your Ethereum address.</TYPE.black>
+          <TYPE.black>Sign in with Twitter to link your wallet address and Twitter handle.</TYPE.black>
           <TwitterAccountPreview />
           <TwitterLoginButton text="Connect Twitter" />
         </AutoColumn>
@@ -181,10 +191,7 @@ export default function TwitterFlow({
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TYPE.black>
-            Sign a mesage that will be used to link your address with Twitter handle. The signature will be derived from
-            the following data:
-          </TYPE.black>
+          <TYPE.black>Sign a mesage that will be used to link your wallet address and Twitter handle.</TYPE.black>
           <TwitterAccountPreview />
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
         </AutoColumn>
@@ -222,7 +229,7 @@ export default function TwitterFlow({
           </RowBetween>
           <TwitterAccountPreview />
           <Tweet tweetId={tweetID} />
-          <TYPE.black>Post your tweet content location on-chain for off-chain verifiers to use.</TYPE.black>
+          <TYPE.black>Verify your tweet and add your handle to the list of verified mappings.</TYPE.black>
           <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>
             Submit
           </ButtonPrimary>
