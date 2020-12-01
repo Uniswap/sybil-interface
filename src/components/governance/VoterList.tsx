@@ -84,7 +84,7 @@ export default function VoterList({
   return (
     <StyledDataCard>
       <Modal isOpen={showAll} onDismiss={() => setShowAll(false)}>
-        <AllVoters title={title} amount={amount} proposalID={id} support={'for' ? true : false} />
+        <AllVoters title={title} amount={amount} proposalID={id} support={support === 'for' ? true : false} />
       </Modal>
       <CardSection>
         <AutoColumn gap="md">

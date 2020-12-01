@@ -14,6 +14,7 @@ import { useSubgraphClient } from '../application/hooks'
 import { fetchDelegates, fetchProposals, enumerateProposalState, fetchGlobalData } from '../../data/governance'
 import { useAllVerifiedHandles } from '../social/hooks'
 import { ALL_VOTERS } from '../../apollo/queries'
+import { deserializeToken } from '../user/hooks'
 
 export interface GlobaData {
   id: string
@@ -56,15 +57,7 @@ export function useActiveProtocol(): [GovernanceInfo, (activeProtocol: Governanc
 export function useGovernanceToken(): Token | undefined {
   const { chainId } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
-  return chainId && activeProtocol
-    ? new Token(
-        chainId,
-        activeProtocol.token.address[chainId],
-        activeProtocol.token.decimals,
-        activeProtocol.token.symbol,
-        activeProtocol.token.name
-      )
-    : undefined
+  return chainId && activeProtocol ? deserializeToken(activeProtocol.token) : undefined
 }
 
 // @todo add typed query response
@@ -166,6 +159,41 @@ export function useProposalCount(): number | undefined {
   return undefined
 }
 
+/**
+ * @TODO can this be used to speed up the loading?
+ */
+export function useAllProposalStates() {
+  const govContract = useGovernanceContract()
+
+  const [statuses, setStatuses] = useState<string[] | undefined>()
+
+  // get total amount
+  const proposalCount = useProposalCount()
+  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [k + 1]) : [['']]
+
+  const statusRes = useSingleContractMultipleData(
+    proposalCount ? govContract : undefined,
+    'state',
+    ids,
+    NEVER_RELOAD
+  ).reverse()
+
+  useEffect(() => {
+    if (!statuses) {
+      const formattedRes = statusRes?.map(res => {
+        if (!res.loading && res.valid) {
+          return res.result?.[0]
+        }
+      })
+      if (formattedRes[0]) {
+        setStatuses(formattedRes)
+      }
+    }
+  }, [statuses, statusRes])
+
+  return statuses
+}
+
 export function useAllProposals() {
   const [proposals, setProposals] = useState<ProposalData[] | undefined>()
 
@@ -228,6 +256,7 @@ export function useAllProposals() {
     }
   }, [counts, govToken, proposals])
 
+  // subgraphs dont store updated status right now, need to
   useEffect(() => {
     if (states && proposals && govToken) {
       proposals.map((p, i) => {

@@ -6,6 +6,9 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../state'
 import { SUPPORTED_PROTOCOLS } from '../state/governance/reducer'
+import { useActiveWeb3React } from '../hooks'
+import { ChainId } from '@uniswap/sdk'
+import { OutlineCard } from '../components/Card'
 
 export default function Delegates({
   match: {
@@ -21,10 +24,17 @@ export default function Delegates({
     }
   }, [dispatch, protocolID, setActiveProtocol])
 
+  // if on testnet, show warning
+  const { chainId } = useActiveWeb3React()
+
   const topDelegates = useTopDelegates()
   return (
     <BodyWrapper>
-      <DelegateList topDelegates={topDelegates} />
+      {chainId === ChainId.MAINNET ? (
+        <DelegateList topDelegates={topDelegates} />
+      ) : (
+        <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
+      )}
     </BodyWrapper>
   )
 }

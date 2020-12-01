@@ -6,6 +6,9 @@ import { RouteComponentProps } from 'react-router-dom'
 import { AppDispatch } from '../state'
 import { useDispatch } from 'react-redux'
 import { SUPPORTED_PROTOCOLS } from '../state/governance/reducer'
+import { useActiveWeb3React } from '../hooks'
+import { OutlineCard } from '../components/Card'
+import { ChainId } from '@uniswap/sdk'
 
 export default function Proposals({
   match: {
@@ -23,9 +26,16 @@ export default function Proposals({
 
   const topProposals = useAllProposals()
 
+  // if on testnet, show warning
+  const { chainId } = useActiveWeb3React()
+
   return (
     <BodyWrapper>
-      <ProposalList allProposals={topProposals} />
+      {chainId === ChainId.MAINNET ? (
+        <ProposalList allProposals={topProposals} />
+      ) : (
+        <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
+      )}
     </BodyWrapper>
   )
 }

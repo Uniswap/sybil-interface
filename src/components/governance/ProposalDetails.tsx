@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { useProposalData, useActiveProtocol } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
@@ -15,8 +15,6 @@ import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { BodyWrapper } from '../../pages/AppBody'
-import Modal from '../Modal'
-import AllVoters from './AllVoters'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -139,7 +137,7 @@ export default function ProposalDetails({
                   amount={proposalData?.againstCount}
                   percentage={againstPercentage}
                   voters={proposalData?.againstVotes}
-                  support="against"
+                  support={'against'}
                   id={proposalData?.id}
                 />
               </>

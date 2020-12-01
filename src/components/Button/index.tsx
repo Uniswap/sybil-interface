@@ -1,9 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { darken, lighten } from 'polished'
-
-import { RowBetween } from '../Row'
-import { ChevronDown } from 'react-feather'
+import { darken } from 'polished'
 import { Button as RebassButton, ButtonProps } from 'rebass/styled-components'
 
 const Base = styled(RebassButton)<{
@@ -171,48 +168,6 @@ export const ButtonSecondary = styled(Base)`
   }
 `
 
-export const ButtonPink = styled(Base)`
-  background-color: ${({ theme }) => theme.primary1};
-  color: white;
-
-  &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.1, theme.primary1)};
-  }
-  &:disabled {
-    background-color: ${({ theme }) => theme.primary1};
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-export const ButtonOutlined = styled(Base)`
-  border: 1px solid ${({ theme }) => theme.bg2};
-  background-color: transparent;
-  color: ${({ theme }) => theme.text1};
-
-  &:focus {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:hover {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:active {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
 export const ButtonEmpty = styled(Base)`
   background-color: transparent;
   color: ${({ theme }) => theme.primary1};
@@ -229,38 +184,6 @@ export const ButtonEmpty = styled(Base)`
   &:active {
     text-decoration: underline;
   }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-export const ButtonWhite = styled(Base)`
-  border: 1px solid #edeef2;
-  background-color: ${({ theme }) => theme.bg1};
-  color: black;
-
-  &:focus {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    box-shadow: 0 0 0 1pt ${darken(0.05, '#edeef2')};
-  }
-  &:hover {
-    box-shadow: 0 0 0 1pt ${darken(0.1, '#edeef2')};
-  }
-  &:active {
-    box-shadow: 0 0 0 1pt ${darken(0.1, '#edeef2')};
-  }
-  &:disabled {
-    opacity: 50%;
-    cursor: auto;
-  }
-`
-
-const ButtonConfirmedStyle = styled(Base)`
-  background-color: ${({ theme }) => lighten(0.5, theme.green1)};
-  color: ${({ theme }) => theme.green1};
-  border: 1px solid ${({ theme }) => theme.green1};
-
   &:disabled {
     opacity: 50%;
     cursor: auto;
@@ -291,51 +214,9 @@ const ButtonErrorStyle = styled(Base)`
   }
 `
 
-export function ButtonConfirmed({
-  confirmed,
-  altDisabledStyle,
-  ...rest
-}: { confirmed?: boolean; altDisabledStyle?: boolean } & ButtonProps) {
-  if (confirmed) {
-    return <ButtonConfirmedStyle {...rest} />
-  } else {
-    return <ButtonPrimary {...rest} altDisabledStyle={altDisabledStyle} />
-  }
-}
-
 export function ButtonError({ error, ...rest }: { error?: boolean } & ButtonProps) {
   if (error) {
     return <ButtonErrorStyle {...rest} />
-  } else {
-    return <ButtonPrimary {...rest} />
-  }
-}
-
-export function ButtonDropdown({ disabled = false, children, ...rest }: { disabled?: boolean } & ButtonProps) {
-  return (
-    <ButtonPrimary {...rest} disabled={disabled}>
-      <RowBetween>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        <ChevronDown size={24} />
-      </RowBetween>
-    </ButtonPrimary>
-  )
-}
-
-export function ButtonDropdownLight({ disabled = false, children, ...rest }: { disabled?: boolean } & ButtonProps) {
-  return (
-    <ButtonOutlined {...rest} disabled={disabled}>
-      <RowBetween>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        <ChevronDown size={24} />
-      </RowBetween>
-    </ButtonOutlined>
-  )
-}
-
-export function ButtonRadio({ active, ...rest }: { active?: boolean } & ButtonProps) {
-  if (!active) {
-    return <ButtonWhite {...rest} />
   } else {
     return <ButtonPrimary {...rest} />
   }

@@ -14,7 +14,6 @@ export const RoundedProfileImage = styled.div`
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  margin-right: 1rem;
 
   & > img {
     height: 100%;

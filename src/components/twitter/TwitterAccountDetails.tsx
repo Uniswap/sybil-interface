@@ -72,6 +72,11 @@ const LoadingFlag = styled.div`
   font-size: 12px;
 `
 
+const TwitterButton = styled(ButtonBasic)`
+  padding: 4px 1rem;
+  white-space: nowrap;
+`
+
 export default function TwitterAccountDetails() {
   const { account } = useActiveWeb3React()
   const theme = useTheme()
@@ -121,12 +126,12 @@ export default function TwitterAccountDetails() {
         !twitterAccount ? (
           <TwitterLoginButton text="Announce yourself as a delegate" />
         ) : (
-          <ButtonBasic onClick={() => setShowTwitterFlow(true)} padding="4px 1rem">
+          <TwitterButton onClick={() => setShowTwitterFlow(true)}>
             <RowBetween>
               <TYPE.white fontSize="14px">Announce yourself as a delegate</TYPE.white>
               <TwitterLogo src={TwitterIcon} />
             </RowBetween>
-          </ButtonBasic>
+          </TwitterButton>
         )
       ) : profileData ? (
         <Wrapper>

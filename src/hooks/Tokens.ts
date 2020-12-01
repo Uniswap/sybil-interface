@@ -1,18 +1,13 @@
 import { parseBytes32String } from '@ethersproject/strings'
-import { Currency, ETHER, Token, currencyEquals } from '@uniswap/sdk'
+import { Currency, ETHER, Token } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
-import { useUserAddedTokens } from '../state/user/hooks'
 import { isAddress } from '../utils'
 
 import { useActiveWeb3React } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
 
 // Check if currency is included in custom list from user storage
-export function useIsUserAddedToken(currency: Currency): boolean {
-  const userAddedTokens = useUserAddedTokens()
-  return !!userAddedTokens.find(token => currencyEquals(currency, token))
-}
 
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/

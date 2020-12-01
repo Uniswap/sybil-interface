@@ -11,12 +11,12 @@ import useENS from '../../hooks/useENS'
 import { useActiveWeb3React, useTheme } from '../../hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { TokenAmount, JSBI, Token, ChainId } from '@uniswap/sdk'
+import { TokenAmount, Token, ChainId, JSBI } from '@uniswap/sdk'
 import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../constants'
 import { GreyCard } from '../../components/Card'
-import { RowBetween, RowFixed, AutoRow } from '../../components/Row'
+import { RowBetween, RowFixed } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
-import { ButtonBasic, ButtonSecondary } from '../../components/Button'
+import { ButtonBasic, ButtonGray } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import { Settings } from 'react-feather'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
@@ -51,32 +51,19 @@ const StyledSettings = styled(Settings)`
   }
 `
 
-const UpdateButton = styled(ButtonSecondary)`
+const UpdateButton = styled(ButtonGray)`
   font-size: 12px;
-  color: ${({ theme }) => theme.text3}
-  border-color: ${({ theme }) => theme.text3}
   width: fit-content;
-  padding:  4px;
-
-  :hover {
-    border-color: ${({ theme }) => theme.text2}
-    color: ${({ theme }) => theme.text2}
-  }
-
-  &:active, &:focus {
-    border-color: ${({ theme }) => theme.text3}
-    box-shadow: 0 0 0 0.5pt ${({ theme }) => theme.text3};
-  }
+  padding: 4px;
 `
 
 const ResponsiveRow = styled.div`
-  width: 100%;
   display: flex;
-  padding: 0;
   align-items: flex-start;
+  width: 100%;
+  padding: 0;
 
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    display: flex;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     flex-direction: column;
     justify-content: flex-start;
   `};
@@ -88,9 +75,17 @@ const MobilePadding = styled.div`
   width: 100%;
   justify-content: flex-end;
 
-  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    padding: 2rem 0;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding-top: 1rem;
     justify-content: flex-start;
+  `};
+`
+
+const MobileColumn = styled(AutoColumn)`
+  justify-items: flex-end;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    justify-items: flex-start;
   `};
 `
 
@@ -112,16 +107,9 @@ export default function Overview() {
   const govTokenBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, govToken)
   const userDelegatee: string | undefined = useUserDelegatee()
 
-  // show delegation option if they have have a balance, but have not delegated
-  const showUnlockVoting = Boolean(
-    govTokenBalance && JSBI.notEqual(govTokenBalance.raw, BIG_INT_ZERO) && userDelegatee === ZERO_ADDRESS
-  )
-
-  // if delegate that isnt user or 0 address, show balance delegated
-  const showDelegatedCount = userDelegatee && account && userDelegatee !== ZERO_ADDRESS
-
-  // hide update button if no votes
-  const hideUpdateButton = govTokenBalance && JSBI.equal(govTokenBalance.raw, BIG_INT_ZERO)
+  // if delegated to real address, show token balance, if not use available votes from contract
+  const voteCount: TokenAmount | undefined =
+    userDelegatee && userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? govTokenBalance : availableVotes
 
   return (
     <BodyWrapper>
@@ -129,81 +117,72 @@ export default function Overview() {
         <AutoColumn gap="1rem">
           <Dropdown />
           <AccountCard>
-            <AutoColumn gap="lg">
-              {!account && (
-                <RowBetween>
-                  <RowFixed>
-                    <EmptyCircle />
-                    <AutoColumn gap="10px">
-                      <TYPE.main fontSize="20px">Your Address</TYPE.main>
-                      <TYPE.main fontSize="12px">
-                        Connect wallet to see your votes or announce yourself as a delegate.
-                      </TYPE.main>
-                    </AutoColumn>
-                  </RowFixed>
-                  <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-                    Connect wallet
-                  </ButtonBasic>
-                </RowBetween>
-              )}
+            {!account ? (
+              <RowBetween>
+                <RowFixed>
+                  <EmptyCircle />
+                  <AutoColumn gap="10px">
+                    <TYPE.main fontSize="20px">Your Address</TYPE.main>
+                    <TYPE.main fontSize="12px">
+                      Connect wallet to see your votes or announce yourself as a delegate.
+                    </TYPE.main>
+                  </AutoColumn>
+                </RowFixed>
+                <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
+                  Connect wallet
+                </ButtonBasic>
+              </RowBetween>
+            ) : (
               <ResponsiveRow>
-                <AutoColumn gap="sm">
+                <AutoColumn gap="md">
                   {account && chainId && (
                     <RowFixed style={{ width: 'fit-content' }}>
                       <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>
                         <TYPE.mediumHeader mr="10px" color={theme.text1}>
-                          {shortenAddress(account)}
+                          {ensName ?? shortenAddress(account)}
                         </TYPE.mediumHeader>
                       </ExternalLink>
                       <StyledSettings onClick={toggleWalletModal} stroke="black" />
                     </RowFixed>
                   )}
-                  {ensName ?? ''}
-                  {account && showUnlockVoting && (
-                    <TYPE.darkYellow fontSize="12px">Unlock voting to participate in governance</TYPE.darkYellow>
-                  )}
+                  <TwitterAccountDetails />
                 </AutoColumn>
                 <MobilePadding>
-                  {account && !showUnlockVoting && userDelegatee && userDelegatee !== account && (
-                    <RowFixed>
-                      <TYPE.main mr="8px">{govTokenBalance?.toFixed(0)} votes</TYPE.main>
-                      {showDelegatedCount && (
+                  <MobileColumn gap="md">
+                    {voteCount && chainId === ChainId.MAINNET && (
+                      <RowFixed>
+                        <TYPE.mediumHeader>{voteCount.toFixed(0)} votes</TYPE.mediumHeader>
+                      </RowFixed>
+                    )}
+                    {userDelegatee &&
+                      (userDelegatee === ZERO_ADDRESS &&
+                      govTokenBalance &&
+                      !JSBI.equal(BIG_INT_ZERO, govTokenBalance.raw) ? (
+                        <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
+                      ) : (
                         <RowFixed>
-                          delegated to
-                          <ExternalLink
-                            style={{ margin: '0 6px' }}
-                            href={getEtherscanLink(ChainId.MAINNET, userDelegatee, 'address')}
-                          >
-                            {shortenAddress(userDelegatee)}
-                          </ExternalLink>
-                        </RowFixed>
-                      )}
-                      {!hideUpdateButton && <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>}
-                    </RowFixed>
-                  )}
-                  {account && showUnlockVoting && (
-                    <RowFixed>
-                      <TYPE.main mr="1rem">{govTokenBalance?.toFixed(0)} Votes</TYPE.main>
-                      <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
-                    </RowFixed>
-                  )}
-                  {account && !showUnlockVoting && userDelegatee === account && (
-                    <AutoColumn gap="sm" justify="flex-end">
-                      {availableVotes ? <TYPE.main>{availableVotes?.toFixed(0)} Votes</TYPE.main> : ''}
-                      {userDelegatee === account && (
-                        <RowFixed>
-                          <TYPE.green mr="8px">You are self delegated</TYPE.green>
-                          {!hideUpdateButton && (
+                          {userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? (
+                            <RowFixed>
+                              <TYPE.main mr="4px">Delegated to: </TYPE.main>
+                              <ExternalLink
+                                style={{ margin: '0 6px' }}
+                                href={getEtherscanLink(ChainId.MAINNET, userDelegatee, 'address')}
+                              >
+                                {shortenAddress(userDelegatee)}
+                              </ExternalLink>
+                            </RowFixed>
+                          ) : (
+                            userDelegatee === account && <TYPE.main mr="8px">Self delegated</TYPE.main>
+                          )}
+                          {voteCount && JSBI.notEqual(BIG_INT_ZERO, voteCount?.raw) && (
                             <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>
                           )}
                         </RowFixed>
-                      )}
-                    </AutoColumn>
-                  )}
+                      ))}
+                  </MobileColumn>
                 </MobilePadding>
               </ResponsiveRow>
-              {account && <TwitterAccountDetails />}
-            </AutoColumn>
+            )}
           </AccountCard>
           <Tabs />
         </AutoColumn>
