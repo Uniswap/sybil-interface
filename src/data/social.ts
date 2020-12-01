@@ -51,12 +51,12 @@ export function fetchProfileData(handle: string): Promise<ProfileDataResponse | 
         if (res.status === 200) {
           return res.json()
         } else {
-          console.debug(`No handle found`)
+          Promise.reject('No handle found')
           return null
         }
       })
       .catch(error => {
-        console.error('Failed to get claim data', error)
+        return Promise.reject(error)
       }))
 }
 
@@ -71,16 +71,16 @@ export interface LatestTweetResponse {
 
 // dont save responses as user may need to tweet multiple times
 export async function fetchLatestTweet(handle: string): Promise<LatestTweetResponse | null> {
-  const url = `${TWITTER_WORKER_URL}/user/latest-tweet?handle=` + handle
-  return fetch(url)
-    .then(async res => {
+  const url = `${TWITTER_WORKER_URL}/latest-tweet?handle=` + handle
+  try {
+    return fetch(url).then(async res => {
       if (res.status === 200) {
         return res.json()
       } else {
-        return null
+        return Promise.reject('Error fetching latest tweet')
       }
     })
-    .catch(error => {
-      return Promise.reject(new Error(error))
-    })
+  } catch (error) {
+    return Promise.reject('Error fetching latest tweet')
+  }
 }
