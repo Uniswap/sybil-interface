@@ -28,7 +28,7 @@ const TwitterLogo = styled.img`
 
 export default function TwitterLoginButton({ text }: { text: string }) {
   return (
-    <VerifyButton href="http://localhost:8080/login/twitter">
+    <VerifyButton href="https://gswf8vje6i.execute-api.us-east-2.amazonaws.com/latest/login/twitter">
       <RowBetween>
         <TYPE.white fontSize="14px">{text}</TYPE.white>
         <TwitterLogo src={TwitterIcon} />
