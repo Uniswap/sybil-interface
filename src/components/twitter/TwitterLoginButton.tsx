@@ -14,7 +14,6 @@ export const VerifyButton = styled.a`
   white-space: nowrap;
   text-decoration: none;
   font-size: 14px;
-
   :hover {
     cursor: pointer;
     opacity: 0.8;
