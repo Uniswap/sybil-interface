@@ -33,6 +33,10 @@ const EmptyCircle = styled.div`
   background: ${({ theme }) => theme.bg3};
   border-radius: 50%;
   margin-right: 1rem;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  display: none;
+`};
 `
 
 const AccountCard = styled(GreyCard)`

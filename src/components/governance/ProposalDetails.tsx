@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { useProposalData, useActiveProtocol } from '../../state/governance/hooks'
+import { useProposalData, useActiveProtocol, useProposalStatus } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
@@ -15,6 +15,9 @@ import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { BodyWrapper } from '../../pages/AppBody'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../state'
+import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -66,13 +69,23 @@ const DetailText = styled.div`
 
 export default function ProposalDetails({
   match: {
-    params: { proposalID }
+    params: { protocolID, proposalID }
   }
-}: RouteComponentProps<{ proposalID: string }>) {
+}: RouteComponentProps<{ protocolID: string; proposalID: string }>) {
   const { chainId } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
+  // if valid protocol id passed in, update global active protocol
+  const dispatch = useDispatch<AppDispatch>()
+  const [, setActiveProtocol] = useActiveProtocol()
+  useEffect(() => {
+    if (protocolID && Object.keys(SUPPORTED_PROTOCOLS).includes(protocolID)) {
+      setActiveProtocol(SUPPORTED_PROTOCOLS[protocolID])
+    }
+  }, [dispatch, protocolID, setActiveProtocol])
+
   const proposalData = useProposalData(proposalID)
+  const status = useProposalStatus(proposalID) // @TODO shoudlnt use spearate data for this
 
   // get and format data
   const startTimestamp: number | undefined = useTimestampFromBlock(proposalData?.startBlock)
@@ -102,12 +115,10 @@ export default function ProposalDetails({
       <Wrapper>
         <ProposalInfo gap="lg" justify="start">
           <RowBetween style={{ width: '100%' }}>
-            <ArrowWrapper as={Link} to={'/proposals/' + activeProtocol.id}>
+            <ArrowWrapper as={Link} to={'/proposals/' + activeProtocol?.id}>
               <ArrowLeft size={20} /> All Proposals
             </ArrowWrapper>
-            {proposalData && (
-              <ProposalStatus status={proposalData?.status ?? ''}>{proposalData?.status}</ProposalStatus>
-            )}
+            {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
           </RowBetween>
           <AutoColumn gap="10px" style={{ width: '100%' }}>
             <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>{proposalData?.title}</TYPE.largeHeader>
