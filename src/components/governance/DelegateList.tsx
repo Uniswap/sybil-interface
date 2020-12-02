@@ -48,7 +48,7 @@ const TwitterLogo = styled.img`
 const OnlyAboveLarge = styled.div`
   display: initial;
 
-  ${({ theme }) => theme.mediaWidth.upToLarge`
+  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
   display: none;
   `};
 `
@@ -81,9 +81,8 @@ const DataRow = styled.div`
     }
   }
 
-  ${({ theme }) => theme.mediaWidth.upToLarge`
+  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
     grid-template-columns: 1fr 160px;
-
   `};
 
   ${({ theme }) => theme.mediaWidth.upToSmall`

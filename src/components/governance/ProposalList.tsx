@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ProposalData, useActiveProtocol } from '../../state/governance/hooks'
+import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
 import { EmptyProposals, ProposalStatus } from './styled'
 import { TYPE } from '../../theme'
 import { GreyCard } from '../Card'
@@ -8,6 +8,7 @@ import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { Link } from 'react-router-dom'
 import Loader from '../Loader'
+import { enumerateProposalState } from '../../data/governance'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -28,6 +29,8 @@ const ProposalItem = styled.div`
 export default function ProposalList({ allProposals }: { allProposals: ProposalData[] | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
+  const allStatuses = useAllProposalStates()
+
   return (
     <Wrapper>
       <GreyCard>
@@ -41,14 +44,15 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
         )}
         <AutoColumn gap="1rem">
           {allProposals?.map((p: ProposalData, i) => {
+            const status = allStatuses?.[i] ? enumerateProposalState(allStatuses?.[i]) : enumerateProposalState(0)
             return (
-              <ProposalItem key={i} as={Link} to={activeProtocol.id + '/' + p.id}>
+              <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
                 <RowBetween>
                   <RowFixed>
                     <TYPE.black mr="8px">{p.id}</TYPE.black>
                     <TYPE.black>{p.title}</TYPE.black>
                   </RowFixed>
-                  {p.status ? <ProposalStatus status={p.status}>{p.status}</ProposalStatus> : <Loader />}
+                  {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
                 </RowBetween>
               </ProposalItem>
             )

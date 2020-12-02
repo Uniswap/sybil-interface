@@ -11,7 +11,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
-import { fetchDelegates, fetchProposals, enumerateProposalState, fetchGlobalData } from '../../data/governance'
+import { fetchDelegates, fetchProposals, fetchGlobalData, enumerateProposalState } from '../../data/governance'
 import { useAllVerifiedHandles } from '../social/hooks'
 import { ALL_VOTERS } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
@@ -39,7 +39,7 @@ export interface DelegateData {
   imageURL?: string | undefined
 }
 
-export function useActiveProtocol(): [GovernanceInfo, (activeProtocol: GovernanceInfo) => void] {
+export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtocol: GovernanceInfo) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const activeProtocol = useSelector<AppState, AppState['governance']['activeProtocol']>(state => {
     return state.governance.activeProtocol
@@ -106,7 +106,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
     async function fetchTopDelegates() {
       try {
         library &&
-          fetchDelegates(client, key, library, allVerifiedHandles).then(async delegateData => {
+          fetchDelegates(client, library, allVerifiedHandles).then(async delegateData => {
             if (delegateData) {
               setDelegates(delegateData)
             }
@@ -169,10 +169,10 @@ export function useProposalCount(): number | undefined {
 /**
  * @TODO can this be used to speed up the loading?
  */
-export function useAllProposalStates() {
+export function useAllProposalStates(): number[] | undefined {
   const govContract = useGovernanceContract()
 
-  const [statuses, setStatuses] = useState<string[] | undefined>()
+  const [statuses, setStatuses] = useState<number[] | undefined>()
 
   // get total amount
   const proposalCount = useProposalCount()
@@ -201,6 +201,11 @@ export function useAllProposalStates() {
   return statuses
 }
 
+export function useProposalStatus(id: string): string | undefined {
+  const allStatuses = useAllProposalStates()
+  return allStatuses ? enumerateProposalState(allStatuses[parseInt(id) - 1]) : undefined
+}
+
 export function useAllProposals() {
   const [proposals, setProposals] = useState<ProposalData[] | undefined>()
 
@@ -227,7 +232,7 @@ export function useAllProposals() {
     ids,
     NEVER_RELOAD
   ).reverse()
-  const states = useSingleContractMultipleData(amount ? govContract : undefined, 'state', ids, NEVER_RELOAD).reverse()
+  const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
@@ -262,15 +267,6 @@ export function useAllProposals() {
       })
     }
   }, [counts, govToken, proposals])
-
-  // subgraphs dont store updated status right now, need to
-  useEffect(() => {
-    if (states && proposals && govToken) {
-      proposals.map((p, i) => {
-        return (p.status = enumerateProposalState(states?.[i]?.result?.[0] ?? undefined))
-      })
-    }
-  }, [counts, govToken, proposals, states])
 
   return proposals
 }

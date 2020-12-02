@@ -50,7 +50,6 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 
 export async function fetchDelegates(
   client: any,
-  key: string,
   library: Web3Provider,
   allVerifiedHandles: { [key: string]: HandleEntry } | undefined
 ): Promise<DelegateData[] | null> {
