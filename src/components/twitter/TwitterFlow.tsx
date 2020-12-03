@@ -57,7 +57,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
     const res = await verifyCallback()
 
     // if error, display for user, if not update verified handle
-    if (res.error) {
+    if (res.error || !res.success) {
       setRequestError(res.error)
       setAttempting(false)
     } else if (res.success && twitterHandle) {
@@ -93,8 +93,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       name: 'Sybil Verifier',
       version: '1'
     }
-    const Permit = [{ name: 'handle', type: 'string' }]
-    const message = { handle: twitterHandle }
+    const Permit = [{ name: 'username', type: 'string' }]
+    const message = { username: twitterHandle }
     const data = JSON.stringify({
       types: {
         EIP712Domain,
@@ -119,7 +119,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   const tweetCopy = `Verifying identity for ${
     activeProtocol?.token.symbol
-  } governance - addr:${account} - Signature:${signedMessage ?? ''}`
+  } governance - addr:${account} - sig:${signedMessage ?? ''} `
 
   // twitter watcher
   const [tweetError, setTweetError] = useState<string | undefined>()
@@ -179,7 +179,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TYPE.black>Sign in with Twitter to link your wallet address and Twitter handle.</TYPE.black>
+          <TYPE.black>Sign in with Twitter to link your Ethereum address and Twitter handle.</TYPE.black>
           <TwitterAccountPreview />
           <TwitterLoginButton text="Connect Twitter" />
         </AutoColumn>

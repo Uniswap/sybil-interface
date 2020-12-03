@@ -63,8 +63,8 @@ export default function SideMenu() {
             verified for use off-chain.
           </TYPE.main>
           <TYPE.main>
-            This mapping can be used for displaying public identies for governance platforms on ethereum or any project
-            that wants to connect social idenity to addresses.
+            This mapping can be used for displaying public identities for governance platforms on ethereum or any
+            project that wants to connect social identity to addresses. Open, public, and forkable.
           </TYPE.main>
           <TYPE.main>Open, public, and forkable.</TYPE.main>
         </AutoColumn>
