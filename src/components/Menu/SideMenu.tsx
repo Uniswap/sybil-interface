@@ -63,8 +63,8 @@ export default function SideMenu() {
             verified for use off-chain.
           </TYPE.main>
           <TYPE.main>
-            This mapping can be used for displaying public identies for governance platforms on ethereum or any project
-            that wants to connect social idenity to addresses.
+            This mapping can be used for displaying public identities for governance platforms on ethereum or any
+            project that wants to connect social identity to addresses. Open, public, and forkable.
           </TYPE.main>
           <TYPE.main>Open, public, and forkable.</TYPE.main>
         </AutoColumn>
@@ -72,16 +72,8 @@ export default function SideMenu() {
       {open ? (
         <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
           <ButtonBasic style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}>
-            <Code />
-            Make a sybil list
-          </ButtonBasic>
-          <ButtonBasic style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}>
             <Book />
             Sybil Documentation
-          </ButtonBasic>
-          <ButtonBasic style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}>
-            <HelpCircle />
-            Learn about how it works
           </ButtonBasic>
         </AutoColumn>
       ) : (
