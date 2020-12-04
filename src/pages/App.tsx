@@ -25,7 +25,11 @@ const SiteWrapper = styled.div`
   overflow: auto;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    overflow-x: hidden;
+    grid-gap: 0;
   `};
 `
 
@@ -34,6 +38,7 @@ const AppWrapper = styled.div`
   flex-flow: column;
   align-items: flex-start;
   overflow-x: hidden;
+  width: 100%;
 `
 
 const ContentWrapper = styled.div`
@@ -45,14 +50,15 @@ const ContentWrapper = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: 10;
+  z-index: 1;
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    padding: 0px;
-    padding-top: 2rem;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    padding: 2rem 0 0 0;
   `};
 
-  z-index: 1;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding: 1rem 0 0 0;
+  `};
 `
 
 const Marginer = styled.div`
