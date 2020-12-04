@@ -95,11 +95,12 @@ export default function ProposalDetails({
   const now: DateTime = DateTime.local()
 
   // get total votes and format percentages for UI
-  const totalVotes: number | undefined = proposalData ? proposalData.forCount + proposalData.againstCount : undefined
+  const totalVotes: number | undefined =
+    proposalData?.forCount && proposalData?.againstCount ? proposalData.forCount + proposalData.againstCount : undefined
   const forPercentage: string =
-    proposalData && totalVotes ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
+    proposalData?.forCount && totalVotes ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
   const againstPercentage: string =
-    proposalData && totalVotes ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
+    proposalData?.againstCount && totalVotes ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
 
   // show links in propsoal details if content is an address
   // if content is contract with common name, replace address with common name

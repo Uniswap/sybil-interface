@@ -22,7 +22,7 @@ export async function fetchAllVerifiedHandles(): Promise<{ [address: string]: Ha
       }
     })
   } catch (e) {
-    return Promise.reject(new Error(e))
+    return Promise.reject('Error fetch verified handle data')
   }
 }
 
@@ -41,20 +41,24 @@ const PROFILE_DATA_PROMISES: { [key: string]: Promise<ProfileDataResponse | null
 export function fetchProfileData(handle: string): Promise<ProfileDataResponse | null> {
   const key = `${handle}`
   const url = `${TWITTER_WORKER_URL}/user?handle=${handle}`
-  return (PROFILE_DATA_PROMISES[key] =
-    PROFILE_DATA_PROMISES[key] ??
-    fetch(url)
-      .then(async res => {
-        if (res.status === 200) {
-          return res.json()
-        } else {
-          Promise.reject('No handle found')
-          return null
-        }
-      })
-      .catch(error => {
-        return Promise.reject(error)
-      }))
+  try {
+    return (PROFILE_DATA_PROMISES[key] =
+      PROFILE_DATA_PROMISES[key] ??
+      fetch(url)
+        .then(async res => {
+          if (res.status === 200) {
+            return res.json()
+          } else {
+            Promise.reject('No handle found')
+            return null
+          }
+        })
+        .catch(error => {
+          return Promise.reject(error)
+        }))
+  } catch {
+    return Promise.reject('Error fetching profile data')
+  }
 }
 
 export interface LatestTweetResponse {

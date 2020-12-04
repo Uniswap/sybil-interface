@@ -8,6 +8,7 @@ import { ChainId } from '@uniswap/sdk'
 import Modal from '../Modal'
 import AllVoters from './AllVoters'
 import { ButtonEmpty } from '../Button'
+import Loader from '../Loader'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -67,7 +68,7 @@ export default function VoterList({
   id
 }: {
   title: string
-  amount: number
+  amount: number | undefined
   percentage: string
   voters: {
     support: boolean
@@ -90,7 +91,11 @@ export default function VoterList({
         <AutoColumn gap="md">
           <WrapSmall>
             <TYPE.black fontWeight={600}>{title}</TYPE.black>
-            <TYPE.black fontWeight={600}>{amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TYPE.black>
+            {amount ? (
+              <TYPE.black fontWeight={600}>{amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TYPE.black>
+            ) : (
+              <Loader />
+            )}
           </WrapSmall>
         </AutoColumn>
         <ProgressWrapper>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { AutoColumn } from '../Column'
 import { ButtonPrimary } from '../Button'
 import { TYPE, CloseIcon, BackArrowSimple } from '../../theme'
@@ -6,15 +6,15 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import { useVerifyCallback, useAllVerifiedHandles, HandleEntry } from '../../state/social/hooks'
+import { useVerifyCallback, useAllVerifiedHandles, HandleEntry, useTweetWatcher } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
-import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import TwitterAccountPreview from '../../components/twitter/TwitterAccountPreview'
 import TwitterLoginButton from './TwitterLoginButton'
 import { OffChainRequestModal } from '../TransactionConfirmationModal'
+import { useSignedHandle } from '../../hooks/useSignedHandle'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -29,22 +29,24 @@ const TweetWrapper = styled.div`
 `
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
-  const { account, library } = useActiveWeb3React()
+  const { account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
   // monitor user inputs
   const [twitterHandle] = useTwitterAccount()
   const [tweetID, setTweetID] = useState<undefined | string>()
-  const [signedMessage, setSignedMessage] = useState<undefined | string>()
-
-  // monitor on chain submission
-  const { verifyCallback } = useVerifyCallback(tweetID)
-  const [requestError, setRequestError] = useState<string | undefined>()
-  const [verified, setVerified] = useState(false)
-  const [attempting, setAttempting] = useState(false)
 
   // update verified handles if succesful verification
   const [verifiedHandles, setVerifiedHandles] = useAllVerifiedHandles()
+
+  // monitor if user has signed message, reset if back arrow clicked
+  const { sig, signMessage, setSig } = useSignedHandle(twitterHandle)
+
+  // monitor verification attempt
+  const { verifyCallback } = useVerifyCallback(tweetID)
+  const [attempting, setAttempting] = useState(false)
+  const [verified, setVerified] = useState(false)
+  const [requestError, setRequestError] = useState<string | undefined>()
 
   async function onVerify() {
     //reset error and loading state
@@ -62,12 +64,12 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       setAttempting(false)
     } else if (res.success && twitterHandle) {
       const newVerified: { [address: string]: HandleEntry } = {}
+      // new copy of verified list
       verifiedHandles &&
         Object.keys(verifiedHandles).map(address => {
           newVerified[address] = verifiedHandles[address]
           return true
         })
-
       // reset global list of verified handles to account for new entry
       if (newVerified) {
         newVerified[account] = {
@@ -80,94 +82,28 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
     }
   }
 
-  async function signMessage() {
-    if (!library && account) {
-      return
-    }
-
-    const EIP712Domain = [
-      { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' }
-    ]
-    const domain = {
-      name: 'Sybil Verifier',
-      version: '1'
-    }
-    const Permit = [{ name: 'username', type: 'string' }]
-    const message = { username: twitterHandle }
-    const data = JSON.stringify({
-      types: {
-        EIP712Domain,
-        Permit
-      },
-      domain,
-      primaryType: 'Permit',
-      message
-    })
-
-    library
-      ?.send('eth_signTypedData_v4', [account, data])
-      .catch(error => {
-        console.log(error)
-      })
-      .then(sig => {
-        setSignedMessage(sig)
-      })
-  }
-
+  // tweet data
   const tweetHashTag = `${activeProtocol?.token.symbol}governance`
+  const tweetCopy = `Verifying identity for ${activeProtocol?.token.symbol} governance - addr:${account} - sig:${sig ??
+    ''} `
 
-  const tweetCopy = `Verifying identity for ${
-    activeProtocol?.token.symbol
-  } governance - addr:${account} - sig:${signedMessage ?? ''} `
-
-  // twitter watcher
+  // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
-
   const [watch, setWatch] = useState(false)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (twitterHandle && watch) {
-        fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
-          if (res?.data[0]) {
-            const tweetData = res?.data?.[0]
 
-            // @TODO add regex for format check
-            const passedRegex = tweetData.text.includes(tweetCopy)
-            if (passedRegex) {
-              setTweetID(tweetData.id)
-              setTweetError(undefined)
-            } else {
-              setWatch(false)
-              setTweetError('Tweet not found, try again with exact message.')
-            }
-          } else {
-            setWatch(false)
-            setTweetError('Tweet not found, try again.')
-          }
-        })
-      }
-    }, 6000)
-    return () => clearTimeout(timer)
-  }, [tweetCopy, twitterHandle, watch])
+  // use hook to handle polling
+  useTweetWatcher(tweetCopy, twitterHandle, watch, setWatch, setTweetID, setTweetError)
 
   // start watching and open window
   function checkForTweet() {
-    setTweetError(undefined)
+    setWatch(true) // restart watcher
+    setTweetError(undefined) // reset error
     window.open(
       `https://twitter.com/intent/tweet?text=${tweetCopy}&hashtags=${tweetHashTag && tweetHashTag}`,
       'tweetWindow',
       'height=400,width=800'
     )
-    setWatch(true)
   }
-
-  // reset watcher if tweet found
-  useEffect(() => {
-    if (tweetID && watch) {
-      setWatch(false)
-    }
-  }, [tweetID, watch])
 
   return (
     <ModalContentWrapper>
@@ -183,7 +119,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           <TwitterAccountPreview />
           <TwitterLoginButton text="Connect Twitter" />
         </AutoColumn>
-      ) : !signedMessage ? (
+      ) : !sig ? (
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
@@ -199,16 +135,15 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
-              <BackArrowSimple onClick={() => setSignedMessage(undefined)} />
+              <BackArrowSimple onClick={() => setSig(undefined)} />
               <TYPE.mediumHeader ml="6px">2/3 Announce</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TwitterAccountPreview />
-
           <TweetWrapper>{tweetCopy + `#${tweetHashTag}`}</TweetWrapper>
           <ButtonPrimary onClick={checkForTweet}>
-            {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Try again' : 'Tweet This'}
+            {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Check again' : 'Tweet This'}
           </ButtonPrimary>
           {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
         </AutoColumn>
@@ -230,7 +165,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           <TwitterAccountPreview />
           <Tweet tweetId={tweetID} />
           <TYPE.black>Verify your tweet and add your handle to the list of verified mappings.</TYPE.black>
-          <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !signedMessage}>
+          <ButtonPrimary onClick={onVerify} disabled={!account || !tweetID || !sig}>
             Submit
           </ButtonPrimary>
           {requestError && <TYPE.error error={true}>{requestError}</TYPE.error>}

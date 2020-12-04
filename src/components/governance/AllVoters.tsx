@@ -42,7 +42,7 @@ export default function AllVoters({
   support
 }: {
   title: string
-  amount: number
+  amount: number | undefined
   proposalID: string
   support: boolean
 }) {
@@ -54,7 +54,9 @@ export default function AllVoters({
         <AutoColumn gap="md">
           <RowBetween>
             <TYPE.black fontWeight={600}>{title}</TYPE.black>
-            <TYPE.black fontWeight={600}>{amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TYPE.black>
+            {amount && (
+              <TYPE.black fontWeight={600}>{amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TYPE.black>
+            )}
           </RowBetween>
         </AutoColumn>
         <TopVoterWrapper>

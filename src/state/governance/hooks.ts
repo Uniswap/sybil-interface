@@ -115,7 +115,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
         console.log(e)
       }
     }
-    if (!delegates && client && allVerifiedHandles) {
+    if (!delegates && client) {
       fetchTopDelegates()
     }
   }, [library, client, key, delegates, allVerifiedHandles])
@@ -135,8 +135,8 @@ export interface ProposalData {
   description: string
   proposer: string
   status: string
-  forCount: number
-  againstCount: number
+  forCount: number | undefined
+  againstCount: number | undefined
   startBlock: number
   endBlock: number
   details: ProposalDetail[]
@@ -259,10 +259,10 @@ export function useAllProposals() {
       proposals.map((p, i) => {
         p.forCount = counts?.[i]?.result?.forVotes
           ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
-          : 0
+          : undefined
         p.againstCount = counts?.[i]?.result?.againstVotes
           ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
-          : 0
+          : undefined
         return true
       })
     }
@@ -273,7 +273,6 @@ export function useAllProposals() {
 
 export function useProposalData(id: string): ProposalData | undefined {
   const allProposalData = useAllProposals()
-
   return allProposalData?.find(p => p.id === id)
 }
 

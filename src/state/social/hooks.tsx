@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { fetchProfileData, ProfileDataResponse } from '../../data/social'
+import { fetchProfileData, ProfileDataResponse, fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { useActiveWeb3React } from '../../hooks'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppState } from '..'
@@ -92,32 +92,76 @@ export function useVerifyCallback(tweetID: string | undefined): { verifyCallback
         error: 'Invalid tweet id'
       }
 
-    return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`).then(async res => {
-      if (res.status === 200) {
-        return {
-          success: true
-        }
-      } else {
-        const errorText = await res.text()
-        if (res.status === 400 && errorText === 'Invalid tweet format.') {
+    try {
+      return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`).then(async res => {
+        if (res.status === 200) {
+          return {
+            success: true
+          }
+        } else {
+          const errorText = await res.text()
+          if (res.status === 400 && errorText === 'Invalid tweet format.') {
+            return {
+              success: false,
+              error: 'Invalid tweet format'
+            }
+          }
+          if (res.status === 400 && errorText === 'Invalid tweet id.') {
+            return {
+              success: false,
+              error: 'Invalid tweet id'
+            }
+          }
           return {
             success: false,
-            error: 'Invalid tweet format'
+            error: 'Unknown error, please try again.'
           }
         }
-        if (res.status === 400 && errorText === 'Invalid tweet id.') {
-          return {
-            success: false,
-            error: 'Invalid tweet id'
-          }
-        }
-        return {
-          success: false,
-          error: 'Unknown error, please try again.'
-        }
+      })
+    } catch {
+      return {
+        success: false,
+        error: 'Invalid tweet id'
       }
-    })
+    }
   }
 
   return { verifyCallback }
+}
+
+// check for tweet every couple seconds after theyve kicked off flow
+const POLL_DURATION_MS = 8000 // length after which to check
+export function useTweetWatcher(
+  tweetCopy: string, // used to check regex
+  twitterHandle: string | undefined, // handle to fetch tweet from
+  watch: boolean, // wether to actively look or not
+  setWatch: React.Dispatch<React.SetStateAction<boolean | undefined>>,
+  setTweetID: React.Dispatch<React.SetStateAction<string | undefined>>,
+  setTweetError: React.Dispatch<React.SetStateAction<string | undefined>>
+) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (twitterHandle && watch) {
+        fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
+          if (res?.data[0]) {
+            const tweetData = res?.data?.[0]
+            // check that tweet contains correct data
+            const passedRegex = tweetData.text.includes(tweetCopy)
+            if (passedRegex) {
+              setTweetID(tweetData.id)
+              setTweetError(undefined)
+              setWatch(false)
+            } else {
+              setWatch(false)
+              setTweetError('Tweet not found, try again with exact message.')
+            }
+          } else {
+            setWatch(false)
+            setTweetError('Tweet not found, try again.')
+          }
+        })
+      }
+    }, POLL_DURATION_MS)
+    return () => clearTimeout(timer)
+  }, [setTweetError, setTweetID, setWatch, tweetCopy, twitterHandle, watch])
 }

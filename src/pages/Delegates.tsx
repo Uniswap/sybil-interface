@@ -27,7 +27,9 @@ export default function Delegates({
   // if on testnet, show warning
   const { chainId } = useActiveWeb3React()
 
+  // get top delegates
   const topDelegates = useTopDelegates()
+
   return (
     <BodyWrapper>
       {chainId === ChainId.MAINNET ? (

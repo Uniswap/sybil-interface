@@ -36,7 +36,6 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
   return client
     .query({
       query: GLOBAL_DATA,
-
       fetchPolicy: 'cache-first'
     })
     .then(async (res: GlobalResponse) => {
@@ -45,6 +44,9 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
       } else {
         return Promise.reject('Error fetching global data')
       }
+    })
+    .catch(() => {
+      return Promise.reject('Error fetching from subgraph')
     })
 }
 
@@ -71,9 +73,7 @@ export async function fetchDelegates(
         const handles = await Promise.all(
           res.data.delegates.map(async (a: DelegateData) => {
             const checksummed = isAddress(a.id)
-
             const handle = checksummed ? allVerifiedHandles?.[checksummed]?.handle : undefined
-
             const profileData = handle ? await fetchProfileData(handle) : undefined
             return {
               account: a.id,
@@ -92,8 +92,11 @@ export async function fetchDelegates(
           }
         })
       })
+      .catch(() => {
+        return Promise.reject('Error fetching delegates from subgraph')
+      })
   } catch (e) {
-    return Promise.reject(new Error('Unable to fetch delegates'))
+    return Promise.reject('Unable to fetch delegates')
   }
 }
 
@@ -141,7 +144,7 @@ export const enumerateProposalState = (state: number) => {
 // @todo add typed query response
 const PROPOSAL_PROMISES: { [key: string]: Promise<ProposalData[] | null> } = {}
 
-export function fetchProposals(client: any, key: string): Promise<ProposalData[] | null> {
+export async function fetchProposals(client: any, key: string): Promise<ProposalData[] | null> {
   return (PROPOSAL_PROMISES[key] =
     PROPOSAL_PROMISES[key] ??
     client
@@ -157,8 +160,8 @@ export function fetchProposals(client: any, key: string): Promise<ProposalData[]
             description: p.description?.split(/# /)[1] || 'No description.',
             proposer: p.proposer.id,
             status: undefined, // initialize as 0
-            forCount: 0, // initialize as 0
-            againstCount: 0, // initialize as 0
+            forCount: undefined, // initialize as 0
+            againstCount: undefined, // initialize as 0
             startBlock: parseInt(p.startBlock),
             endBlock: parseInt(p.endBlock),
             forVotes: p.forVotes,
@@ -179,5 +182,7 @@ export function fetchProposals(client: any, key: string): Promise<ProposalData[]
           }))
         }
         return null
-      }))
+      })).catch(() => {
+    return Promise.reject('Error fetching proposals from subgraph')
+  })
 }
