@@ -10,6 +10,7 @@ import MenuBG from '../../assets/images/menu-bg.png'
 
 const Wrapper = styled.div<{ open: boolean }>`
   height: 100vh;
+  position: relative;
   width: ${({ open }) => (open ? '350px' : '60px')};
   background-color: #f7f8fa;
   padding: ${({ open }) => (open ? '2rem 2rem' : '2rem 1.25rem')};
@@ -78,33 +79,6 @@ export default function SideMenu() {
             </ButtonBasic>
           </RowBetween>
         )}
-        {open && (
-          <AutoColumn gap="1rem">
-            <TYPE.largeHeader>Social proof for Ethereum Products</TYPE.largeHeader>
-            <TYPE.main>Sybil is a tool that connects Ethereum addresses to digital indentities.</TYPE.main>
-            <TYPE.main>
-              This interface uses Sybil to help discovery for delegates and voters within governance systems on
-              Ethereum. Connect a web3-wallet and announce on Twitter to verify your social identity.
-            </TYPE.main>
-            <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
-            <TYPE.main>
-              At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as an
-              authentication methods. For instance, github integration is coming soon.
-            </TYPE.main>
-            <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
-            <TYPE.main>
-              No! Sybil can be used to connect identities to addresses for any type of project that uses addresses. In
-              fact, you don’t even have to use sybil through this interface! Check out the documentation for how to set
-              up a similar system.
-            </TYPE.main>
-            <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
-            <TYPE.main>
-              Sybil tries to answer the question: What is the most simple way to connect an identity to an address
-              without requiring user signups or on chain fees. There are many great identity products out there, but
-              many are too complex for the simple needs of delegates and voters within governance systems.
-            </TYPE.main>
-          </AutoColumn>
-        )}
         {open ? (
           <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
             <ButtonBasic
@@ -121,6 +95,41 @@ export default function SideMenu() {
             <Code />
             <Book />
             <HelpCircle />
+          </AutoColumn>
+        )}
+        {open && (
+          <AutoColumn gap="1.5rem">
+            <AutoColumn gap="0.5rem">
+              <TYPE.largeHeader>Social proof for Ethereum Products</TYPE.largeHeader>
+              <TYPE.main>Sybil is a tool that connects Ethereum addresses to digital indentities.</TYPE.main>
+              <TYPE.main>
+                This interface uses Sybil to help discovery for delegates and voters within governance systems on
+                Ethereum.
+              </TYPE.main>
+            </AutoColumn>
+            <AutoColumn gap="0.5rem">
+              <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
+              <TYPE.main>
+                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as an
+                authentication methods. For instance, github integration is coming soon.
+              </TYPE.main>
+            </AutoColumn>
+            <AutoColumn gap="0.5rem">
+              <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
+              <TYPE.main>
+                No! Sybil can be used to connect identities to addresses for any type of project that uses addresses. In
+                fact, you don’t even have to use sybil through this interface! Check out the documentation for how to
+                set up a similar system.
+              </TYPE.main>
+            </AutoColumn>
+            <AutoColumn gap="0.5rem">
+              <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
+              <TYPE.main>
+                Sybil tries to answer the question: What is the most simple way to connect an identity to an address
+                without requiring user signups or on chain fees. There are many great identity products out there, but
+                many are too complex for the simple needs of delegates and voters within governance systems.
+              </TYPE.main>
+            </AutoColumn>
           </AutoColumn>
         )}
       </Wrapper>
