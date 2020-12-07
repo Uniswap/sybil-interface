@@ -34,6 +34,8 @@ Steps to add new protocol support:
 
 2. Make sure to have a [subgraph](https://thegraph.com/) that can return data that matches the stuctures in [queries.js](./src/apollo/queries.js). See subgraph code for governance here: [https://github.com/protofire/compound-governance-subgraph](https://github.com/protofire/compound-governance-subgraph).
 
+3. Add subgraph support by adding client information in [client.js](./src/apollo/client.js) and in hook `useSubgraphClient` in [hooks.ts](./src/state/governance/hooks.ts)
+
 PR's for additional protocol support are welcome. 
 
 
