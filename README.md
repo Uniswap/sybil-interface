@@ -30,11 +30,10 @@ Forks of Compound or Uniswap governance can easily be integrated into the interf
 
 Steps to add new protocol support: 
 
-1. Add relevant information to list of supported protocols here: [https://github.com/Uniswap/sybil-interface/blob/master/src/state/governance/reducer.ts](https://github.com/Uniswap/sybil-interface/blob/master/src/state/governance/reducer.ts)
-  - 
+1. Add relevant information to list of supported protocols in [reducer.js](./src/state/governance/reducer.ts)
 
-2. Make sure to have a [subgraph]() that can return data that matches the stuctures in [queries.js](./src/apollo/queries.js)
-* To fork 
+2. Make sure to have a [subgraph](https://thegraph.com/) that can return data that matches the stuctures in [queries.js](./src/apollo/queries.js). See subgraph code for governance here: [https://github.com/protofire/compound-governance-subgraph](https://github.com/protofire/compound-governance-subgraph).
+
 
 ## Development
 
