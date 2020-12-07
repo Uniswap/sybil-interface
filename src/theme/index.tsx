@@ -8,6 +8,7 @@ import styled, {
 import { useIsDarkMode } from '../state/user/hooks'
 import { Text, TextProps } from 'rebass'
 import { Colors } from './styled'
+import GTHaptikMedium from '../assets/fonts/GT-Haptik-Medium.ttf'
 
 export * from './components'
 
@@ -184,10 +185,18 @@ export const TYPE = {
 }
 
 export const FixedGlobalStyle = createGlobalStyle`
+
+@font-face {
+      font-family: 'GT Haptik Medium';
+      src: url(${GTHaptikMedium});
+}
+
 html, input, textarea, button {
   font-family: 'Inter', sans-serif;
   font-display: fallback;
 }
+
+
 @supports (font-variation-settings: normal) {
   html, input, textarea, button {
     font-family: 'Inter var', sans-serif;

@@ -17,7 +17,7 @@ const Wrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  justify-content: flex-start;
+  justify-content: space-between;
 
   background: url(${MenuBG});
 
@@ -51,6 +51,12 @@ const FlippedText = styled.div`
 
 export default function SideMenu() {
   const [open, setOpen] = useState(true)
+  const [faqOpen, setfaqOpen] = useState(false)
+
+  function closeBoth() {
+    setOpen(!open)
+    setfaqOpen(false)
+  }
 
   return (
     <>
@@ -68,26 +74,55 @@ export default function SideMenu() {
             <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>
           </FlippedText>
         )}
-        {open && (
+        {open && !faqOpen && (
           <RowBetween>
             <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>
             <ButtonBasic
-              onClick={() => setOpen(!open)}
+              onClick={() => closeBoth()}
               style={{ cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.4)', color: '#000' }}
             >
               <ChevronLeft />
             </ButtonBasic>
           </RowBetween>
         )}
+        {open && !faqOpen && (
+          <AutoColumn gap="1.5rem">
+            <AutoColumn gap="0.5rem">
+              <TYPE.black
+                style={{ marginBottom: '1rem', fontFamily: 'GT Haptik Medium', fontSize: '36px', lineHeight: '125%' }}
+              >
+                Social proof for Ethereum Products
+              </TYPE.black>
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
+                This tool connects wallet addresses to digital identities. Signed messages are posted publicly, and can
+                be verified for use off-chain.
+              </TYPE.black>
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
+                This mapping can be used for displaying public identities for governance platforms on Ethereum or any
+                project that wants to connect social identity to addresses. Open, public, and forkable.
+              </TYPE.black>
+            </AutoColumn>
+          </AutoColumn>
+        )}
         {open ? (
           <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
+            {!faqOpen && (
+              <ButtonBasic
+                as={ExternalLink}
+                href="https://github.com/Uniswap/sybil-list"
+                style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
+              >
+                <Book />
+                Sybil Documentation
+              </ButtonBasic>
+            )}
             <ButtonBasic
-              as={ExternalLink}
+              onClick={() => setfaqOpen(!faqOpen)}
               href="https://github.com/Uniswap/sybil-list"
               style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
             >
-              <Book />
-              Sybil Documentation
+              <HelpCircle />
+              Help and Info {faqOpen && '(close)'}
             </ButtonBasic>
           </AutoColumn>
         ) : (
@@ -97,37 +132,30 @@ export default function SideMenu() {
             <HelpCircle />
           </AutoColumn>
         )}
-        {open && (
+
+        {faqOpen && (
           <AutoColumn gap="1.5rem">
-            <AutoColumn gap="0.5rem">
-              <TYPE.largeHeader>Social proof for Ethereum Products</TYPE.largeHeader>
-              <TYPE.main>Sybil is a tool that connects Ethereum addresses to digital identities.</TYPE.main>
-              <TYPE.main>
-                This interface uses Sybil to help discovery for delegates and voters within governance systems on
-                Ethereum.
-              </TYPE.main>
-            </AutoColumn>
-            <AutoColumn gap="0.5rem">
-              <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
-              <TYPE.main>
-                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
-                authentication methods. For instance, github integration is coming soon.
-              </TYPE.main>
-            </AutoColumn>
-            <AutoColumn gap="0.5rem">
-              <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
-              <TYPE.main>
-                No! Sybil can be used to connect identities to addresses for any type of project that uses addresses. In
-                fact, you don’t even have to use sybil through this interface! Check out the documentation for how to
-                set up a similar system.
-              </TYPE.main>
-            </AutoColumn>
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
               <TYPE.main>
                 Sybil tries to answer the question: What is the most simple way to connect an identity to an address
                 without requiring user signups or on chain fees. There are many great identity products out there, but
                 many are too complex for the simple needs of delegates and voters within governance systems.
+              </TYPE.main>
+            </AutoColumn>
+            <AutoColumn gap="0.5rem">
+              <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
+              <TYPE.main>
+                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
+                authentication methods. For instance, Github integration is coming soon.
+              </TYPE.main>
+            </AutoColumn>
+            <AutoColumn gap="0.5rem">
+              <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
+              <TYPE.main>
+                Sybil can be used to connect identities to addresses for any type of project that uses addresses. In
+                fact, you don’t even have to use sybil through this interface! Check out the documentation for how to
+                set up a similar system.
               </TYPE.main>
             </AutoColumn>
           </AutoColumn>

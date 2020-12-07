@@ -50,7 +50,7 @@ export default function Dropdown() {
   return (
     <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open} ref={ref}>
       <RowBetween>
-        <RowFixed>
+        <RowFixed style={{ gap: '16px' }}>
           <WrappedListLogo src={activeProtocol?.logo} />
           <TYPE.mediumHeader color={activeProtocol?.primaryColor}>{activeProtocol?.name}</TYPE.mediumHeader>
         </RowFixed>
@@ -67,7 +67,7 @@ export default function Dropdown() {
               to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
             >
               <RowBetween>
-                <RowFixed>
+                <RowFixed style={{ gap: '16px' }}>
                   <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
                   <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
                     {SUPPORTED_PROTOCOLS[k].name}

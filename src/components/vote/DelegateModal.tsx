@@ -120,9 +120,7 @@ export default function DelegateModal({ isOpen, onDismiss, title, prefilledDeleg
               <TYPE.mediumHeader color="white">{usingDelegate ? 'Delegate Votes' : 'Self Delegate'}</TYPE.mediumHeader>
             </ButtonPrimary>
             <TextButton onClick={() => setUsingDelegate(!usingDelegate)}>
-              <TYPE.blue>
-                {usingDelegate ? 'Remove' : 'Add'} Delegate {!usingDelegate && '+'}
-              </TYPE.blue>
+              <TYPE.blue>{usingDelegate ? 'Remove' : 'Change'} Delegation</TYPE.blue>
             </TextButton>
           </AutoColumn>
         </ContentWrapper>

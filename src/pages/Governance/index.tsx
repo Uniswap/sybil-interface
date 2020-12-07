@@ -162,7 +162,7 @@ export default function Overview() {
                       (userDelegatee === ZERO_ADDRESS && govTokenBalance ? (
                         <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
                       ) : (
-                        <RowFixed>
+                        <RowFixed height="38px" style={{ display: 'flex' }}>
                           {userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? (
                             <RowFixed>
                               <TYPE.main mr="4px">Delegated to: </TYPE.main>
