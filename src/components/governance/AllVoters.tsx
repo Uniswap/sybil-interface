@@ -5,7 +5,6 @@ import { AutoColumn } from '../Column'
 import { TYPE, ExternalLink } from '../../theme'
 import { getEtherscanLink, shortenAddress } from '../../utils'
 import { ChainId } from '@uniswap/sdk'
-import { useAllVotersForProposal } from '../../state/governance/hooks'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -38,16 +37,19 @@ const TopVoterWrapper = styled.div`
 export default function AllVoters({
   title,
   amount,
-  proposalID,
-  support
+  allVoters
 }: {
   title: string
   amount: number | undefined
-  proposalID: string
-  support: boolean
+  allVoters:
+    | {
+        votes: string
+        voter: {
+          id: string
+        }
+      }[]
+    | undefined
 }) {
-  const allVoters = useAllVotersForProposal(proposalID, support)
-
   return (
     <StyledDataCard>
       <CardSection>

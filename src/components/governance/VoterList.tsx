@@ -9,6 +9,7 @@ import Modal from '../Modal'
 import AllVoters from './AllVoters'
 import { ButtonEmpty } from '../Button'
 import Loader from '../Loader'
+import { useAllVotersForProposal } from '../../state/governance/hooks'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -81,11 +82,12 @@ export default function VoterList({
   id: string
 }) {
   const [showAll, setShowAll] = useState(false)
+  const allVoters = useAllVotersForProposal(id, support === 'for')
 
   return (
     <StyledDataCard>
       <Modal isOpen={showAll} onDismiss={() => setShowAll(false)}>
-        <AllVoters title={title} amount={amount} proposalID={id} support={support === 'for' ? true : false} />
+        <AllVoters title={title} amount={amount} allVoters={allVoters} />
       </Modal>
       <CardSection>
         <AutoColumn gap="md">
