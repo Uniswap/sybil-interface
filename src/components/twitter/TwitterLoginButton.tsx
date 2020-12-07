@@ -23,7 +23,6 @@ export const VerifyButton = styled.a`
 const TwitterLogo = styled.img`
   height: 20px;
   width: 20px;
-  margin-left: 4px;
 `
 
 export default function TwitterLoginButton({ text }: { text: string }) {

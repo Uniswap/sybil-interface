@@ -5,14 +5,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, getEtherscanLink, getTwitterProfileLink } from '../../utils'
-import {
-  DelegateData,
-  useActiveProtocol,
-  useGlobalData,
-  useUserVotes,
-  useGovernanceToken,
-  useUserDelegatee
-} from '../../state/governance/hooks'
+import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
@@ -92,11 +85,14 @@ const DataRow = styled.div`
   `};
 `
 
-const DelegateButton = styled(ButtonBlue)`
+const DelegateButton = styled(ButtonBlue)<{ disabled: boolean }>`
   ${({ theme }) => theme.mediaWidth.upToMedium`
     font-size: 12px;
     margin-top: 0px !important;
   `};
+
+  background-color: ${({ disabled, theme }) => disabled && theme.bg3};
+  color: ${({ disabled, theme }) => disabled && theme.text2};
 `
 
 const VoteText = styled(NoWrap)`
@@ -121,18 +117,11 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // get global data to calculate vote %
   const globalData = useGlobalData()
 
-  const availableVotes = useUserVotes()
-  const userDelegatee = useUserDelegatee()
   const govToken = useGovernanceToken()
   const govTokenBalance = useTokenBalance(account ?? undefined, govToken)
 
   // show delegate button if they have available votes or if theyve delegated to someone else
-  const showDelegateButton =
-    userDelegatee && govTokenBalance && userDelegatee !== account
-      ? JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO)
-      : availableVotes
-      ? JSBI.greaterThan(availableVotes?.raw, BIG_INT_ZERO)
-      : false
+  const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
@@ -169,17 +158,16 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                     <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
                   )}
                 </FixedAddressSize>
-                {showDelegateButton && (
-                  <DelegateButton
-                    width="fit-content"
-                    onClick={() => {
-                      setPrefilledDelegate(d.id)
-                      toggelDelegateModal()
-                    }}
-                  >
-                    Delegate
-                  </DelegateButton>
-                )}
+                <DelegateButton
+                  width="fit-content"
+                  disabled={!showDelegateButton}
+                  onClick={() => {
+                    setPrefilledDelegate(d.id)
+                    toggelDelegateModal()
+                  }}
+                >
+                  Delegate
+                </DelegateButton>
               </AutoRow>
               <OnlyAboveLarge>
                 <NoWrap textAlign="end">{d.votes.length}</NoWrap>

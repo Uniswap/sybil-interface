@@ -1,6 +1,6 @@
 import { HandleEntry } from './../state/social/hooks'
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA } from '../apollo/queries'
+import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
 import { fetchProfileData } from './social'
@@ -53,12 +53,17 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 export async function fetchDelegates(
   client: any,
   library: Web3Provider,
-  allVerifiedHandles: { [key: string]: HandleEntry } | undefined
+  allVerifiedHandles: { [key: string]: HandleEntry } | undefined,
+  filter?: boolean
 ): Promise<DelegateData[] | null> {
+  const mapping = allVerifiedHandles && Object.keys(allVerifiedHandles)?.map(a => a.toLocaleLowerCase())
   try {
     return client
       .query({
-        query: TOP_DELEGATES,
+        query: filter && allVerifiedHandles ? DELEGATES_FROM_LIST : TOP_DELEGATES,
+        variables: {
+          list: filter && allVerifiedHandles && mapping
+        },
         fetchPolicy: 'cache-first'
       })
       .then(async (res: DelegateResponse) => {
@@ -92,7 +97,8 @@ export async function fetchDelegates(
           }
         })
       })
-      .catch(() => {
+      .catch((e: any) => {
+        console.log(e)
         return Promise.reject('Error fetching delegates from subgraph')
       })
   } catch (e) {

@@ -3,7 +3,7 @@ import { HandleEntry } from './../state/social/hooks'
 // Endpoints
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 const VERIFIED_JSON =
-  'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json?token=AECO4KYAJFHPHN6MP7GKA2272KFBS'
+  'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json?token=AECO4K2U7EWRWEL4PXDNTIS727XYC'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
 interface GithubData {

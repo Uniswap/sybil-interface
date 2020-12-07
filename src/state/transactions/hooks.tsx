@@ -36,9 +36,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
 // returns all the transactions for the current chain
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const { chainId } = useActiveWeb3React()
-
   const state = useSelector<AppState, AppState['transactions']>(state => state.transactions)
-
   return chainId ? state[chainId] ?? {} : {}
 }
 

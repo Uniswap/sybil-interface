@@ -223,3 +223,19 @@ export const Dots = styled.span`
     }
   }
 `
+
+export const LoadingFlag = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid ${({ theme }) => theme.blue1};
+  color: ${({ theme }) => theme.blue1};
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+`

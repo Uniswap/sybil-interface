@@ -101,7 +101,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
     window.open(
       `https://twitter.com/intent/tweet?text=${tweetCopy}&hashtags=${tweetHashTag && tweetHashTag}`,
       'tweetWindow',
-      'height=400,width=800'
+      'height=400,width=800,top=400px,left=400px'
     )
   }
 

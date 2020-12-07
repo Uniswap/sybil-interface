@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { BodyWrapper } from '../AppBody'
 import { AutoColumn } from '../../components/Column'
 import styled from 'styled-components'
-import { useGovernanceToken, useUserVotes, useUserDelegatee } from '../../state/governance/hooks'
+import { useGovernanceToken, useUserVotes, useUserDelegatee, useActiveProtocol } from '../../state/governance/hooks'
 
 import Dropdown from '../../components/governance/Dropdown'
 import Tabs from '../../components/governance/Tabs'
@@ -20,6 +20,11 @@ import { ButtonBasic, ButtonGray } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import { Settings } from 'react-feather'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
+import Loader from '../../components/Loader'
+import QuestionHelper from '../../components/QuestionHelper'
+import { useAllTransactions, isTransactionRecent } from '../../state/transactions/hooks'
+import { newTransactionsFirst } from '../../components/Web3Status'
+import { LoadingFlag } from '../../theme/components'
 
 const SectionWrapper = styled.div`
   display: grid;
@@ -98,6 +103,7 @@ export default function Overview() {
 
   // account details
   const { chainId, account } = useActiveWeb3React()
+  const [activeProtocol] = useActiveProtocol()
   const { name: ensName } = useENS(account)
 
   // UI views
@@ -111,9 +117,22 @@ export default function Overview() {
   const govTokenBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, govToken)
   const userDelegatee: string | undefined = useUserDelegatee()
 
-  // if delegated to real address, show token balance, if not use available votes from contract
+  // if delegated to real address, show token balance + available, if not use available votes from contract
   const voteCount: TokenAmount | undefined =
-    userDelegatee && userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? govTokenBalance : availableVotes
+    govTokenBalance && availableVotes
+      ? userDelegatee && userDelegatee !== account
+        ? govTokenBalance.add(availableVotes)
+        : availableVotes
+      : undefined
+
+  // show pending txns if needed
+  const allTransactions = useAllTransactions()
+  const sortedRecentTransactions = useMemo(() => {
+    const txs = Object.values(allTransactions)
+    return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
+  }, [allTransactions])
+  const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
+  const hasPendingTransactions = !!pending.length
 
   return (
     <BodyWrapper>
@@ -147,19 +166,32 @@ export default function Overview() {
                         </TYPE.mediumHeader>
                       </ExternalLink>
                       <StyledSettings onClick={toggleWalletModal} stroke="black" />
+                      {hasPendingTransactions && (
+                        <LoadingFlag style={{ marginLeft: '10px' }} onClick={toggleWalletModal}>
+                          {pending?.length} pending <Loader style={{ marginLeft: '4px', height: '12px' }} />
+                        </LoadingFlag>
+                      )}
                     </RowFixed>
                   )}
                   <TwitterAccountDetails />
                 </AutoColumn>
                 <MobilePadding>
                   <MobileColumn gap="md">
+                    {!govTokenBalance && <Loader />}
                     {voteCount && chainId === ChainId.MAINNET && (
                       <RowFixed>
-                        <TYPE.mediumHeader>{voteCount.toFixed(0)} votes</TYPE.mediumHeader>
+                        <TYPE.mediumHeader>{voteCount.toSignificant(3)} votes</TYPE.mediumHeader>
+                        {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
+                          <QuestionHelper
+                            text={`Hold ${activeProtocol?.token.symbol} to be be able to self-delegate or delegate to others.`}
+                          />
+                        )}
                       </RowFixed>
                     )}
                     {userDelegatee &&
-                      (userDelegatee === ZERO_ADDRESS && govTokenBalance ? (
+                      (userDelegatee === ZERO_ADDRESS &&
+                      govTokenBalance &&
+                      JSBI.notEqual(BIG_INT_ZERO, govTokenBalance.raw) ? (
                         <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
                       ) : (
                         <RowFixed height="38px" style={{ display: 'flex' }}>
@@ -176,7 +208,7 @@ export default function Overview() {
                           ) : (
                             userDelegatee === account && <TYPE.main mr="8px">Self delegated</TYPE.main>
                           )}
-                          {voteCount && JSBI.notEqual(BIG_INT_ZERO, voteCount?.raw) && (
+                          {govTokenBalance && JSBI.notEqual(BIG_INT_ZERO, govTokenBalance?.raw) && (
                             <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>
                           )}
                         </RowFixed>

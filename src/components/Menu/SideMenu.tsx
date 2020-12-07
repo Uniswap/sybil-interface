@@ -28,7 +28,6 @@ const Wrapper = styled.div<{ open: boolean }>`
   }
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
-
     display: none;
   `};
 `

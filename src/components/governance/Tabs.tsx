@@ -1,10 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useActiveProtocol } from '../../state/governance/hooks'
-import { AutoRow } from '../Row'
+import { useActiveProtocol, useFilterActive } from '../../state/governance/hooks'
+import { AutoRow, RowBetween } from '../Row'
 import { GreyCard } from '../Card'
 import { TYPE } from '../../theme'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import Toggle from '../Toggle'
 
 const TabOption = styled.button<{ selected?: boolean }>`
   padding: 6px;
@@ -24,19 +25,39 @@ const TabOption = styled.button<{ selected?: boolean }>`
   }
 `
 
+const AboveSmall = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `};
+`
+
 function Tabs({ location }: RouteComponentProps<{ location: string }>) {
   const [activeProtocol] = useActiveProtocol()
+  const [filter, setFilter] = useFilterActive()
 
   return (
     <GreyCard backgroundColor={activeProtocol?.secondaryColor}>
-      <AutoRow gap="10px">
-        <TabOption as={Link} to={'/delegates/' + activeProtocol?.id} selected={location.pathname.includes('delegates')}>
-          <TYPE.black fontSize={'16px'}>Delegates</TYPE.black>
-        </TabOption>
-        <TabOption as={Link} to={'/proposals/' + activeProtocol?.id} selected={location.pathname.includes('proposals')}>
-          <TYPE.black fontSize={'16px'}>Proposals</TYPE.black>
-        </TabOption>
-      </AutoRow>
+      <RowBetween>
+        <AutoRow gap="10px" width="fit-content">
+          <TabOption
+            as={Link}
+            to={'/delegates/' + activeProtocol?.id}
+            selected={location.pathname.includes('delegates')}
+          >
+            <TYPE.black fontSize={'16px'}>Delegates</TYPE.black>
+          </TabOption>
+          <TabOption
+            as={Link}
+            to={'/proposals/' + activeProtocol?.id}
+            selected={location.pathname.includes('proposals')}
+          >
+            <TYPE.black fontSize={'16px'}>Proposals</TYPE.black>
+          </TabOption>
+        </AutoRow>
+        <AboveSmall>
+          {location.pathname.includes('delegates') && <Toggle isActive={filter} toggle={() => setFilter(!filter)} />}
+        </AboveSmall>
+      </RowBetween>
     </GreyCard>
   )
 }

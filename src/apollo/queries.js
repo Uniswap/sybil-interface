@@ -28,6 +28,23 @@ export const TOP_DELEGATES = gql`
   }
 `
 
+// fetch top delegates by votes delegated at current time
+export const DELEGATES_FROM_LIST = gql`
+  query delegates($list: [Bytes!]) {
+    delegates(first: 500, orderBy: delegatedVotes, orderDirection: desc, where: { id_in: $list }) {
+      id
+      delegatedVotes
+      delegatedVotesRaw
+      tokenHoldersRepresentedAmount
+      votes {
+        id
+        votes
+        support
+      }
+    }
+  }
+`
+
 // all proposals
 export const PROPOSALS = gql`
   query proposals {

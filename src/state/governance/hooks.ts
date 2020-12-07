@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
-import { updateActiveProtocol } from './actions'
+import { updateActiveProtocol, updateFilterActive } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo } from './reducer'
@@ -54,6 +54,21 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
   return [activeProtocol, setActiveProtocol]
 }
 
+export function useFilterActive(): [boolean, (filterActive: boolean) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const filterActive = useSelector<AppState, AppState['governance']['filterActive']>(state => {
+    return state.governance.filterActive
+  })
+
+  const setFilterActive = useCallback(
+    (filterActive: boolean) => {
+      dispatch(updateFilterActive({ filterActive }))
+    },
+    [dispatch]
+  )
+  return [filterActive, setFilterActive]
+}
+
 export function useGovernanceToken(): Token | undefined {
   const { chainId } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
@@ -77,7 +92,7 @@ export function useGlobalData(): GlobaData | undefined {
   return globalData
 }
 
-export function useTopDelegates(): DelegateData[] | undefined {
+export function useTopDelegates(filter: boolean): DelegateData[] | undefined {
   const { library } = useActiveWeb3React()
 
   const [delegates, setDelegates] = useState<DelegateData[] | undefined>()
@@ -91,7 +106,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
   const [activeProtocol] = useActiveProtocol()
   useEffect(() => {
     setDelegates(undefined)
-  }, [activeProtocol])
+  }, [activeProtocol, filter])
 
   const key = activeProtocol?.id ?? ''
 
@@ -106,7 +121,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
     async function fetchTopDelegates() {
       try {
         library &&
-          fetchDelegates(client, library, allVerifiedHandles).then(async delegateData => {
+          fetchDelegates(client, library, allVerifiedHandles, filter).then(async delegateData => {
             if (delegateData) {
               setDelegates(delegateData)
             }
@@ -118,7 +133,7 @@ export function useTopDelegates(): DelegateData[] | undefined {
     if (!delegates && client) {
       fetchTopDelegates()
     }
-  }, [library, client, key, delegates, allVerifiedHandles])
+  }, [library, client, key, delegates, allVerifiedHandles, filter])
 
   return delegates
 }
