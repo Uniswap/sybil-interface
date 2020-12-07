@@ -3,7 +3,7 @@
 [![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
 - Interface: [https://sybil.org](https://sybil.org)
-- Read the Sybil annoucnement post : [link to post]()
+- Read the Sybil announcement post : [link to post]()
 
 Governance interface that incorporates Sybil, a tool for linking Ethereum addresses to social identities. Only Ethereum mainnet is supported. 
 
@@ -19,11 +19,11 @@ This interface supports social verification through Twitter only. However, more 
 
 ## Governance 
 
-The interface allows users to view data about delegates and proposals for multiple Ethereum goverance. Users can also delegate votes and vote on active proposals. 
+The interface allows users to view data about delegates and proposals for multiple Ethereum governance. Users can also delegate votes and vote on active proposals. 
 
 #### Supported protocols 
 
-Currenlty Uniswap and Compound governance are supported in the interface. 
+Currently Uniswap and Compound governance are supported in the interface. 
 
 #### Adding protocol support 
 
@@ -62,7 +62,7 @@ To have the interface default to a different network when a wallet is not connec
 2. Change `REACT_APP_NETWORK_ID` to `"{YOUR_NETWORK_ID}"`
 3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://{YOUR_NETWORK_ID}.infura.io/v3/{YOUR_INFURA_KEY}"` 
 
-Note that the interface only works on mainnet to limit the amount of required data soures for goverance systems. 
+Note that the interface only works on mainnet to limit the amount of required data sources for governance systems. 
 
 ## Contributions
 
