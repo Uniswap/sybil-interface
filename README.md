@@ -3,6 +3,7 @@
 [![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
 - Interface: [https://sybil.org](https://sybil.org)
+- Read the Sybil annoucnement post : [link to post]()
 
 Governance interface that incorporates Sybil, a tool for linking Ethereum addresses to social identities. Only Ethereum mainnet is supported. 
 
