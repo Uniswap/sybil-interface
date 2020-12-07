@@ -101,7 +101,7 @@ export default function SideMenu() {
           <AutoColumn gap="1.5rem">
             <AutoColumn gap="0.5rem">
               <TYPE.largeHeader>Social proof for Ethereum Products</TYPE.largeHeader>
-              <TYPE.main>Sybil is a tool that connects Ethereum addresses to digital indentities.</TYPE.main>
+              <TYPE.main>Sybil is a tool that connects Ethereum addresses to digital identities.</TYPE.main>
               <TYPE.main>
                 This interface uses Sybil to help discovery for delegates and voters within governance systems on
                 Ethereum.
@@ -110,7 +110,7 @@ export default function SideMenu() {
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
               <TYPE.main>
-                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as an
+                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
                 authentication methods. For instance, github integration is coming soon.
               </TYPE.main>
             </AutoColumn>
