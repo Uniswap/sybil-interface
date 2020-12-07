@@ -123,11 +123,11 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
         <AutoColumn gap="lg">
           <RowBetween>
             <RowFixed>
-              <TYPE.mediumHeader ml="6px">1/3 Sign Message</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">Step 1: Sign Message</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TYPE.black>Sign a mesage that will be used to link your wallet address and Twitter handle.</TYPE.black>
+          <TYPE.black>Sign a message that will be used to link your wallet address and Twitter handle.</TYPE.black>
           <TwitterAccountPreview />
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
         </AutoColumn>
@@ -136,7 +136,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           <RowBetween>
             <RowFixed>
               <BackArrowSimple onClick={() => setSig(undefined)} />
-              <TYPE.mediumHeader ml="6px">2/3 Announce</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">Step 2: Announce</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
@@ -158,7 +158,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
                   setWatch(false)
                 }}
               />
-              <TYPE.mediumHeader ml="6px">3/3 Submit</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml="6px">Step 3: Submit</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
