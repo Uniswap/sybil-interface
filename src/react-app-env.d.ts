@@ -25,4 +25,4 @@ declare module 'multihashes' {
   declare function toB58String(hash: Uint8Array): string
 }
 
-declare module "*.ttf";
+declare module '*.ttf'
