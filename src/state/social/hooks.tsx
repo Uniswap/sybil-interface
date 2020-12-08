@@ -38,7 +38,7 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
 // monitor if the tweet was correctly picked up and linked in cloudflare KV
 export interface VerifyResult {
   readonly success: boolean
-  readonly error?: string
+  readonly error?: string | undefined
 }
 
 export interface HandleEntry {
@@ -90,20 +90,21 @@ export function useVerifiedHandle(address: string | null | undefined): HandleEnt
 export function useVerifyCallback(tweetID: string | undefined): { verifyCallback: () => Promise<VerifyResult> } {
   const { account } = useActiveWeb3React()
 
-  const verifyCallback = async () => {
+  const verifyCallback = useCallback(() => {
     if (!tweetID)
-      return {
+      return Promise.reject({
         success: false,
         error: 'Invalid tweet id'
-      }
+      })
 
-    try {
-      return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`).then(async res => {
+    return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`)
+      .then(async res => {
         if (res.status === 200) {
           return {
             success: true
           }
         } else {
+          console.log('here')
           const errorText = await res.text()
           if (res.status === 400 && errorText === 'Invalid tweet format.') {
             return {
@@ -123,13 +124,13 @@ export function useVerifyCallback(tweetID: string | undefined): { verifyCallback
           }
         }
       })
-    } catch {
-      return {
-        success: false,
-        error: 'Invalid tweet id'
-      }
-    }
-  }
+      .catch(() => {
+        return {
+          success: false,
+          error: 'Error submitting verification'
+        }
+      })
+  }, [account, tweetID])
 
   return { verifyCallback }
 }

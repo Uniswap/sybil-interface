@@ -15,6 +15,7 @@ import TwitterAccountPreview from '../../components/twitter/TwitterAccountPrevie
 import TwitterLoginButton from './TwitterLoginButton'
 import { OffChainRequestModal } from '../TransactionConfirmationModal'
 import { useSignedHandle } from '../../hooks/useSignedHandle'
+import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -94,8 +95,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   // use hook to handle polling
   useTweetWatcher(tweetCopy, twitterHandle, watch, setWatch, setTweetID, setTweetError)
 
-  // start watching and open window
-  function checkForTweet() {
+  function startWatching() {
     setWatch(true) // restart watcher
     setTweetError(undefined) // reset error
     window.open(
@@ -103,6 +103,31 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       'tweetWindow',
       'height=400,width=800,top=400px,left=400px'
     )
+  }
+
+  // start watching and open window
+  function checkForTweet() {
+    twitterHandle &&
+      fetchLatestTweet(twitterHandle)
+        .then((res: LatestTweetResponse | null) => {
+          if (res?.data[0]) {
+            const tweetData = res?.data?.[0]
+            // check that tweet contains correct data
+            const passedRegex = tweetData.text.includes(tweetCopy)
+            if (passedRegex) {
+              setTweetID(tweetData.id)
+              setTweetError(undefined)
+              setWatch(false)
+            } else {
+              startWatching()
+            }
+          } else {
+            startWatching()
+          }
+        })
+        .catch(() => {
+          startWatching()
+        })
   }
 
   return (
