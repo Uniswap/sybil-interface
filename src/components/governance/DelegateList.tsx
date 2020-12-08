@@ -4,7 +4,7 @@ import { AutoColumn } from '../Column'
 import { TYPE, ExternalLink } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
-import { shortenAddress, getEtherscanLink, getTwitterProfileLink } from '../../utils'
+import { shortenAddress, getEtherscanLink, getTwitterProfileLink, isAddress } from '../../utils'
 import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
@@ -19,6 +19,7 @@ import Loader from '../Loader'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
+import { useAllUncategorizedNames } from '../../state/social/hooks'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -123,9 +124,16 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // show delegate button if they have available votes or if theyve delegated to someone else
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
+  // get uncategorized names
+  const [uncategorizedNames] = useAllUncategorizedNames()
+
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
       ? topDelegates.map((d, i) => {
+          const formattedAddress = isAddress(d.id)
+          const contentLink =
+            !d.handle && formattedAddress && uncategorizedNames && uncategorizedNames[formattedAddress]?.contentURL
+
           return (
             <DataRow key={d.id}>
               <AutoRow gap="10px">
@@ -146,13 +154,23 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                     <ExternalLink
                       href={d.handle ? getTwitterProfileLink(d.handle) : getEtherscanLink(chainId, d.id, 'address')}
                     >
-                      <TYPE.black>{d.handle ? `@${d.handle}` : shortenAddress(d.id)}</TYPE.black>
+                      <TYPE.black>
+                        {d.handle
+                          ? `@${d.handle}`
+                          : formattedAddress && uncategorizedNames?.[formattedAddress]
+                          ? uncategorizedNames?.[formattedAddress].name
+                          : shortenAddress(d.id)}
+                      </TYPE.black>
                     </ExternalLink>
                     {d.handle && <TwitterLogo src={TwitterIcon} />}
                   </RowFixed>
                   {d.handle ? (
                     <ExternalLink href={getEtherscanLink(chainId, d.id, 'address')}>
                       <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                    </ExternalLink>
+                  ) : contentLink ? (
+                    <ExternalLink href={contentLink}>
+                      <TYPE.black fontSize="12px">View details</TYPE.black>
                     </ExternalLink>
                   ) : (
                     <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
@@ -188,7 +206,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           )
         })
       : null
-  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates])
+  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates, uncategorizedNames])
 
   return (
     <GreyCard padding="2rem 0">

@@ -1,16 +1,18 @@
-import { HandleEntry } from './../state/social/hooks'
+import { HandleEntry, UncategorizedContentEntry } from './../state/social/hooks'
 
 // Endpoints
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 const VERIFIED_JSON =
-  'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json?token=AECO4K2U7EWRWEL4PXDNTIS727XYC'
+  'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json?token=AECO4K3LEYWJP3HT6EZFTPS72766I'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
 interface GithubData {
-  [address: string]: HandleEntry
+  [address: string]: { twitter: HandleEntry | undefined; other: UncategorizedContentEntry | undefined }
 }
 
-export async function fetchAllVerifiedHandles(): Promise<{ [address: string]: HandleEntry } | undefined> {
+export async function fetchAllVerifiedHandles(): Promise<
+  { [address: string]: { twitter: HandleEntry | undefined; other: UncategorizedContentEntry | undefined } } | undefined
+> {
   try {
     return fetch(VERIFIED_JSON).then(async res => {
       if (!res || res.status !== 200) {

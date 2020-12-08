@@ -3,7 +3,7 @@ import { fetchProfileData, ProfileDataResponse, fetchLatestTweet, LatestTweetRes
 import { useActiveWeb3React } from '../../hooks'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppState } from '..'
-import { updateVerifiedHanldes } from './actions'
+import { updateVerifiedHanldes, updateUncategorizedNames } from './actions'
 
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
@@ -44,6 +44,11 @@ export interface VerifyResult {
 export interface HandleEntry {
   handle: string | undefined
   timestamp: number
+}
+
+export interface UncategorizedContentEntry {
+  name: string
+  contentURL: string
 }
 
 // get al verified handles from github file
@@ -164,4 +169,25 @@ export function useTweetWatcher(
     }, POLL_DURATION_MS)
     return () => clearTimeout(timer)
   }, [setTweetError, setTweetID, setWatch, tweetCopy, twitterHandle, watch])
+}
+
+// get al verified handles from github file
+export function useAllUncategorizedNames(): [
+  { [address: string]: UncategorizedContentEntry } | undefined,
+  (names: { [address: string]: UncategorizedContentEntry }) => void
+] {
+  const dispatch = useDispatch<AppDispatch>()
+  const names = useSelector<AppState, AppState['social']['uncategorizedNames']>(
+    state => state.social.uncategorizedNames
+  )
+
+  // set new or reset account
+  const setNames = useCallback(
+    (names: { [address: string]: UncategorizedContentEntry }) => {
+      dispatch(updateUncategorizedNames({ names }))
+    },
+    [dispatch]
+  )
+
+  return [names, setNames]
 }
