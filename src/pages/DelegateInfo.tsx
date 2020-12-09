@@ -174,7 +174,7 @@ export default function DelegateInfo({
                     proposal && (
                       <div key={i}>
                         <RowBetween key={i + proposal.id}>
-                          <AutoColumn gap="sm" style={{ maxWidth: '300px' }} justify="flex-start">
+                          <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
                             <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
                               <TYPE.black>{proposal.title}</TYPE.black>
                             </StyledInternalLink>
@@ -203,6 +203,7 @@ export default function DelegateInfo({
                                 </RedIcon>
                               )}
                             </RowFixed>
+                            <div> </div>
                           </AutoColumn>
                         </RowBetween>
                         {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
