@@ -1,24 +1,25 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { TYPE, ExternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
-import { Book, Code, HelpCircle, ChevronLeft } from 'react-feather'
+import { Book, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
 
 import MenuBG from '../../assets/images/menu-bg.png'
+import Logo from '../../assets/images/sybil_logo.png'
 
 const Wrapper = styled.div<{ open: boolean }>`
   height: 100vh;
   position: relative;
   width: ${({ open }) => (open ? '350px' : '60px')};
   background-color: #f7f8fa;
-  padding: ${({ open }) => (open ? '2rem 2rem' : '2rem 1.25rem')};
+  padding: ${({ open }) => (open ? '2rem 2rem' : '1rem 1.25rem')};
   display: flex;
   flex-direction: column;
   gap: 24px;
   justify-content: space-between;
-
+  align-items: ${({ open }) => (open ? 'unset' : 'center')};
   background: url(${MenuBG});
 
   overflow: auto;
@@ -48,6 +49,21 @@ const FlippedText = styled.div`
   -webkit-transform: rotate(90deg);
 `
 
+const SybilLogo = styled.div`
+  width: 32px;
+  height: 32px;
+  mix-blend-mode: multiply;
+  background-image: url(${Logo});
+  background-size: contain;
+  outline: none;
+`
+
+const SybilWorkmark = styled.div`
+  font-weight: 600;
+  font-size: 20px;
+  font-style: italic;
+`
+
 export default function SideMenu() {
   const [open, setOpen] = useState(true)
   const [faqOpen, setfaqOpen] = useState(false)
@@ -61,7 +77,10 @@ export default function SideMenu() {
     <>
       <MobileHeader>
         <RowBetween>
-          <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>
+          <RowFixed style={{ gap: '8px' }}>
+            <SybilLogo />
+            <SybilWorkmark>sybil</SybilWorkmark>
+          </RowFixed>
           <ExternalLink href="https://github.com/Uniswap/sybil-list">
             <Book style={{ stroke: 'black' }} />
           </ExternalLink>
@@ -69,13 +88,19 @@ export default function SideMenu() {
       </MobileHeader>
       <Wrapper open={open} onClick={() => !open && setOpen(!open)}>
         {!open && (
-          <FlippedText>
-            <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>
-          </FlippedText>
+          <span style={{ width: '30px' }}>
+            <SybilLogo style={{ marginBottom: '8px' }} />
+            <FlippedText>
+              <SybilWorkmark>sybil</SybilWorkmark>
+            </FlippedText>
+          </span>
         )}
         {open && !faqOpen && (
           <RowBetween>
-            <TYPE.mediumHeader>Sybil</TYPE.mediumHeader>
+            <RowFixed style={{ gap: '8px' }}>
+              <SybilLogo />
+              <SybilWorkmark>sybil</SybilWorkmark>
+            </RowFixed>
             <ButtonBasic
               onClick={() => closeBoth()}
               style={{ cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.4)', color: '#000' }}
@@ -85,10 +110,10 @@ export default function SideMenu() {
           </RowBetween>
         )}
         {open && !faqOpen && (
-          <AutoColumn gap="1.5rem">
+          <AutoColumn gap="3rem">
             <AutoColumn gap="1rem">
               <TYPE.black
-                style={{ marginBottom: '1rem', fontFamily: 'GT Haptik Medium', fontSize: '36px', lineHeight: '125%' }}
+                style={{ marginBottom: '1rem', fontFamily: 'GT Haptik Medium', fontSize: '36px', lineHeight: '115%' }}
               >
                 An Ethereum Governance Tool.
               </TYPE.black>
@@ -100,39 +125,62 @@ export default function SideMenu() {
                 messages to map wallets to identities and makes this list available for anyone to use.
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>Open, public, and forkable.</TYPE.black>
-              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                A <ExternalLink href="uniswap.org">Uniswap</ExternalLink> Project
-              </TYPE.black>
             </AutoColumn>
-          </AutoColumn>
-        )}
-        {open ? (
-          <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
-            {!faqOpen && (
+            <AutoColumn gap="1rem">
               <ButtonBasic
                 as={ExternalLink}
                 href="https://github.com/Uniswap/sybil-list"
                 style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
               >
-                <Book />
-                Sybil Documentation
+                <Book size={20} />
+                <TYPE.black style={{ lineHeight: '125%', fontWeight: 500 }}>Sybil Documentation</TYPE.black>
               </ButtonBasic>
-            )}
-            <ButtonBasic
-              onClick={() => setfaqOpen(!faqOpen)}
-              href="https://github.com/Uniswap/sybil-list"
-              style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
-            >
-              <HelpCircle />
-              Help and Info {faqOpen && '(close)'}
-            </ButtonBasic>
+              <ButtonBasic
+                onClick={() => setfaqOpen(!faqOpen)}
+                href="https://github.com/Uniswap/sybil-list"
+                style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
+              >
+                <HelpCircle size={20} />
+                <TYPE.black style={{ lineHeight: '125%', fontWeight: 500 }}>
+                  Help and Info {faqOpen && '(close)'}
+                </TYPE.black>
+              </ButtonBasic>
+            </AutoColumn>
           </AutoColumn>
-        ) : (
+        )}
+        {open && !faqOpen ? (
+          <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
+            <TYPE.black style={{ lineHeight: '125%', fontWeight: 400, fontSize: '12px' }}>
+              A{' '}
+              <ExternalLink style={{ color: '#ff007a' }} href="uniswap.org">
+                Uniswap
+              </ExternalLink>{' '}
+              Project
+            </TYPE.black>
+          </AutoColumn>
+        ) : !faqOpen ? (
           <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end', marginTop: '1rem' }}>
             <Code />
             <Book />
             <HelpCircle />
           </AutoColumn>
+        ) : (
+          <RowBetween>
+            <ButtonBasic
+              onClick={() => setfaqOpen(!faqOpen)}
+              href="https://github.com/Uniswap/sybil-list"
+              style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
+            >
+              <HelpCircle size={20} />
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>Help and Info</TYPE.black>
+            </ButtonBasic>
+            <ButtonBasic
+              onClick={() => setfaqOpen(!faqOpen)}
+              style={{ cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.4)', color: '#000' }}
+            >
+              <X />
+            </ButtonBasic>
+          </RowBetween>
         )}
 
         {faqOpen && (
