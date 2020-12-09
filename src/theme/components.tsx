@@ -5,6 +5,30 @@ import styled, { keyframes } from 'styled-components'
 import { darken } from 'polished'
 import { ArrowLeft, X } from 'react-feather'
 
+export const OnlyAboveLarge = styled.div`
+  display: initial;
+
+  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
+  display: none;
+  `};
+`
+
+export const OnlyAboveSmall = styled.div`
+  display: initial;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `};
+`
+
+export const OnlyBelowSmall = styled.div`
+  display: none;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: initial;
+  `};
+`
+
 export const Button = styled.button.attrs<{ warning: boolean }, { backgroundColor: string }>(({ warning, theme }) => ({
   backgroundColor: warning ? theme.red1 : theme.primary1
 }))`

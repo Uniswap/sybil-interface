@@ -18,13 +18,15 @@ import { ArrowLeft, CheckCircle, XCircle } from 'react-feather'
 import { AutoColumn } from '../components/Column'
 import EmptyProfile from '../assets/images/emptyprofile.png'
 import { RoundedProfileImage, WrappedListLogo, ProposalStatusSmall } from '../components/governance/styled'
-import { getTwitterProfileLink, getEtherscanLink } from '../utils'
+import { getTwitterProfileLink, getEtherscanLink, shortenAddress } from '../utils'
 import TwitterIcon from '../assets/images/Twitter_Logo_Blue.png'
-import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink } from '../theme'
+import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
 import { useIdentityInfo, useTwitterProfileData } from '../state/social/hooks'
 import { useTokenBalance } from '../state/wallet/hooks'
 import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
+import CopyHelper from '../components/AccountDetails/Copy'
+import { useIsEOA } from '../hooks/useIsEOA'
 
 const ArrowWrapper = styled.div`
   display: flex;
@@ -52,12 +54,32 @@ const TwitterLogo = styled.img`
 const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    grid-template-columns: 1fr 1fr;
+  `};
 `
 
 export const Break = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.bg3};
   height: 1px;
+`
+
+const ResponsiveDataText = styled(TYPE.black)`
+  font-size: 20px;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 14px;
+  `};
+`
+
+const ResponsiveBodyText = styled(TYPE.black)`
+  font-size: 16px;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 12px;
+  `};
 `
 
 function localNumber(val: number) {
@@ -80,6 +102,8 @@ export default function DelegateInfo({
   const delegatedVotes = delegateInfo ? localNumber(delegateInfo.delegatedVotes) : '-'
   const holdersRepresented = delegateInfo ? localNumber(delegateInfo.tokenHoldersRepresentedAmount) : '-'
 
+  const isEOA = useIsEOA(delegateAddress)
+
   // proposal data
   const proposalData = useAllProposals()
   const proposalStatuses = useAllProposalStates()
@@ -101,62 +125,80 @@ export default function DelegateInfo({
     <BodyWrapper>
       <GreyCard>
         {delegateAddress && chainId ? (
-          <AutoColumn gap="lg">
+          <AutoColumn gap="md">
             <RowBetween style={{ width: '100%' }}>
               <ArrowWrapper as={Link} to={'/delegates/' + activeProtocol?.id}>
                 <ArrowLeft size={20} /> All Delegates
               </ArrowWrapper>
             </RowBetween>
             <WhiteCard>
-              <AutoRow gap="10px">
-                {twitterData?.profileURL ? (
-                  <RoundedProfileImage>
-                    <img src={twitterData.profileURL} alt="profile" />
-                  </RoundedProfileImage>
-                ) : (
-                  <WrappedListLogo src={EmptyProfile} />
-                )}
-                <AutoColumn gap="md">
-                  <RowFixed>
-                    <ExternalLink
-                      href={
-                        identityInfo?.twitter?.handle
-                          ? getTwitterProfileLink(identityInfo?.twitter?.handle)
-                          : getEtherscanLink(chainId, delegateAddress, 'address')
-                      }
-                    >
-                      <TYPE.black>
-                        {identityInfo?.twitter?.handle ? `@${identityInfo.twitter.handle}` : delegateAddress}
-                      </TYPE.black>
-                    </ExternalLink>
-                    {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
-                  </RowFixed>
-                  {identityInfo?.twitter?.handle ? (
-                    <ExternalLink href={getEtherscanLink(chainId, delegateAddress, 'address')}>
-                      <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
-                    </ExternalLink>
+              <RowBetween>
+                <AutoRow gap="10px">
+                  {twitterData?.profileURL ? (
+                    <RoundedProfileImage>
+                      <img src={twitterData.profileURL} alt="profile" />
+                    </RoundedProfileImage>
                   ) : (
-                    <TYPE.black fontSize="12px">
-                      {delegateInfo?.EOA === true ? '👤 EOA' : delegateInfo?.EOA === false && '📜 Smart Contract'}
-                    </TYPE.black>
+                    <WrappedListLogo src={EmptyProfile} />
                   )}
-                </AutoColumn>
-              </AutoRow>
+                  <AutoColumn gap="sm">
+                    <RowFixed>
+                      <ExternalLink
+                        href={
+                          identityInfo?.twitter?.handle
+                            ? getTwitterProfileLink(identityInfo?.twitter?.handle)
+                            : getEtherscanLink(chainId, delegateAddress, 'address')
+                        }
+                      >
+                        <OnlyAboveSmall>
+                          <TYPE.black>
+                            {identityInfo?.twitter?.handle ? `@${identityInfo.twitter.handle}` : delegateAddress}
+                          </TYPE.black>
+                        </OnlyAboveSmall>
+                        <OnlyBelowSmall>
+                          <TYPE.black>
+                            {identityInfo?.twitter?.handle
+                              ? `@${identityInfo.twitter.handle}`
+                              : shortenAddress(delegateAddress)}
+                          </TYPE.black>
+                        </OnlyBelowSmall>
+                      </ExternalLink>
+                      {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
+                      <CopyHelper toCopy={delegateAddress} />
+                    </RowFixed>
+                    {identityInfo?.twitter?.handle ? (
+                      <RowFixed>
+                        <ExternalLink href={getEtherscanLink(chainId, delegateAddress, 'address')}>
+                          <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
+                        </ExternalLink>
+                        <CopyHelper toCopy={delegateAddress} />
+                      </RowFixed>
+                    ) : (
+                      <TYPE.black fontSize="12px">
+                        {isEOA === true ? '👤 EOA' : isEOA === false && '📜 Smart Contract'}
+                      </TYPE.black>
+                    )}
+                  </AutoColumn>
+                </AutoRow>
+                {/* <ButtonBlue width="100px">Delegate</ButtonBlue> */}
+              </RowBetween>
             </WhiteCard>
             <WhiteCard>
               <DataRow>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
-                  <TYPE.black fontSize="20px">{govTokenBalance ? govTokenBalance?.toFixed(0) : '-'}</TYPE.black>
+                  <ResponsiveDataText>{govTokenBalance ? govTokenBalance?.toFixed(0) : '-'}</ResponsiveDataText>
                 </AutoColumn>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">Votes</TYPE.main>
-                  <TYPE.black fontSize="20px">{delegatedVotes}</TYPE.black>
+                  <ResponsiveDataText>{delegatedVotes}</ResponsiveDataText>
                 </AutoColumn>
-                <AutoColumn gap="sm">
-                  <TYPE.main fontSize="14px">Token Holders Represented</TYPE.main>
-                  <TYPE.black fontSize="20px">{holdersRepresented}</TYPE.black>
-                </AutoColumn>
+                <OnlyAboveSmall>
+                  <AutoColumn gap="sm">
+                    <TYPE.main fontSize="14px">Token Holders Represented</TYPE.main>
+                    <ResponsiveDataText>{holdersRepresented}</ResponsiveDataText>
+                  </AutoColumn>
+                </OnlyAboveSmall>
               </DataRow>
             </WhiteCard>
             <WhiteCard>
@@ -176,7 +218,7 @@ export default function DelegateInfo({
                           <RowBetween key={i + proposal.id}>
                             <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
                               <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
-                                <TYPE.black>{proposal.title}</TYPE.black>
+                                <ResponsiveBodyText>{proposal.title}</ResponsiveBodyText>
                               </StyledInternalLink>
                               {status && (
                                 <RowFixed>

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { AutoColumn } from '../Column'
 
-import { TYPE, BlankInternalLink } from '../../theme'
+import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
@@ -36,22 +36,6 @@ const TwitterLogo = styled.img`
   height: 24px;
   width: 24px;
   margin-left: 4px;
-`
-
-const OnlyAboveLarge = styled.div`
-  display: initial;
-
-  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
-  display: none;
-  `};
-`
-
-const OnlyAboveSmall = styled.div`
-  display: initial;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    display: none;
-  `};
 `
 
 const DataRow = styled.div`
