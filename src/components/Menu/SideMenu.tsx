@@ -5,7 +5,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
 import { Book, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
-
+import { fontFaces } from '../../theme/extraFonts'
 import MenuBG from '../../assets/images/menu-bg.png'
 import Logo from '../../assets/images/sybil_logo.png'
 
@@ -21,6 +21,7 @@ const Wrapper = styled.div<{ open: boolean }>`
   justify-content: space-between;
   align-items: ${({ open }) => (open ? 'unset' : 'center')};
   background: url(${MenuBG});
+  background-size: contain;
 
   overflow: auto;
 
@@ -62,6 +63,10 @@ const SybilWorkmark = styled.div`
   font-weight: 600;
   font-size: 20px;
   font-style: italic;
+`
+
+const Haptik = styled(TYPE.black)`
+  fontfamily: 'GT Haptik Medium';
 `
 
 export default function SideMenu() {
@@ -112,19 +117,17 @@ export default function SideMenu() {
         {open && !faqOpen && (
           <AutoColumn gap="3rem">
             <AutoColumn gap="1rem">
-              <TYPE.black
-                style={{ marginBottom: '1rem', fontFamily: 'GT Haptik Medium', fontSize: '36px', lineHeight: '115%' }}
-              >
+              <Haptik fontSize="36px" style={{ marginBottom: '1rem', fontSize: '36px', lineHeight: '115%' }}>
                 An Ethereum Governance Tool.
+              </Haptik>
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
+                Sybil is a governance tool for discovering delegates. Sybil maps on-chain addresses to digital
+                identities to maintain a list of delegates.
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                Discover delegates or announce yourself as a delegate.
+                Currently, we support Compound and Uniswap governance. Feel free to
+                <ExternalLink href="https://github.com/Uniswap/sybil-interface"> add others</ExternalLink>
               </TYPE.black>
-              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                Sybil maintains a list of known delegates and their digital identities. It uses publicly posted signed
-                messages to map wallets to identities and makes this list available for anyone to use.
-              </TYPE.black>
-              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>Open, public, and forkable.</TYPE.black>
             </AutoColumn>
             <AutoColumn gap="1rem">
               <ButtonBasic
@@ -152,7 +155,7 @@ export default function SideMenu() {
           <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end' }}>
             <TYPE.black style={{ lineHeight: '125%', fontWeight: 400, fontSize: '12px' }}>
               A{' '}
-              <ExternalLink style={{ color: '#ff007a' }} href="uniswap.org">
+              <ExternalLink style={{ color: '#ff007a' }} href="https://uniswap.org/">
                 Uniswap
               </ExternalLink>{' '}
               Project
@@ -188,23 +191,24 @@ export default function SideMenu() {
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
               <TYPE.main>
-                Sybil tries to answer the question: What is the most simple way to connect an identity to an address
-                without requiring user signups or on chain fees. There are many great identity products out there, but
-                many are too complex for the simple needs of delegates and voters within governance systems.
+                We wanted to support various Ethereum governance initiatives and found it hard to find potential
+                delegates or no easy way to delegate our vote. Sybil is our contribution to help everyone in the
+                ecosystem.
               </TYPE.main>
             </AutoColumn>
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
               <TYPE.main>
                 At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
-                authentication methods. For instance, Github integration is coming soon.
+                authentication methods. We are planning to add GitHub soon and feel free to suggest others in our repo
+                [link to github issues page].
               </TYPE.main>
             </AutoColumn>
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
               <TYPE.main>
-                Sybil can be used to connect identities to addresses for any type of project that uses addresses. In
-                fact, you don’t even have to use sybil through this interface! Check out the documentation for how to
+                Since the mapping of wallets to identities is public, you can easily use it to show identities anywhere.
+                In fact, you don’t even have to use Sybil through this interface! Check out the documentation for how to
                 set up a similar system.
               </TYPE.main>
             </AutoColumn>
