@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppState } from '..'
 import { updateIdentities } from './actions'
 import { TwitterEntry, UncategorizedContentEntry, Identities, Identity } from './reducer'
+import { isAddress } from '../../utils'
 
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
@@ -42,7 +43,6 @@ export function useAllUncategorizedNames(): { [address: string]: UncategorizedCo
 // filter for only entities with uncategorized names
 export function useAllVerifiedHandles(): { [address: string]: TwitterEntry | undefined } | undefined {
   const [allIdentities] = useAllIdentities()
-
   if (allIdentities) {
     const twitterOnly: { [address: string]: TwitterEntry | undefined } | undefined = {}
     Object.keys(allIdentities).map(address => {
@@ -57,30 +57,32 @@ export function useAllVerifiedHandles(): { [address: string]: TwitterEntry | und
   }
 }
 
-// check if address is contained within list of all verified handles
+// filter for only entities with twitter handles
 // undefined is no verification, null is loading
 export function useVerifiedHandle(address: string | null | undefined): TwitterEntry | undefined | null {
   const allHandles = useAllVerifiedHandles()
+  const formattedAddress = address && isAddress(address)
   if (!allHandles) {
     return null
   }
-  if (!address) {
+  if (!formattedAddress) {
     return undefined
   }
-  return allHandles[address]
+  return allHandles[formattedAddress]
 }
 
 // check for any indentity info
 // undefined is no verification, null is loading
 export function useIdentityInfo(address: string | null | undefined): Identity | undefined | null {
   const [allIdentities] = useAllIdentities()
+  const formattedAddress = address && isAddress(address)
   if (!allIdentities) {
     return null
   }
-  if (!address) {
+  if (!formattedAddress) {
     return undefined
   }
-  return allIdentities[address]
+  return allIdentities[formattedAddress]
 }
 
 // monitor status of submission

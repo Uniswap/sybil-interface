@@ -90,10 +90,12 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   }
 
   // tweet data
-  const tweetCopy = `${activeProtocol?.emoji ?? ''} Verifying and announcing myself as a delegate in #${
+  const tweetCopy = `${activeProtocol?.emoji ?? ''} Verifying myself as a #${
     activeProtocol?.token?.symbol
-  }Governance ${activeProtocol?.social} 🏛️ \n addr:${account} \n sig:${sig ?? ''} `
+  }Delegate on sybil.org/delegates/uniswap/${account} ${activeProtocol?.social} 🏛️ \n addr:${account} \n sig:${sig ??
+    ''} `
 
+  // replace hashtags with acceptable link character
   const tweetCopyForLink = tweetCopy.replace('#', '%23')
 
   // watch for user tweet
