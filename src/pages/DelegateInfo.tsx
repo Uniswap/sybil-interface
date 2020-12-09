@@ -163,49 +163,50 @@ export default function DelegateInfo({
               <AutoColumn gap="lg">
                 <TYPE.main fontSize="16px">Voting History</TYPE.main>
                 <Break />
-                {delegateInfo?.votes?.map((vote, i) => {
-                  const proposal = proposalData?.[vote.proposal - 1]
-                  return (
-                    proposal && (
-                      <div key={i}>
-                        <RowBetween key={i + proposal.id}>
-                          <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
-                            <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
-                              <TYPE.black>{proposal.title}</TYPE.black>
-                            </StyledInternalLink>
-                            {proposalStatuses?.[vote.proposal - 1] && (
-                              <RowFixed>
-                                <ProposalStatusSmall
-                                  status={enumerateProposalState(proposalStatuses?.[vote.proposal - 1])}
-                                >
-                                  {enumerateProposalState(proposalStatuses?.[vote.proposal - 1])}
-                                </ProposalStatusSmall>
-                              </RowFixed>
-                            )}
-                          </AutoColumn>
-                          <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
-                            <RowFixed>
-                              <TYPE.body mr="6px">{`${localNumber(vote.votes)} votes ${
-                                vote.support ? 'in favor' : 'against'
-                              }`}</TYPE.body>
-                              {vote.support ? (
-                                <GreenIcon>
-                                  <CheckCircle />
-                                </GreenIcon>
-                              ) : (
-                                <RedIcon>
-                                  <XCircle />
-                                </RedIcon>
+                {proposalStatuses &&
+                  delegateInfo?.votes?.map((vote, i) => {
+                    const proposal = proposalData?.[vote.proposal - 1]
+                    const index = proposalStatuses.length - vote.proposal // offset based on reverse index
+                    const status = proposalStatuses[index]
+                      ? enumerateProposalState(proposalStatuses[index])
+                      : enumerateProposalState(0)
+                    return (
+                      proposal && (
+                        <div key={i}>
+                          <RowBetween key={i + proposal.id}>
+                            <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
+                              <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
+                                <TYPE.black>{proposal.title}</TYPE.black>
+                              </StyledInternalLink>
+                              {status && (
+                                <RowFixed>
+                                  <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                                </RowFixed>
                               )}
-                            </RowFixed>
-                            <div> </div>
-                          </AutoColumn>
-                        </RowBetween>
-                        {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
-                      </div>
+                            </AutoColumn>
+                            <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
+                              <RowFixed>
+                                <TYPE.body mr="6px">{`${localNumber(vote.votes)} votes ${
+                                  vote.support ? 'in favor' : 'against'
+                                }`}</TYPE.body>
+                                {vote.support ? (
+                                  <GreenIcon>
+                                    <CheckCircle />
+                                  </GreenIcon>
+                                ) : (
+                                  <RedIcon>
+                                    <XCircle />
+                                  </RedIcon>
+                                )}
+                              </RowFixed>
+                              <div> </div>
+                            </AutoColumn>
+                          </RowBetween>
+                          {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
+                        </div>
+                      )
                     )
-                  )
-                })}
+                  })}
                 {delegateInfo && delegateInfo?.votes?.length === 0 && <TYPE.body>No past votes</TYPE.body>}
               </AutoColumn>
             </WhiteCard>
