@@ -5,7 +5,9 @@
 - Interface: [https://sybil.org](https://sybil.org)
 - Read the Sybil announcement post : [link to post]()
 
-Governance interface that incorporates Sybil, a tool for linking Ethereum addresses to social identities. Only Ethereum mainnet is supported. 
+Governance interface that incorporates Sybil. Sybil maintains a list of known delegates and their digital identities. It uses publicly posted signed messages to map wallets to identities and makes this list available for anyone to use. 
+
+Ethereum mainnet support only. 
 
 ## Social Verification
 
