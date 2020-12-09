@@ -15,6 +15,7 @@ import { fetchDelegates, fetchProposals, fetchGlobalData, enumerateProposalState
 import { useAllIdentities } from '../social/hooks'
 import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
+import { useIsEOA } from '../../hooks/useIsEOA'
 
 export interface GlobaData {
   id: string
@@ -447,6 +448,8 @@ export interface DelegateInfo {
     votes: number
     support: boolean
   }[]
+
+  EOA: boolean
 }
 
 interface DelegateInfoRes {
@@ -472,6 +475,8 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
 
   const [data, setData] = useState<DelegateInfo | undefined>()
 
+  const isEOA = useIsEOA(address)
+
   useEffect(() => {
     async function fetchData() {
       client
@@ -492,7 +497,8 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
             setData({
               delegatedVotes: parseFloat(resData.delegatedVotes),
               tokenHoldersRepresentedAmount: resData.tokenHoldersRepresentedAmount,
-              votes
+              votes,
+              EOA: isEOA
             })
           }
         })
@@ -503,7 +509,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
     if (!data && address) {
       fetchData()
     }
-  }, [address, client, data])
+  }, [address, client, data, isEOA])
 
   return data
 }

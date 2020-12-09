@@ -92,9 +92,6 @@ export default function DelegateInfo({
   const identityInfo = useIdentityInfo(delegateAddress)
   const twitterData = useTwitterProfileData(identityInfo?.twitter?.handle)
 
-  const uncategorizedName = delegateAddress && identityInfo && identityInfo?.other?.name
-  const contentURL = delegateAddress && identityInfo && identityInfo?.other?.contentURL
-
   // mainnet only
   if (chainId && chainId !== ChainId.MAINNET) {
     return <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
@@ -138,12 +135,8 @@ export default function DelegateInfo({
                     <ExternalLink href={getEtherscanLink(chainId, delegateAddress, 'address')}>
                       <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
                     </ExternalLink>
-                  ) : uncategorizedName && contentURL ? (
-                    <ExternalLink href={contentURL}>
-                      <TYPE.black fontSize="12px">{uncategorizedName}</TYPE.black>
-                    </ExternalLink>
                   ) : (
-                    <TYPE.black fontSize="12px">{true ? 'EOA' : 'Smart Contract 📜'}</TYPE.black>
+                    <TYPE.black fontSize="12px">{delegateInfo?.EOA ? '👤 EOA' : '📜 Smart Contract'}</TYPE.black>
                   )}
                 </AutoColumn>
               </AutoRow>

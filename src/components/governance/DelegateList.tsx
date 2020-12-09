@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react'
 import { AutoColumn } from '../Column'
 
-import { TYPE, ExternalLink, StyledInternalLink } from '../../theme'
+import { TYPE, BlankInternalLink } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
-import { shortenAddress, getTwitterProfileLink, isAddress } from '../../utils'
+import { shortenAddress } from '../../utils'
 import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
@@ -19,7 +19,6 @@ import Loader from '../Loader'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { useAllUncategorizedNames } from '../../state/social/hooks'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -71,7 +70,6 @@ const DataRow = styled.div`
   &:first-child {
     :hover {
       border-left: 3px solid transparent;
-      cursor: initial;
     }
   }
 
@@ -84,6 +82,13 @@ const DataRow = styled.div`
     margin: 0;
     padding: 0 1.5rem;
   `};
+`
+
+const AccountLinkGroup = styled(AutoRow)`
+  :hover {
+    opacity: 0.5;
+    border-radius: 8px;
+  }
 `
 
 const DelegateButton = styled(ButtonBlue)<{ disabled: boolean }>`
@@ -124,61 +129,45 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // show delegate button if they have available votes or if theyve delegated to someone else
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
-  // get uncategorized names
-  const uncategorizedNames = useAllUncategorizedNames()
-
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
       ? topDelegates.map((d, i) => {
-          const formattedAddress = isAddress(d.id)
-          const formattedUncategorizedName = formattedAddress && uncategorizedNames?.[formattedAddress]?.name
-          const contentLink =
-            !d.handle && formattedAddress && uncategorizedNames && uncategorizedNames[formattedAddress]?.contentURL
-
           return (
             <DataRow key={d.id}>
               <AutoRow gap="10px">
                 <OnlyAboveSmall>
                   <NoWrap>{i + 1}</NoWrap>
                 </OnlyAboveSmall>
-                <OnlyAboveSmall>
-                  {d.imageURL ? (
-                    <RoundedProfileImage>
-                      <img src={d.imageURL} alt="profile" />
-                    </RoundedProfileImage>
-                  ) : (
-                    <WrappedListLogo src={EmptyProfile} />
-                  )}
-                </OnlyAboveSmall>
-                <FixedAddressSize gap="6px">
-                  <RowFixed>
-                    {d.handle ? (
-                      // getEtherscanLink(chainId, d.id, 'address')}
-                      <ExternalLink href={getTwitterProfileLink(d.handle)}>
-                        <TYPE.black>{`@${d.handle}`}</TYPE.black>
-                      </ExternalLink>
-                    ) : (
-                      <StyledInternalLink to={activeProtocol?.id + '/' + d.id}>
-                        <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
-                      </StyledInternalLink>
-                    )}
+                <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
+                  <AccountLinkGroup gap="10px" width="initial">
+                    <OnlyAboveSmall>
+                      {d.imageURL ? (
+                        <RoundedProfileImage>
+                          <img src={d.imageURL} alt="profile" />
+                        </RoundedProfileImage>
+                      ) : (
+                        <WrappedListLogo src={EmptyProfile} />
+                      )}
+                    </OnlyAboveSmall>
+                    <FixedAddressSize gap="6px">
+                      <RowFixed>
+                        {d.handle ? (
+                          // getEtherscanLink(chainId, d.id, 'address')}
+                          <TYPE.black>{`@${d.handle}`}</TYPE.black>
+                        ) : (
+                          <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
+                        )}
 
-                    {d.handle && <TwitterLogo src={TwitterIcon} />}
-                  </RowFixed>
-                  {d.handle ? (
-                    <StyledInternalLink to={activeProtocol?.id + '/' + d.id}>
-                      <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
-                    </StyledInternalLink>
-                  ) : formattedUncategorizedName && contentLink ? (
-                    <ExternalLink href={contentLink}>
-                      <TYPE.black fontSize="12px">
-                        {formattedUncategorizedName} {' ' + d.EOA ? '📜' : ''}
-                      </TYPE.black>
-                    </ExternalLink>
-                  ) : (
-                    <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract 📜'}</TYPE.black>
-                  )}
-                </FixedAddressSize>
+                        {d.handle && <TwitterLogo src={TwitterIcon} />}
+                      </RowFixed>
+                      {d.handle ? (
+                        <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                      ) : (
+                        <TYPE.black fontSize="12px">{d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}</TYPE.black>
+                      )}
+                    </FixedAddressSize>
+                  </AccountLinkGroup>
+                </BlankInternalLink>
                 <DelegateButton
                   width="fit-content"
                   disabled={!showDelegateButton}
@@ -209,7 +198,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           )
         })
       : null
-  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates, uncategorizedNames])
+  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates])
 
   return (
     <GreyCard padding="2rem 0">
