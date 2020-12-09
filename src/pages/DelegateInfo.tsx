@@ -136,7 +136,9 @@ export default function DelegateInfo({
                       <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
                     </ExternalLink>
                   ) : (
-                    <TYPE.black fontSize="12px">{delegateInfo?.EOA ? '👤 EOA' : '📜 Smart Contract'}</TYPE.black>
+                    <TYPE.black fontSize="12px">
+                      {delegateInfo?.EOA === true ? '👤 EOA' : delegateInfo?.EOA === false && '📜 Smart Contract'}
+                    </TYPE.black>
                   )}
                 </AutoColumn>
               </AutoRow>

@@ -449,7 +449,7 @@ export interface DelegateInfo {
     support: boolean
   }[]
 
-  EOA: boolean
+  EOA: boolean | null // null means loading
 }
 
 interface DelegateInfoRes {
