@@ -207,7 +207,7 @@ export default function DelegateInfo({
                 <Break />
                 {proposalStatuses &&
                   delegateInfo?.votes?.map((vote, i) => {
-                    const proposal = proposalData?.[vote.proposal - 1]
+                    const proposal = proposalData?.[vote.proposal - 1] // proposals start at 1
                     const index = proposalStatuses.length - vote.proposal // offset based on reverse index
                     const status = proposalStatuses[index]
                       ? enumerateProposalState(proposalStatuses[index])
