@@ -93,7 +93,7 @@ export default function VoterList({
         <AutoColumn gap="md">
           <WrapSmall>
             <TYPE.black fontWeight={600}>{title}</TYPE.black>
-            {amount ? (
+            {amount || amount === 0 ? (
               <TYPE.black fontWeight={600}>{amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TYPE.black>
             ) : (
               <Loader />

@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react'
 import { AutoColumn } from '../Column'
 
-import { TYPE, ExternalLink } from '../../theme'
+import { TYPE, ExternalLink, StyledInternalLink } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
-import { shortenAddress, getEtherscanLink, getTwitterProfileLink, isAddress } from '../../utils'
+import { shortenAddress, getTwitterProfileLink, isAddress } from '../../utils'
 import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage } from './styled'
 import { GreyCard } from '../Card'
@@ -125,12 +125,13 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
   // get uncategorized names
-  const [uncategorizedNames] = useAllUncategorizedNames()
+  const uncategorizedNames = useAllUncategorizedNames()
 
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
       ? topDelegates.map((d, i) => {
           const formattedAddress = isAddress(d.id)
+          const formattedUncategorizedName = formattedAddress && uncategorizedNames?.[formattedAddress]?.name
           const contentLink =
             !d.handle && formattedAddress && uncategorizedNames && uncategorizedNames[formattedAddress]?.contentURL
 
@@ -151,29 +152,31 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                 </OnlyAboveSmall>
                 <FixedAddressSize gap="6px">
                   <RowFixed>
-                    <ExternalLink
-                      href={d.handle ? getTwitterProfileLink(d.handle) : getEtherscanLink(chainId, d.id, 'address')}
-                    >
-                      <TYPE.black>
-                        {d.handle
-                          ? `@${d.handle}`
-                          : formattedAddress && uncategorizedNames?.[formattedAddress]
-                          ? uncategorizedNames?.[formattedAddress].name
-                          : shortenAddress(d.id)}
-                      </TYPE.black>
-                    </ExternalLink>
+                    {d.handle ? (
+                      // getEtherscanLink(chainId, d.id, 'address')}
+                      <ExternalLink href={getTwitterProfileLink(d.handle)}>
+                        <TYPE.black>{`@${d.handle}`}</TYPE.black>
+                      </ExternalLink>
+                    ) : (
+                      <StyledInternalLink to={activeProtocol?.id + '/' + d.id}>
+                        <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
+                      </StyledInternalLink>
+                    )}
+
                     {d.handle && <TwitterLogo src={TwitterIcon} />}
                   </RowFixed>
                   {d.handle ? (
-                    <ExternalLink href={getEtherscanLink(chainId, d.id, 'address')}>
+                    <StyledInternalLink to={activeProtocol?.id + '/' + d.id}>
                       <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
-                    </ExternalLink>
-                  ) : contentLink ? (
+                    </StyledInternalLink>
+                  ) : formattedUncategorizedName && contentLink ? (
                     <ExternalLink href={contentLink}>
-                      <TYPE.black fontSize="12px">View details</TYPE.black>
+                      <TYPE.black fontSize="12px">
+                        {formattedUncategorizedName} {' ' + d.EOA ? '📜' : ''}
+                      </TYPE.black>
                     </ExternalLink>
                   ) : (
-                    <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract'}</TYPE.black>
+                    <TYPE.black fontSize="12px">{d.EOA ? 'EOA' : 'Smart Contract 📜'}</TYPE.black>
                   )}
                 </FixedAddressSize>
                 <DelegateButton

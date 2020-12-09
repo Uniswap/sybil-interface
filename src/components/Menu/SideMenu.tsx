@@ -86,19 +86,22 @@ export default function SideMenu() {
         )}
         {open && !faqOpen && (
           <AutoColumn gap="1.5rem">
-            <AutoColumn gap="0.5rem">
+            <AutoColumn gap="1rem">
               <TYPE.black
                 style={{ marginBottom: '1rem', fontFamily: 'GT Haptik Medium', fontSize: '36px', lineHeight: '125%' }}
               >
-                Social proof for Ethereum Products
+                An Ethereum Governance Tool.
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                This tool connects wallet addresses to digital identities. Signed messages are posted publicly, and can
-                be verified for use off-chain.
+                Discover delegates or announce yourself as a delegate.
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                This mapping can be used for displaying public identities for governance platforms on Ethereum or any
-                project that wants to connect social identity to addresses. Open, public, and forkable.
+                Sybil maintains a list of known delegates and their digital identities. It uses publicly posted signed
+                messages to map wallets to identities and makes this list available for anyone to use.
+              </TYPE.black>
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>Open, public, and forkable.</TYPE.black>
+              <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
+                A <ExternalLink href="uniswap.org">Uniswap</ExternalLink> Project
               </TYPE.black>
             </AutoColumn>
           </AutoColumn>

@@ -14,6 +14,8 @@ export interface GovernanceInfo {
   secondaryColor: string
   token: SerializedToken
   governanceAddress: string
+  social: string
+  emoji?: string
 }
 
 // constant addresses for supported protocols
@@ -32,7 +34,9 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#FF007A',
   secondaryColor: '#FDEEF5',
   token: serializeToken(UNI),
-  governanceAddress: UNI_GOVERNANCE_ADDRESS
+  governanceAddress: UNI_GOVERNANCE_ADDRESS,
+  social: '@UniswapProtocol',
+  emoji: '🦄'
 }
 
 export const COMPOUND_GOVERNANCE: GovernanceInfo = {
@@ -42,7 +46,9 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#00D395',
   secondaryColor: '#f0fffa',
   token: serializeToken(COMP),
-  governanceAddress: COMP_GOVERNANCE_ADDRESS
+  governanceAddress: COMP_GOVERNANCE_ADDRESS,
+  social: '@compoundfinance',
+  emoji: '🏦'
 }
 
 // mapping for routing

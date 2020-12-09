@@ -1,4 +1,4 @@
-import { HandleEntry } from './../state/social/hooks'
+import { Identities } from './../state/social/reducer'
 import { Web3Provider } from '@ethersproject/providers'
 import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST } from '../apollo/queries'
 import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
@@ -53,16 +53,16 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 export async function fetchDelegates(
   client: any,
   library: Web3Provider,
-  allVerifiedHandles: { [key: string]: HandleEntry } | undefined,
+  allIdentities: Identities,
   filter?: boolean
 ): Promise<DelegateData[] | null> {
-  const mapping = allVerifiedHandles && Object.keys(allVerifiedHandles)?.map(a => a.toLocaleLowerCase())
+  const mapping = allIdentities && Object.keys(allIdentities)?.map(a => a.toLocaleLowerCase())
   try {
     return client
       .query({
-        query: filter && allVerifiedHandles ? DELEGATES_FROM_LIST : TOP_DELEGATES,
+        query: filter && allIdentities ? DELEGATES_FROM_LIST : TOP_DELEGATES,
         variables: {
-          list: filter && allVerifiedHandles && mapping
+          list: filter && allIdentities && mapping
         },
         fetchPolicy: 'cache-first'
       })
@@ -78,7 +78,7 @@ export async function fetchDelegates(
         const handles = await Promise.all(
           res.data.delegates.map(async (a: DelegateData) => {
             const checksummed = isAddress(a.id)
-            const handle = checksummed ? allVerifiedHandles?.[checksummed]?.handle : undefined
+            const handle = checksummed ? allIdentities?.[checksummed]?.twitter?.handle : undefined
             const profileData = handle ? await fetchProfileData(handle) : undefined
             return {
               account: a.id,

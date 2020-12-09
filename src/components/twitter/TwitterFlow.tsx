@@ -6,7 +6,7 @@ import { useActiveWeb3React } from '../../hooks'
 
 import { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
-import { useVerifyCallback, useAllVerifiedHandles, HandleEntry, useTweetWatcher } from '../../state/social/hooks'
+import { useVerifyCallback, useAllVerifiedHandles, useTweetWatcher, useAllIdentities } from '../../state/social/hooks'
 import { Tweet } from 'react-twitter-widgets'
 import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
@@ -16,6 +16,7 @@ import TwitterLoginButton from './TwitterLoginButton'
 import { OffChainRequestModal } from '../TransactionConfirmationModal'
 import { useSignedHandle } from '../../hooks/useSignedHandle'
 import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
+import { Identities } from '../../state/social/reducer'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
@@ -38,7 +39,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const [tweetID, setTweetID] = useState<undefined | string>()
 
   // update verified handles if succesful verification
-  const [verifiedHandles, setVerifiedHandles] = useAllVerifiedHandles()
+  const verifiedHandles = useAllVerifiedHandles()
+  const [allIndentities, setAllIdentities] = useAllIdentities()
 
   // monitor if user has signed message, reset if back arrow clicked
   const { sig, signMessage, setSig } = useSignedHandle(twitterHandle)
@@ -64,42 +66,48 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       setRequestError(res.error)
       setAttempting(false)
     } else if (res.success && twitterHandle) {
-      const newVerified: { [address: string]: HandleEntry } = {}
+      const newVerified: Identities = {}
       // new copy of verified list
       verifiedHandles &&
+        allIndentities &&
         Object.keys(verifiedHandles).map(address => {
-          newVerified[address] = verifiedHandles[address]
+          newVerified[address] = allIndentities[address]
           return true
         })
       // reset global list of verified handles to account for new entry
-      if (newVerified) {
+      if (newVerified && allIndentities) {
         newVerified[account] = {
-          handle: twitterHandle,
-          timestamp: Date.now()
+          ...allIndentities[account],
+          twitter: {
+            handle: twitterHandle,
+            timestamp: Date.now()
+          }
         }
-        setVerifiedHandles(newVerified)
+        setAllIdentities(newVerified)
       }
       setVerified(true)
     }
   }
 
   // tweet data
-  const tweetHashTag = `${activeProtocol?.token.symbol}governance`
-  const tweetCopy = `Verifying identity for ${activeProtocol?.token.symbol} governance - addr:${account} - sig:${sig ??
-    ''} `
+  const tweetCopy = `${activeProtocol?.emoji ?? ''} Verifying and announcing myself as a delegate in #${
+    activeProtocol?.token?.symbol
+  }Governance ${activeProtocol?.social} 🏛️ \n addr:${account} \n sig:${sig ?? ''} `
+
+  const tweetCopyForLink = tweetCopy.replace('#', '%23')
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
   const [watch, setWatch] = useState(false)
 
   // use hook to handle polling
-  useTweetWatcher(tweetCopy, twitterHandle, watch, setWatch, setTweetID, setTweetError)
+  useTweetWatcher(sig, twitterHandle, watch, setWatch, setTweetID, setTweetError)
 
   function startWatching() {
     setWatch(true) // restart watcher
     setTweetError(undefined) // reset error
     window.open(
-      `https://twitter.com/intent/tweet?text=${tweetCopy}&hashtags=${tweetHashTag && tweetHashTag}`,
+      `https://twitter.com/intent/tweet?text=${tweetCopyForLink}`,
       'tweetWindow',
       'height=400,width=800,top=400px,left=400px'
     )
@@ -113,7 +121,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           if (res?.data[0]) {
             const tweetData = res?.data?.[0]
             // check that tweet contains correct data
-            const passedRegex = tweetData.text.includes(tweetCopy)
+            const passedRegex = tweetData.text.includes('sig:' + sig)
             if (passedRegex) {
               setTweetID(tweetData.id)
               setTweetError(undefined)
@@ -152,7 +160,9 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
-          <TYPE.black>Sign a message that will be used to link your wallet address and Twitter handle.</TYPE.black>
+          <TYPE.black>
+            Sign and tweet a message that will be used to link your wallet address and Twitter handle.
+          </TYPE.black>
           <TwitterAccountPreview />
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
         </AutoColumn>
@@ -166,7 +176,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TwitterAccountPreview />
-          <TweetWrapper>{tweetCopy + `#${tweetHashTag}`}</TweetWrapper>
+          <TweetWrapper>{tweetCopy}</TweetWrapper>
           <ButtonPrimary onClick={checkForTweet}>
             {watch ? <Dots>Looking for tweet</Dots> : tweetError ? 'Check again' : 'Tweet This'}
           </ButtonPrimary>

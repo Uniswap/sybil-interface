@@ -94,3 +94,20 @@ export const ALL_VOTERS = gql`
     }
   }
 `
+
+export const DELEGATE_INFO = gql`
+  query delegates($address: Bytes!) {
+    delegates(where: { id: $address }) {
+      id
+      delegatedVotes
+      tokenHoldersRepresentedAmount
+      votes {
+        proposal {
+          id
+        }
+        support
+        votes
+      }
+    }
+  }
+`

@@ -15,6 +15,7 @@ import Web3Status from '../components/Web3Status'
 import Delegates from './Delegates'
 import Proposals from './Proposals'
 import ProposalDetails from '../components/governance/ProposalDetails'
+import DelegateInfo from './DelegateInfo'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -85,6 +86,7 @@ export default function App() {
                 <Route exact strict path="/delegates/:protocolID" component={Delegates} />
                 <Route exact strict path="/proposals/:protocolID" component={Proposals} />
                 <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+                <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
                 <Route path="/" component={RedirectWithUpdatedGovernance} />
               </Switch>
             </Web3ReactManager>

@@ -224,6 +224,26 @@ export const Dots = styled.span`
   }
 `
 
+export const GreenIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > * {
+    width: 16px;
+    stroke: ${({ theme }) => theme.green1};
+  }
+`
+
+export const RedIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > * {
+    width: 16px;
+    stroke: ${({ theme }) => theme.red2};
+  }
+`
+
 export const LoadingFlag = styled.div`
   display: flex;
   align-items: center;

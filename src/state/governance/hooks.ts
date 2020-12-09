@@ -12,8 +12,8 @@ import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
 import { fetchDelegates, fetchProposals, fetchGlobalData, enumerateProposalState } from '../../data/governance'
-import { useAllVerifiedHandles } from '../social/hooks'
-import { ALL_VOTERS } from '../../apollo/queries'
+import { useAllIdentities } from '../social/hooks'
+import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 
 export interface GlobaData {
@@ -100,7 +100,7 @@ export function useTopDelegates(filter: boolean): DelegateData[] | undefined {
   // get graphql client for active protocol
   const client = useSubgraphClient()
 
-  const [allVerifiedHandles] = useAllVerifiedHandles()
+  const [allIdentities] = useAllIdentities()
 
   // reset list on active protocol change
   const [activeProtocol] = useActiveProtocol()
@@ -112,16 +112,17 @@ export function useTopDelegates(filter: boolean): DelegateData[] | undefined {
 
   // if verified handles update, reset
   useEffect(() => {
-    if (allVerifiedHandles) {
+    if (allIdentities) {
       setDelegates(undefined)
     }
-  }, [allVerifiedHandles])
+  }, [allIdentities])
 
   useEffect(() => {
     async function fetchTopDelegates() {
       try {
         library &&
-          fetchDelegates(client, library, allVerifiedHandles, filter).then(async delegateData => {
+          allIdentities &&
+          fetchDelegates(client, library, allIdentities, filter).then(async delegateData => {
             if (delegateData) {
               setDelegates(delegateData)
             }
@@ -130,10 +131,10 @@ export function useTopDelegates(filter: boolean): DelegateData[] | undefined {
         console.log(e)
       }
     }
-    if (!delegates && client) {
+    if (!delegates && client && allIdentities) {
       fetchTopDelegates()
     }
-  }, [library, client, key, delegates, allVerifiedHandles, filter])
+  }, [library, client, key, delegates, allIdentities, filter])
 
   return delegates
 }
@@ -193,12 +194,7 @@ export function useAllProposalStates(): number[] | undefined {
   const proposalCount = useProposalCount()
   const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [k + 1]) : [['']]
 
-  const statusRes = useSingleContractMultipleData(
-    proposalCount ? govContract : undefined,
-    'state',
-    ids,
-    NEVER_RELOAD
-  ).reverse()
+  const statusRes = useSingleContractMultipleData(proposalCount ? govContract : undefined, 'state', ids, NEVER_RELOAD)
 
   useEffect(() => {
     if (!statuses) {
@@ -436,4 +432,78 @@ export function useAllVotersForProposal(
   })
 
   return voters
+}
+
+export interface DelegateInfo {
+  // amount of votes delegated to them
+  delegatedVotes: number
+
+  // amount of delegates they represent
+  tokenHoldersRepresentedAmount: number
+
+  // proposals theyve voted on
+  votes: {
+    proposal: number
+    votes: number
+    support: boolean
+  }[]
+}
+
+interface DelegateInfoRes {
+  data:
+    | {
+        delegates: {
+          delegatedVotes: string
+          tokenHoldersRepresentedAmount: number
+          votes: {
+            proposal: {
+              id: string
+            }
+            support: boolean
+            votes: string
+          }[]
+        }[]
+      }
+    | undefined
+}
+
+export function useDelegateInfo(address: string | undefined): DelegateInfo | undefined {
+  const client = useSubgraphClient()
+
+  const [data, setData] = useState<DelegateInfo | undefined>()
+
+  useEffect(() => {
+    async function fetchData() {
+      client
+        ?.query({
+          query: DELEGATE_INFO,
+          variables: {
+            address
+          }
+        })
+        .then((res: DelegateInfoRes) => {
+          if (res?.data) {
+            const resData = res.data.delegates[0]
+            const votes = resData.votes.map((v: { proposal: { id: string }; support: boolean; votes: string }) => ({
+              proposal: parseInt(v.proposal.id),
+              votes: parseFloat(v.votes),
+              support: v.support
+            }))
+            setData({
+              delegatedVotes: parseFloat(resData.delegatedVotes),
+              tokenHoldersRepresentedAmount: resData.tokenHoldersRepresentedAmount,
+              votes
+            })
+          }
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    }
+    if (!data && address) {
+      fetchData()
+    }
+  }, [address, client, data])
+
+  return data
 }

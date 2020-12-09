@@ -1,26 +1,36 @@
-import { updateVerifiedHanldes, updateUncategorizedNames } from './actions'
-import { HandleEntry, UncategorizedContentEntry } from './hooks'
+import { updateIdentities } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 
-export interface SocialState {
-  // all verified twitter handles
-  verifiedHandles: { [address: string]: HandleEntry } | undefined
+export interface TwitterEntry {
+  handle: string | undefined
+  timestamp: number
+}
 
-  // non twitter entities
-  uncategorizedNames: { [address: string]: UncategorizedContentEntry } | undefined
+export interface UncategorizedContentEntry {
+  name: string
+  contentURL: string
+}
+
+export interface Identity {
+  twitter: TwitterEntry | undefined
+  other: UncategorizedContentEntry | undefined
+}
+
+export interface Identities {
+  [address: string]: Identity
+}
+
+export interface SocialState {
+  // all identities fetched
+  identities: Identities | undefined
 }
 
 export const initialState: SocialState = {
-  verifiedHandles: undefined,
-  uncategorizedNames: undefined
+  identities: undefined
 }
 
 export default createReducer(initialState, builder =>
-  builder
-    .addCase(updateVerifiedHanldes, (state, action) => {
-      state.verifiedHandles = action.payload.verifiedHandles
-    })
-    .addCase(updateUncategorizedNames, (state, action) => {
-      state.uncategorizedNames = action.payload.names
-    })
+  builder.addCase(updateIdentities, (state, action) => {
+    state.identities = action.payload.identities
+  })
 )

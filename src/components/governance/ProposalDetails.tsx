@@ -96,11 +96,18 @@ export default function ProposalDetails({
 
   // get total votes and format percentages for UI
   const totalVotes: number | undefined =
-    proposalData?.forCount && proposalData?.againstCount ? proposalData.forCount + proposalData.againstCount : undefined
+    proposalData?.forCount !== undefined && proposalData?.againstCount !== undefined
+      ? proposalData.forCount + proposalData.againstCount
+      : undefined
   const forPercentage: string =
-    proposalData?.forCount && totalVotes ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
+    proposalData?.forCount !== undefined && totalVotes
+      ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) + '%'
+      : '0%'
+
   const againstPercentage: string =
-    proposalData?.againstCount && totalVotes ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) + '%' : '0%'
+    proposalData?.againstCount !== undefined && totalVotes
+      ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) + '%'
+      : '0%'
 
   // show links in propsoal details if content is an address
   // if content is contract with common name, replace address with common name

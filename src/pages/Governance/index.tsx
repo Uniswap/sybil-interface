@@ -16,7 +16,7 @@ import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../constants'
 import { GreyCard } from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
 import { TYPE, ExternalLink } from '../../theme'
-import { ButtonBasic, ButtonGray } from '../../components/Button'
+import { ButtonBasic, ButtonGray, ButtonBlue } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
 import { Settings } from 'react-feather'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
@@ -192,7 +192,7 @@ export default function Overview() {
                       (userDelegatee === ZERO_ADDRESS &&
                       govTokenBalance &&
                       JSBI.notEqual(BIG_INT_ZERO, govTokenBalance.raw) ? (
-                        <ButtonBasic onClick={() => toggelDelegateModal()}>Unlock Voting</ButtonBasic>
+                        <ButtonBlue onClick={() => toggelDelegateModal()}>Delegate</ButtonBlue>
                       ) : (
                         <RowFixed height="38px" style={{ display: 'flex' }}>
                           {userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? (

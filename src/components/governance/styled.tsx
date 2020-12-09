@@ -65,3 +65,15 @@ export const ProposalStatus = styled.span<{ status: string }>`
   justify-self: flex-end;
   text-transform: uppercase;
 `
+
+export const ProposalStatusSmall = styled.span<{ status: string }>`
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.25rem;
+  border-radius: 8px;
+  color: ${({ status, theme }) => handleColorType(status, theme)};
+  border: 1px solid ${({ status, theme }) => handleColorType(status, theme)};
+  width: fit-content;
+  justify-self: flex-end;
+  text-transform: uppercase;
+`

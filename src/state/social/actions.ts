@@ -1,9 +1,4 @@
-import { HandleEntry, UncategorizedContentEntry } from './hooks'
+import { Identities } from './reducer'
 import { createAction } from '@reduxjs/toolkit'
 
-export const updateVerifiedHanldes = createAction<{ verifiedHandles: { [address: string]: HandleEntry } }>(
-  '/social/updateVerifiedHanldes'
-)
-export const updateUncategorizedNames = createAction<{ names: { [address: string]: UncategorizedContentEntry } }>(
-  '/social/updateUncategorizedNames'
-)
+export const updateIdentities = createAction<{ identities: Identities }>('/social/updateIdentities')

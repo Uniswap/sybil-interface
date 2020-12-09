@@ -4,7 +4,7 @@ import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../sta
 import { EmptyProposals, ProposalStatus } from './styled'
 import { TYPE } from '../../theme'
 import { GreyCard } from '../Card'
-import { RowBetween, RowFixed } from '../Row'
+import Row, { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { Link } from 'react-router-dom'
 import Loader from '../Loader'
@@ -29,6 +29,10 @@ const ProposalItem = styled.div`
 export default function ProposalList({ allProposals }: { allProposals: ProposalData[] | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
+  // used for displaying states
+  /**
+   * @TODO update this to be in one list
+   */
   const allStatuses = useAllProposalStates()
 
   return (
@@ -43,20 +47,27 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
           </EmptyProposals>
         )}
         <AutoColumn gap="1rem">
-          {allProposals?.map((p: ProposalData, i) => {
-            const status = allStatuses?.[i] ? enumerateProposalState(allStatuses?.[i]) : enumerateProposalState(0)
-            return (
-              <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                <RowBetween>
-                  <RowFixed>
-                    <TYPE.black mr="8px">{p.id}</TYPE.black>
-                    <TYPE.black>{p.title}</TYPE.black>
-                  </RowFixed>
-                  {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
-                </RowBetween>
-              </ProposalItem>
-            )
-          })}
+          {allStatuses && allProposals ? (
+            allProposals.map((p: ProposalData, i) => {
+              const index = allStatuses.length - i - 1 // offset based on reverse index
+              const status = allStatuses[index] ? enumerateProposalState(allStatuses[index]) : enumerateProposalState(0)
+              return (
+                <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
+                  <RowBetween>
+                    <RowFixed>
+                      <TYPE.black mr="8px">{p.id}</TYPE.black>
+                      <TYPE.black>{p.title}</TYPE.black>
+                    </RowFixed>
+                    {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
+                  </RowBetween>
+                </ProposalItem>
+              )
+            })
+          ) : (
+            <Row justify="center">
+              <Loader />
+            </Row>
+          )}
         </AutoColumn>
       </GreyCard>
     </Wrapper>

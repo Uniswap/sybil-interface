@@ -1,28 +1,25 @@
-import { HandleEntry, UncategorizedContentEntry } from './../state/social/hooks'
-
+import { Identities } from './../state/social/reducer'
 // Endpoints
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 const VERIFIED_JSON =
   'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json?token=AECO4K3LEYWJP3HT6EZFTPS72766I'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
-interface GithubData {
-  [address: string]: { twitter: HandleEntry | undefined; other: UncategorizedContentEntry | undefined }
-}
-
-export async function fetchAllVerifiedHandles(): Promise<
-  { [address: string]: { twitter: HandleEntry | undefined; other: UncategorizedContentEntry | undefined } } | undefined
-> {
+export async function fetchAllIdentities(): Promise<Identities | undefined> {
   try {
-    return fetch(VERIFIED_JSON).then(async res => {
-      if (!res || res.status !== 200) {
-        return Promise.reject('Unable to fetch verified handles')
-      } else {
-        return res.json().then((data: GithubData) => {
-          return data
-        })
-      }
-    })
+    return fetch(VERIFIED_JSON)
+      .then(async res => {
+        if (!res || res.status !== 200) {
+          return Promise.reject('Unable to fetch verified handles')
+        } else {
+          return res.json().then((data: Identities) => {
+            return data
+          })
+        }
+      })
+      .catch(() => {
+        return undefined
+      })
   } catch (e) {
     return Promise.reject('Error fetch verified handle data')
   }
