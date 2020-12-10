@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
-import Row, { AutoRow, RowFixed } from '../Row'
+import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
-import { shortenAddress } from '../../utils'
+import { shortenAddress, isAddress } from '../../utils'
 import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton } from './styled'
 import { GreyCard } from '../Card'
@@ -14,9 +14,9 @@ import { ApplicationModal } from '../../state/application/actions'
 import DelegateModal from '../vote/DelegateModal'
 import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
-import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
+import { useAllPrioritizedNames } from '../../state/social/hooks'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -28,12 +28,6 @@ const NoWrap = styled(TYPE.black)`
 
 const FixedAddressSize = styled(AutoColumn)`
   width: 140px;
-`
-
-const TwitterLogo = styled.img`
-  height: 24px;
-  width: 24px;
-  margin-left: 4px;
 `
 
 const DataRow = styled.div`
@@ -99,9 +93,13 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // show delegate button if they have available votes or if theyve delegated to someone else
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
+  // show indentity if it exists instead of address
+  const names = useAllPrioritizedNames()
+
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
       ? topDelegates.map((d, i) => {
+          const formattedAddress = isAddress(d.id)
           return (
             <DataRow key={d.id}>
               <AutoRow gap="10px">
@@ -120,16 +118,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
                       )}
                     </OnlyAboveSmall>
                     <FixedAddressSize gap="6px">
-                      <RowFixed>
-                        {d.handle ? (
-                          // getEtherscanLink(chainId, d.id, 'address')}
-                          <TYPE.black>{`@${d.handle}`}</TYPE.black>
-                        ) : (
-                          <TYPE.black>{shortenAddress(d.id)}</TYPE.black>
-                        )}
-
-                        {d.handle && <TwitterLogo src={TwitterIcon} />}
-                      </RowFixed>
+                      <TYPE.black>{(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(d.id)}</TYPE.black>
                       {d.handle ? (
                         <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                       ) : (
@@ -168,7 +157,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           )
         })
       : null
-  }, [activeProtocol, chainId, globalData, showDelegateButton, toggelDelegateModal, topDelegates])
+  }, [activeProtocol, chainId, globalData, names, showDelegateButton, toggelDelegateModal, topDelegates])
 
   return (
     <GreyCard padding="2rem 0">

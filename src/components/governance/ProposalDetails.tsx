@@ -13,7 +13,7 @@ import { PROPOSAL_LENGTH_IN_DAYS } from '../../constants'
 import { isAddress, getEtherscanLink } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
-import { RouteComponentProps, Link } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BodyWrapper } from '../../pages/AppBody'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../state'
@@ -68,13 +68,13 @@ const DetailText = styled.div`
   word-break: break-all;
 `
 
-export default function ProposalDetails({
+function ProposalDetails({
   match: {
     params: { protocolID, proposalID }
-  }
+  },
+  history
 }: RouteComponentProps<{ protocolID: string; proposalID: string }>) {
   const { chainId } = useActiveWeb3React()
-  const [activeProtocol] = useActiveProtocol()
 
   // if valid protocol id passed in, update global active protocol
   const dispatch = useDispatch<AppDispatch>()
@@ -125,8 +125,8 @@ export default function ProposalDetails({
         <GreyCard padding="0">
           <ProposalInfo gap="lg" justify="start">
             <RowBetween style={{ width: '100%' }}>
-              <ArrowWrapper as={Link} to={'/proposals/' + activeProtocol?.id}>
-                <ArrowLeft size={20} /> All Proposals
+              <ArrowWrapper onClick={() => history.goBack()}>
+                <ArrowLeft size={20} /> Back
               </ArrowWrapper>
               {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
             </RowBetween>
@@ -205,3 +205,5 @@ export default function ProposalDetails({
     </BodyWrapper>
   )
 }
+
+export default withRouter(ProposalDetails)

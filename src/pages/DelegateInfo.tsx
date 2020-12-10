@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { withRouter } from 'react-router-dom'
 import { BodyWrapper } from './AppBody'
 import {
   useActiveProtocol,
@@ -7,7 +8,7 @@ import {
   useAllProposals,
   useAllProposalStates
 } from '../state/governance/hooks'
-import { RouteComponentProps, Link } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
 import { ChainId, Token, JSBI } from '@uniswap/sdk'
 import { WhiteCard, OutlineCard, GreyCard } from '../components/Card'
@@ -95,10 +96,11 @@ function localNumber(val: number) {
   return parseFloat(parseFloat(val.toString()).toFixed(0)).toLocaleString()
 }
 
-export default function DelegateInfo({
+function DelegateInfo({
   match: {
     params: { protocolID, delegateAddress }
-  }
+  },
+  history
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
@@ -153,8 +155,8 @@ export default function DelegateInfo({
         {delegateAddress && chainId ? (
           <AutoColumn gap="md">
             <RowBetween style={{ width: '100%' }}>
-              <ArrowWrapper as={Link} to={'/delegates/' + activeProtocol?.id}>
-                <ArrowLeft size={20} /> All Delegates
+              <ArrowWrapper onClick={() => history.goBack()}>
+                <ArrowLeft size={20} /> Back
               </ArrowWrapper>
             </RowBetween>
             <WhiteCard>
@@ -295,3 +297,5 @@ export default function DelegateInfo({
     </BodyWrapper>
   )
 }
+
+export default withRouter(DelegateInfo)

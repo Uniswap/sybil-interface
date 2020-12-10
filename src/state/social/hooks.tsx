@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, ReactNode } from 'react'
 import { fetchProfileData, ProfileDataResponse, fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { useActiveWeb3React } from '../../hooks'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,6 +6,7 @@ import { AppDispatch, AppState } from '..'
 import { updateIdentities } from './actions'
 import { TwitterEntry, UncategorizedContentEntry, Identities, Identity } from './reducer'
 import { isAddress } from '../../utils'
+import LogoText from '../../components/governance/LogoText'
 
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
@@ -21,6 +22,27 @@ export function useAllIdentities(): [Identities | undefined, (identities: Identi
     [dispatch]
   )
   return [identities, setIdentities]
+}
+
+/**
+ * When displaying identities in a list, show them in this order of priority (if multiple identities)
+ */
+export function useAllPrioritizedNames(): { [address: string]: string | ReactNode | undefined } | undefined {
+  const [allIdentities] = useAllIdentities()
+
+  if (!allIdentities) return undefined
+  const prioritizedNames: { [address: string]: string | ReactNode | undefined } = {}
+  Object.keys(allIdentities).map(address => {
+    if (allIdentities[address].twitter) {
+      return (prioritizedNames[address] = (
+        <LogoText type="twitter">{'@' + allIdentities[address].twitter?.handle}</LogoText>
+      ))
+    } else if (allIdentities[address].other) {
+      return (prioritizedNames[address] = allIdentities[address].other?.name)
+    }
+    return null
+  })
+  return prioritizedNames
 }
 
 // filter for only entities with uncategorized names

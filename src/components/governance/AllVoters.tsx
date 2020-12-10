@@ -2,9 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
-import { TYPE, ExternalLink } from '../../theme'
-import { getEtherscanLink, shortenAddress } from '../../utils'
-import { ChainId } from '@uniswap/sdk'
+import { TYPE, StyledInternalLink } from '../../theme'
+import { shortenAddress } from '../../utils'
+import { useAllPrioritizedNames } from '../../state/social/hooks'
+import { useActiveProtocol } from '../../state/governance/hooks'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -50,6 +51,11 @@ export default function AllVoters({
       }[]
     | undefined
 }) {
+  // format voter name with indentity if it exists
+  const names = useAllPrioritizedNames()
+
+  const [activeProtocol] = useActiveProtocol()
+
   return (
     <StyledDataCard>
       <CardSection>
@@ -66,11 +72,11 @@ export default function AllVoters({
             {allVoters?.map((p, i) => {
               return (
                 <RowBetween key={'vote-for-' + i}>
-                  <ExternalLink href={getEtherscanLink(ChainId.MAINNET, p.voter.id, 'address')}>
+                  <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {shortenAddress(p.voter.id)}
+                      {names?.[p.voter.id] ?? shortenAddress(p.voter.id)}
                     </TYPE.black>
-                  </ExternalLink>
+                  </StyledInternalLink>
                   <TYPE.black fontWeight={400} fontSize="14px">
                     {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </TYPE.black>

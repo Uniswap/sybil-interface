@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
-import { TYPE, ExternalLink } from '../../theme'
-import { getEtherscanLink, shortenAddress } from '../../utils'
-import { ChainId } from '@uniswap/sdk'
+import { TYPE, StyledInternalLink } from '../../theme'
+import { shortenAddress } from '../../utils'
 import Modal from '../Modal'
 import AllVoters from './AllVoters'
 import { ButtonEmpty } from '../Button'
 import Loader from '../Loader'
-import { useAllVotersForProposal } from '../../state/governance/hooks'
+import { useAllVotersForProposal, useActiveProtocol } from '../../state/governance/hooks'
+import { useAllPrioritizedNames } from '../../state/social/hooks'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -84,6 +84,11 @@ export default function VoterList({
   const [showAll, setShowAll] = useState(false)
   const allVoters = useAllVotersForProposal(id, support === 'for')
 
+  const [activeProtocol] = useActiveProtocol()
+
+  // format voter name with identity if it exists
+  const prioritizedNames = useAllPrioritizedNames()
+
   return (
     <StyledDataCard>
       <Modal isOpen={showAll} onDismiss={() => setShowAll(false)}>
@@ -114,11 +119,11 @@ export default function VoterList({
             {voters.map((p, i) => {
               return (
                 <RowBetween key={'vote-for-' + i}>
-                  <ExternalLink href={getEtherscanLink(ChainId.MAINNET, p.voter.id, 'address')}>
+                  <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {shortenAddress(p.voter.id)}
+                      {prioritizedNames?.[p.voter.id] ?? shortenAddress(p.voter.id)}
                     </TYPE.black>
-                  </ExternalLink>
+                  </StyledInternalLink>
                   <TYPE.black fontWeight={400} fontSize="14px">
                     {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </TYPE.black>
