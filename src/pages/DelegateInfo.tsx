@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BodyWrapper } from './AppBody'
 import {
   useActiveProtocol,
@@ -9,7 +9,7 @@ import {
 } from '../state/governance/hooks'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
-import { ChainId, Token } from '@uniswap/sdk'
+import { ChainId, Token, JSBI } from '@uniswap/sdk'
 import { WhiteCard, OutlineCard, GreyCard } from '../components/Card'
 import { useProtocolUpdate } from '../hooks/useProtocolUpdate'
 import styled from 'styled-components'
@@ -17,7 +17,12 @@ import { RowBetween, AutoRow, RowFixed } from '../components/Row'
 import { ArrowLeft, CheckCircle, XCircle } from 'react-feather'
 import { AutoColumn } from '../components/Column'
 import EmptyProfile from '../assets/images/emptyprofile.png'
-import { RoundedProfileImage, WrappedListLogo, ProposalStatusSmall } from '../components/governance/styled'
+import {
+  RoundedProfileImage,
+  WrappedListLogo,
+  ProposalStatusSmall,
+  DelegateButton
+} from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress } from '../utils'
 import TwitterIcon from '../assets/images/Twitter_Logo_Blue.png'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
@@ -27,6 +32,10 @@ import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
 import CopyHelper from '../components/AccountDetails/Copy'
 import { useIsEOA } from '../hooks/useIsEOA'
+import DelegateModal from '../components/vote/DelegateModal'
+import { useModalOpen, useToggleModal } from '../state/application/hooks'
+import { ApplicationModal } from '../state/application/actions'
+import { BIG_INT_ZERO } from '../constants'
 
 const ArrowWrapper = styled.div`
   display: flex;
@@ -116,6 +125,14 @@ export default function DelegateInfo({
   const identityInfo = useIdentityInfo(delegateAddress)
   const twitterData = useTwitterProfileData(identityInfo?.twitter?.handle)
 
+  // toggle for showing delegation modal with prefilled delegate
+  const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
+  const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
+  const [prefilledDelegate, setPrefilledDelegate] = useState<string | undefined>()
+
+  // detect if they can delegate
+  const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
+
   // mainnet only
   if (chainId && chainId !== ChainId.MAINNET) {
     return <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
@@ -123,6 +140,15 @@ export default function DelegateInfo({
 
   return (
     <BodyWrapper>
+      <DelegateModal
+        isOpen={showDelegateModal}
+        onDismiss={() => {
+          setPrefilledDelegate(undefined)
+          toggelDelegateModal()
+        }}
+        title="Delegate Votes"
+        prefilledDelegate={prefilledDelegate}
+      />
       <GreyCard>
         {delegateAddress && chainId ? (
           <AutoColumn gap="md">
@@ -164,7 +190,7 @@ export default function DelegateInfo({
                         </OnlyBelowSmall>
                       </ExternalLink>
                       {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
-                      <CopyHelper toCopy={delegateAddress} />
+                      {!identityInfo?.twitter?.handle && <CopyHelper toCopy={delegateAddress} />}
                     </RowFixed>
                     {identityInfo?.twitter?.handle ? (
                       <RowFixed>
@@ -180,7 +206,16 @@ export default function DelegateInfo({
                     )}
                   </AutoColumn>
                 </AutoRow>
-                {/* <ButtonBlue width="100px">Delegate</ButtonBlue> */}
+                <DelegateButton
+                  width="fit-content"
+                  disabled={!showDelegateButton}
+                  onClick={() => {
+                    setPrefilledDelegate(delegateAddress)
+                    toggelDelegateModal()
+                  }}
+                >
+                  Delegate
+                </DelegateButton>
               </RowBetween>
             </WhiteCard>
             <WhiteCard>

@@ -18,6 +18,7 @@ import { BodyWrapper } from '../../pages/AppBody'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../state'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
+import { GreyCard } from '../Card'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -121,83 +122,85 @@ export default function ProposalDetails({
   return (
     <BodyWrapper>
       <Wrapper>
-        <ProposalInfo gap="lg" justify="start">
-          <RowBetween style={{ width: '100%' }}>
-            <ArrowWrapper as={Link} to={'/proposals/' + activeProtocol?.id}>
-              <ArrowLeft size={20} /> All Proposals
-            </ArrowWrapper>
-            {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
-          </RowBetween>
-          <AutoColumn gap="10px" style={{ width: '100%' }}>
-            <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>{proposalData?.title}</TYPE.largeHeader>
-            <RowBetween>
-              <TYPE.main>
-                {endDate && endDate < now
-                  ? 'Voting ended ' + (endDate && endDate.toLocaleString(DateTime.DATETIME_FULL))
-                  : proposalData
-                  ? 'Voting ends approximately ' + (endDate && endDate.toLocaleString(DateTime.DATETIME_FULL))
-                  : ''}
-              </TYPE.main>
+        <GreyCard padding="0">
+          <ProposalInfo gap="lg" justify="start">
+            <RowBetween style={{ width: '100%' }}>
+              <ArrowWrapper as={Link} to={'/proposals/' + activeProtocol?.id}>
+                <ArrowLeft size={20} /> All Proposals
+              </ArrowWrapper>
+              {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
             </RowBetween>
-          </AutoColumn>
-          <CardWrapper>
-            {proposalData && (
-              <>
-                <VoterList
-                  title="For"
-                  amount={proposalData?.forCount}
-                  percentage={forPercentage}
-                  voters={proposalData?.forVotes}
-                  support="for"
-                  id={proposalData?.id}
-                />
-                <VoterList
-                  title="Against"
-                  amount={proposalData?.againstCount}
-                  percentage={againstPercentage}
-                  voters={proposalData?.againstVotes}
-                  support={'against'}
-                  id={proposalData?.id}
-                />
-              </>
-            )}
-          </CardWrapper>
-          <AutoColumn gap="md">
-            <TYPE.mediumHeader fontWeight={600}>Details</TYPE.mediumHeader>
-            {proposalData?.details?.map((d, i) => {
-              return (
-                <DetailText key={i}>
-                  {i + 1}: {linkIfAddress(d.target)}.{d.functionSig}(
-                  {d.callData.split(',').map((content, i) => {
-                    return (
-                      <span key={i}>
-                        {linkIfAddress(content)}
-                        {d.callData.split(',').length - 1 === i ? '' : ','}
-                      </span>
+            <AutoColumn gap="10px" style={{ width: '100%' }}>
+              <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>{proposalData?.title}</TYPE.largeHeader>
+              <RowBetween>
+                <TYPE.main>
+                  {endDate && endDate < now
+                    ? 'Voting ended ' + (endDate && endDate.toLocaleString(DateTime.DATETIME_FULL))
+                    : proposalData
+                    ? 'Voting ends approximately ' + (endDate && endDate.toLocaleString(DateTime.DATETIME_FULL))
+                    : ''}
+                </TYPE.main>
+              </RowBetween>
+            </AutoColumn>
+            <CardWrapper>
+              {proposalData && (
+                <>
+                  <VoterList
+                    title="For"
+                    amount={proposalData?.forCount}
+                    percentage={forPercentage}
+                    voters={proposalData?.forVotes}
+                    support="for"
+                    id={proposalData?.id}
+                  />
+                  <VoterList
+                    title="Against"
+                    amount={proposalData?.againstCount}
+                    percentage={againstPercentage}
+                    voters={proposalData?.againstVotes}
+                    support={'against'}
+                    id={proposalData?.id}
+                  />
+                </>
+              )}
+            </CardWrapper>
+            <AutoColumn gap="md">
+              <TYPE.mediumHeader fontWeight={600}>Details</TYPE.mediumHeader>
+              {proposalData?.details?.map((d, i) => {
+                return (
+                  <DetailText key={i}>
+                    {i + 1}: {linkIfAddress(d.target)}.{d.functionSig}(
+                    {d.callData.split(',').map((content, i) => {
+                      return (
+                        <span key={i}>
+                          {linkIfAddress(content)}
+                          {d.callData.split(',').length - 1 === i ? '' : ','}
+                        </span>
+                      )
+                    })}
                     )
-                  })}
-                  )
-                </DetailText>
-              )
-            })}
-          </AutoColumn>
-          <AutoColumn gap="md">
-            <TYPE.mediumHeader fontWeight={600}>Description</TYPE.mediumHeader>
-            <MarkDownWrapper>
-              <ReactMarkdown source={proposalData?.description} />
-            </MarkDownWrapper>
-          </AutoColumn>
-          <AutoColumn gap="md">
-            <TYPE.mediumHeader fontWeight={600}>Proposer</TYPE.mediumHeader>
-            <ExternalLink
-              href={
-                proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
-              }
-            >
-              <ReactMarkdown source={proposalData?.proposer} />
-            </ExternalLink>
-          </AutoColumn>
-        </ProposalInfo>
+                  </DetailText>
+                )
+              })}
+            </AutoColumn>
+            <AutoColumn gap="md">
+              <TYPE.mediumHeader fontWeight={600}>Description</TYPE.mediumHeader>
+              <MarkDownWrapper>
+                <ReactMarkdown source={proposalData?.description} />
+              </MarkDownWrapper>
+            </AutoColumn>
+            <AutoColumn gap="md">
+              <TYPE.mediumHeader fontWeight={600}>Proposer</TYPE.mediumHeader>
+              <ExternalLink
+                href={
+                  proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
+                }
+              >
+                <ReactMarkdown source={proposalData?.proposer} />
+              </ExternalLink>
+            </AutoColumn>
+          </ProposalInfo>
+        </GreyCard>
       </Wrapper>
     </BodyWrapper>
   )

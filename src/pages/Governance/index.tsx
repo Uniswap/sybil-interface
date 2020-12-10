@@ -3,9 +3,7 @@ import { BodyWrapper } from '../AppBody'
 import { AutoColumn } from '../../components/Column'
 import styled from 'styled-components'
 import { useGovernanceToken, useUserVotes, useUserDelegatee, useActiveProtocol } from '../../state/governance/hooks'
-
 import Dropdown from '../../components/governance/Dropdown'
-import Tabs from '../../components/governance/Tabs'
 import { useToggleModal } from '../../state/application/hooks'
 import useENS from '../../hooks/useENS'
 import { useActiveWeb3React, useTheme } from '../../hooks'
@@ -218,7 +216,6 @@ export default function Overview() {
               </ResponsiveRow>
             )}
           </AccountCard>
-          <Tabs />
         </AutoColumn>
       </SectionWrapper>
     </BodyWrapper>

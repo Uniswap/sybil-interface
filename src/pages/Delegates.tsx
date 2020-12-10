@@ -7,6 +7,8 @@ import { useActiveWeb3React } from '../hooks'
 import { ChainId } from '@uniswap/sdk'
 import { OutlineCard } from '../components/Card'
 import { useProtocolUpdate } from '../hooks/useProtocolUpdate'
+import Tabs from '../components/governance/Tabs'
+import { AutoColumn } from '../components/Column'
 
 export default function Delegates({
   match: {
@@ -24,11 +26,14 @@ export default function Delegates({
 
   return (
     <BodyWrapper>
-      {chainId === ChainId.MAINNET ? (
-        <DelegateList topDelegates={topDelegates} />
-      ) : (
-        <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
-      )}
+      <AutoColumn gap="1rem">
+        <Tabs />
+        {chainId === ChainId.MAINNET ? (
+          <DelegateList topDelegates={topDelegates} />
+        ) : (
+          <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
+        )}
+      </AutoColumn>
     </BodyWrapper>
   )
 }

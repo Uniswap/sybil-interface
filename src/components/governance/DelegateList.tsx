@@ -1,16 +1,14 @@
 import React, { useState, useMemo } from 'react'
+import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-
 import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
 import Row, { AutoRow, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
 import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
-import { WrappedListLogo, RoundedProfileImage } from './styled'
+import { WrappedListLogo, RoundedProfileImage, DelegateButton } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
-import { ButtonBlue } from '../Button'
-import styled from 'styled-components'
 import { useModalOpen, useToggleModal } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import DelegateModal from '../vote/DelegateModal'
@@ -75,16 +73,6 @@ const AccountLinkGroup = styled(AutoRow)`
   }
 `
 
-const DelegateButton = styled(ButtonBlue)<{ disabled: boolean }>`
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    font-size: 12px;
-    margin-top: 0px !important;
-  `};
-
-  background-color: ${({ disabled, theme }) => disabled && theme.bg3};
-  color: ${({ disabled, theme }) => disabled && theme.text2};
-`
-
 const VoteText = styled(NoWrap)`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: 12px;
@@ -94,11 +82,9 @@ const VoteText = styled(NoWrap)`
 export default function DelegateList({ topDelegates }: { topDelegates: DelegateData[] | undefined }) {
   const { chainId, account } = useActiveWeb3React()
 
-  // toggle for showing delegation modal
+  // toggle for showing delegation modal with prefilled delegate
   const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
-
-  // used to prefil modal with delegate address
   const [prefilledDelegate, setPrefilledDelegate] = useState<string | undefined>()
 
   // used to calculate % ownership of votes

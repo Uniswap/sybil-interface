@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { ButtonBlue } from '../Button'
 
 export const WrappedListLogo = styled.img`
   height: 40px;
@@ -76,4 +77,14 @@ export const ProposalStatusSmall = styled.span<{ status: string }>`
   width: fit-content;
   justify-self: flex-end;
   text-transform: uppercase;
+`
+
+export const DelegateButton = styled(ButtonBlue)<{ disabled: boolean }>`
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    font-size: 12px;
+    margin-top: 0px !important;
+  `};
+
+  background-color: ${({ disabled, theme }) => disabled && theme.bg3};
+  color: ${({ disabled, theme }) => disabled && theme.text2};
 `
