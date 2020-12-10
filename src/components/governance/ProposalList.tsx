@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
-import { EmptyProposals, ProposalStatus } from './styled'
-import { TYPE } from '../../theme'
+import { EmptyProposals, ProposalStatus, ProposalStatusSmall } from './styled'
+import { TYPE, OnlyAboveSmall, OnlyBelowSmall } from '../../theme'
 import { GreyCard } from '../Card'
 import Row, { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
@@ -55,10 +55,21 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
                 <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
                   <RowBetween>
                     <RowFixed>
-                      <TYPE.black mr="8px">{p.id}</TYPE.black>
-                      <TYPE.black>{p.title}</TYPE.black>
+                      <OnlyAboveSmall>
+                        <TYPE.black mr="8px">{p.id}</TYPE.black>
+                      </OnlyAboveSmall>
+                      <TYPE.black mr="10px">{p.title}</TYPE.black>
                     </RowFixed>
-                    {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
+                    <OnlyBelowSmall>
+                      {allStatuses?.[i] ? (
+                        <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                      ) : (
+                        <Loader />
+                      )}
+                    </OnlyBelowSmall>
+                    <OnlyAboveSmall>
+                      {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
+                    </OnlyAboveSmall>
                   </RowBetween>
                 </ProposalItem>
               )

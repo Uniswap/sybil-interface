@@ -21,14 +21,17 @@ import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import { GreyCard } from '../Card'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
-  width: 100%;
+  // width: 100%;
 `
 
 const ProposalInfo = styled(AutoColumn)`
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
-  width: 100%;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+
+  `};
 `
 
 const ArrowWrapper = styled.div`
@@ -52,10 +55,12 @@ const CardWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   width: 100%;
-`
 
-const MarkDownWrapper = styled.div`
-  overflow: hidden;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+  `};
 `
 
 export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
@@ -66,6 +71,12 @@ export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
 
 const DetailText = styled.div`
   word-break: break-all;
+`
+
+const MarkDownWrapper = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    max-width: 400px;
+  `};
 `
 
 function ProposalDetails({
@@ -196,7 +207,11 @@ function ProposalDetails({
                   proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
                 }
               >
-                <ReactMarkdown source={proposalData?.proposer} />
+                <MarkDownWrapper>
+                  <DetailText>
+                    <ReactMarkdown source={proposalData?.proposer} />
+                  </DetailText>
+                </MarkDownWrapper>
               </ExternalLink>
             </AutoColumn>
           </ProposalInfo>

@@ -105,7 +105,7 @@ function DelegateInfo({
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
 
-  const { chainId } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
   // get governance data and format amounts
@@ -210,7 +210,7 @@ function DelegateInfo({
                 </AutoRow>
                 <DelegateButton
                   width="fit-content"
-                  disabled={!showDelegateButton}
+                  disabled={!showDelegateButton || !account}
                   onClick={() => {
                     setPrefilledDelegate(delegateAddress)
                     toggelDelegateModal()
