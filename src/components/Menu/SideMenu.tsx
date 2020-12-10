@@ -21,7 +21,7 @@ const Wrapper = styled.div<{ open: boolean }>`
   justify-content: space-between;
   align-items: ${({ open }) => (open ? 'unset' : 'center')};
   background: url(${MenuBG});
-  background-size: contain;
+  background-size: cover;
 
   overflow: auto;
 
@@ -126,7 +126,7 @@ export default function SideMenu() {
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
                 Currently, we support Compound and Uniswap governance. Feel free to
-                <ExternalLink href="https://github.com/Uniswap/sybil-interface"> add others</ExternalLink>
+                <ExternalLink href="https://github.com/Uniswap/sybil-interface"> add others</ExternalLink>.
               </TYPE.black>
             </AutoColumn>
             <AutoColumn gap="1rem">
