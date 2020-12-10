@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive } from './actions'
+import { updateActiveProtocol, updateFilterActive, updateTopDelegates } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo } from './reducer'
@@ -11,8 +11,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
-import { fetchDelegates, fetchProposals, fetchGlobalData, enumerateProposalState } from '../../data/governance'
-import { useAllIdentities } from '../social/hooks'
+import { fetchProposals, fetchGlobalData, enumerateProposalState } from '../../data/governance'
 import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
@@ -93,51 +92,18 @@ export function useGlobalData(): GlobaData | undefined {
   return globalData
 }
 
-export function useTopDelegates(filter: boolean): DelegateData[] | undefined {
-  const { library } = useActiveWeb3React()
-
-  const [delegates, setDelegates] = useState<DelegateData[] | undefined>()
-
-  // get graphql client for active protocol
-  const client = useSubgraphClient()
-
-  const [allIdentities] = useAllIdentities()
-
-  // reset list on active protocol change
-  const [activeProtocol] = useActiveProtocol()
-  useEffect(() => {
-    setDelegates(undefined)
-  }, [activeProtocol, filter])
-
-  const key = activeProtocol?.id ?? ''
-
-  // if verified handles update, reset
-  useEffect(() => {
-    if (allIdentities) {
-      setDelegates(undefined)
-    }
-  }, [allIdentities])
-
-  useEffect(() => {
-    async function fetchTopDelegates() {
-      try {
-        library &&
-          allIdentities &&
-          fetchDelegates(client, library, allIdentities, filter).then(async delegateData => {
-            if (delegateData) {
-              setDelegates(delegateData)
-            }
-          })
-      } catch (e) {
-        console.log(e)
-      }
-    }
-    if (!delegates && client && allIdentities) {
-      fetchTopDelegates()
-    }
-  }, [library, client, key, delegates, allIdentities, filter])
-
-  return delegates
+export function useTopDelegates(): [DelegateData[] | undefined, (topDelegates: DelegateData[] | undefined) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const topDelegates = useSelector<AppState, AppState['governance']['topDelegates']>(state => {
+    return state.governance.topDelegates
+  })
+  const setTopDelegates = useCallback(
+    (topDelegates: DelegateData[] | undefined) => {
+      dispatch(updateTopDelegates({ topDelegates }))
+    },
+    [dispatch]
+  )
+  return [topDelegates, setTopDelegates]
 }
 
 interface ProposalDetail {

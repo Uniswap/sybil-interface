@@ -1,6 +1,6 @@
 import React from 'react'
 import { BodyWrapper } from './AppBody'
-import { useTopDelegates, useFilterActive } from '../state/governance/hooks'
+import { useTopDelegates } from '../state/governance/hooks'
 import DelegateList from '../components/governance/DelegateList'
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
@@ -20,8 +20,7 @@ export default function Delegates({
   const { chainId } = useActiveWeb3React()
 
   // get top delegates
-  const [filter] = useFilterActive()
-  const topDelegates = useTopDelegates(filter)
+  const [topDelegates] = useTopDelegates()
 
   return (
     <BodyWrapper>

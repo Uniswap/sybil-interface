@@ -14,6 +14,7 @@ import ApplicationUpdater from './state/application/updater'
 import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
+import GovernanceUpdater from './state/governance/updater'
 import SocialUpdater from './state/social/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
 import getLibrary from './utils/getLibrary'
@@ -44,6 +45,7 @@ window.addEventListener('error', error => {
 function Updaters() {
   return (
     <>
+      <GovernanceUpdater />
       <UserUpdater />
       <ApplicationUpdater />
       <TransactionUpdater />

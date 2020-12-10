@@ -1,6 +1,7 @@
+import { DelegateData } from './hooks'
 import { SerializedToken } from './../user/actions'
 import { ChainId, Token } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive } from './actions'
+import { updateActiveProtocol, updateFilterActive, updateTopDelegates } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/unilogo.svg'
 import CompLogo from '../../assets/images/compLogo.png'
@@ -60,12 +61,18 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
 export interface GovernanceState {
   // the selected option from supported protocol options
   activeProtocol: GovernanceInfo | undefined
-  filterActive: boolean // filter on top delegates
+
+  // filter only verified delegates
+  filterActive: boolean
+
+  // top delegates
+  topDelegates: DelegateData[] | undefined
 }
 
 export const initialState: GovernanceState = {
   activeProtocol: undefined,
-  filterActive: false
+  filterActive: false,
+  topDelegates: undefined
 }
 
 export default createReducer(initialState, builder =>
@@ -75,5 +82,8 @@ export default createReducer(initialState, builder =>
     })
     .addCase(updateFilterActive, (state, action) => {
       state.filterActive = action.payload.filterActive
+    })
+    .addCase(updateTopDelegates, (state, action) => {
+      state.topDelegates = action.payload.topDelegates
     })
 )

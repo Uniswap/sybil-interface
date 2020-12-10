@@ -5,7 +5,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
 import { Book, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
-import { fontFaces } from '../../theme/extraFonts'
+import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
 import Logo from '../../assets/images/sybil_logo.png'
 
