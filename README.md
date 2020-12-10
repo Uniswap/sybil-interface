@@ -3,11 +3,12 @@
 [![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
 - Interface: [https://sybil.org](https://sybil.org)
-- Read the Sybil announcement post : [link to post]()
+- Read the Sybil announcement post: [link to post]()
+- Sybil list documentation: [https://github.com/Uniswap/sybil-list](https://github.com/Uniswap/sybil-list)
 
-Governance interface that incorporates Sybil. Sybil maintains a list of known delegates and their digital identities. It uses publicly posted signed messages to map wallets to identities and makes this list available for anyone to use. 
+Sybil is a governance tool for discovering delegates. Sybil maps on-chain addresses to digital identities to maintain a list of delegates. This interface displays governance data for supported protocols, and also allows users to link social profiles with their Ethereum addresses. 
 
-Ethereum mainnet support only. 
+ Mainnet support only. 
 
 ## Social Verification
 
@@ -35,12 +36,11 @@ Steps to add new protocol support:
 
 1. Add relevant information to list of supported protocols in [reducer.js](./src/state/governance/reducer.ts)
 
-2. Make sure to have a [subgraph](https://thegraph.com/) that can return data that matches the stuctures in [queries.js](./src/apollo/queries.js). See subgraph code for governance here: [https://github.com/protofire/compound-governance-subgraph](https://github.com/protofire/compound-governance-subgraph).
+2. Make sure to have a [subgraph](https://thegraph.com/) that can return data that matches the stuctures in [queries.js](./src/apollo/queries.js). See subgraph code for governance here: [https://github.com/protofire/compound-governance-subgraph](https://github.com/protofire/compound-governance-subgraph). This subgraph can easily be forked and pointed towards other governance systems. 
 
-3. Add subgraph support by adding client information in [client.js](./src/apollo/client.js) and in hook `useSubgraphClient` in [hooks.ts](./src/state/governance/hooks.ts)
+3. Add subgraph  client support by adding relevant information in [client.js](./src/apollo/client.js) and in hook `useSubgraphClient` in [hooks.ts](./src/state/governance/hooks.ts)
 
 PR's for additional protocol support are welcome. 
-
 
 ## Development
 
