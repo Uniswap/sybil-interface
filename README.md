@@ -4,7 +4,7 @@
 
 - Interface: [https://sybil.org](https://sybil.org)
 - Read the Sybil announcement post: [link to post]()
-- Sybil lisy documentation: [https://github.com/Uniswap/sybil-list](https://github.com/Uniswap/sybil-list)
+- Sybil list documentation: [https://github.com/Uniswap/sybil-list](https://github.com/Uniswap/sybil-list)
 
 Sybil is a governance tool for discovering delegates. Sybil maps on-chain addresses to digital identities to maintain a list of delegates. 
 
