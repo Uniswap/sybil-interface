@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { RowBetween, RowFixed } from '../Row'
-import { TYPE, ExternalLink } from '../../theme'
+import { TYPE, ExternalLink, BlankInternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
 import { Book, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
@@ -82,10 +82,12 @@ export default function SideMenu() {
     <>
       <MobileHeader>
         <RowBetween>
-          <RowFixed style={{ gap: '8px' }}>
-            <SybilLogo />
-            <SybilWorkmark>sybil</SybilWorkmark>
-          </RowFixed>
+          <BlankInternalLink to="/">
+            <RowFixed style={{ gap: '8px' }}>
+              <SybilLogo />
+              <SybilWorkmark>sybil</SybilWorkmark>
+            </RowFixed>
+          </BlankInternalLink>
           <ExternalLink href="https://github.com/Uniswap/sybil-list">
             <Book style={{ stroke: 'black' }} />
           </ExternalLink>
