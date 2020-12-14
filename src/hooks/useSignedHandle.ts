@@ -14,7 +14,7 @@ export function useSignedHandle(
   const [sig, setSig] = useState<string | undefined>()
 
   const signMessage = useCallback(() => {
-    if (!library && account) {
+    if (!library && account && account !== null) {
       return
     }
     const EIP712Domain = [
@@ -36,14 +36,18 @@ export function useSignedHandle(
       primaryType: 'Permit',
       message
     })
-    library
-      ?.send('eth_signTypedData_v4', [account, data])
-      .catch(error => {
-        console.log(error)
-      })
-      .then(sig => {
-        setSig(sig)
-      })
+
+    if (account !== null) {
+      library
+        ?.getSigner(account)
+        .signMessage(data)
+        .then(sig => {
+          setSig(sig)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
   }, [account, library, twitterHandle])
 
   return { sig, signMessage, setSig }
