@@ -96,6 +96,18 @@ const MobileColumn = styled(AutoColumn)`
   `};
 `
 
+const FixedWidthAtSmall = styled(AutoColumn)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    width: 160px;
+  `};
+`
+
+const ButtonText = styled(TYPE.white)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 12px;
+  `};
+`
+
 export default function Overview() {
   const theme = useTheme()
 
@@ -142,13 +154,13 @@ export default function Overview() {
               <RowBetween>
                 <RowFixed>
                   <EmptyCircle />
-                  <AutoColumn gap="10px">
+                  <FixedWidthAtSmall gap="10px">
                     <TYPE.main fontSize="20px">Your Address</TYPE.main>
                     <TYPE.main fontSize="12px">Connect wallet to sign in or announce yourself as a delegate.</TYPE.main>
-                  </AutoColumn>
+                  </FixedWidthAtSmall>
                 </RowFixed>
                 <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-                  Connect wallet
+                  <ButtonText>Connect wallet</ButtonText>
                 </ButtonBasic>
               </RowBetween>
             ) : (

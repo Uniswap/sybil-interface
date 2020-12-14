@@ -33,13 +33,13 @@ const SiteWrapper = styled.div`
   `};
 `
 
-const AppWrapper = styled.div`
-  display: flex;
-  flex-flow: column;
-  align-items: flex-start;
-  overflow-x: hidden;
-  width: 100%;
-`
+// const AppWrapper = styled.div`
+//   display: flex;
+//   flex-flow: column;
+//   align-items: flex-start;
+//   overflow-x: hidden;
+//   width: 100%;
+// `
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -73,24 +73,24 @@ export default function App() {
       <Route component={TwitterAccountQueryParamReader} />
       <SiteWrapper>
         <SideMenu />
-        <AppWrapper>
-          <ContentWrapper>
-            <Web3Status />
-            <Popups />
-            <Polling />
-            <Overview />
-            <Web3ReactManager>
-              <Switch>
-                <Route exact strict path="/delegates/:protocolID" component={Delegates} />
-                <Route exact strict path="/proposals/:protocolID" component={Proposals} />
-                <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
-                <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
-                <Route path="/" component={RedirectWithUpdatedGovernance} />
-              </Switch>
-            </Web3ReactManager>
-            <Marginer />
-          </ContentWrapper>
-        </AppWrapper>
+        {/* <AppWrapper> */}
+        <ContentWrapper>
+          <Web3Status />
+          <Popups />
+          <Polling />
+          <Overview />
+          <Web3ReactManager>
+            <Switch>
+              <Route exact strict path="/delegates/:protocolID" component={Delegates} />
+              <Route exact strict path="/proposals/:protocolID" component={Proposals} />
+              <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+              <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
+              <Route path="/" component={RedirectWithUpdatedGovernance} />
+            </Switch>
+          </Web3ReactManager>
+          <Marginer />
+        </ContentWrapper>
+        {/* </AppWrapper> */}
       </SiteWrapper>
     </Suspense>
   )
