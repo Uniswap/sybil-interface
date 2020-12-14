@@ -3,7 +3,7 @@ import { SerializedToken } from './../user/actions'
 import { ChainId, Token } from '@uniswap/sdk'
 import { updateActiveProtocol, updateFilterActive, updateTopDelegates } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
-import UniLogo from '../../assets/images/unilogo.svg'
+import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
 import { serializeToken } from '../user/hooks'
 

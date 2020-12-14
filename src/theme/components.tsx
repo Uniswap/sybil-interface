@@ -115,7 +115,7 @@ export const StyledInternalLink = styled(Link)`
 export const BlankInternalLink = styled(Link)`
   text-decoration: none;
   cursor: pointer;
-  color: ${({ theme }) => theme.primary1};
+  color: ${({ theme }) => theme.black};
   font-weight: 500;
 
   :focus {

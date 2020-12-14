@@ -5,6 +5,12 @@ export const WrappedListLogo = styled.img`
   height: 40px;
   width: 40px;
   border-radius: 50%;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    height: 32px;
+    width: 32px;
+    margin-right: 8px;
+  `};
 `
 
 export const RoundedProfileImage = styled.div`
