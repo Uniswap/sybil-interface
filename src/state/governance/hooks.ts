@@ -455,17 +455,19 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
         .then((res: DelegateInfoRes) => {
           if (res?.data) {
             const resData = res.data.delegates[0]
-            const votes = resData.votes
-              // sort in order created
-              .sort((a, b) => (parseInt(a.proposal.id) > parseInt(b.proposal.id) ? 1 : -1))
-              .map((v: { proposal: { id: string }; support: boolean; votes: string }) => ({
-                proposal: parseInt(v.proposal.id),
-                votes: parseFloat(v.votes),
-                support: v.support
-              }))
+            const votes = resData
+              ? resData.votes
+                  // sort in order created
+                  .sort((a, b) => (parseInt(a.proposal.id) > parseInt(b.proposal.id) ? 1 : -1))
+                  .map((v: { proposal: { id: string }; support: boolean; votes: string }) => ({
+                    proposal: parseInt(v.proposal.id),
+                    votes: parseFloat(v.votes),
+                    support: v.support
+                  }))
+              : []
             setData({
-              delegatedVotes: parseFloat(resData.delegatedVotes),
-              tokenHoldersRepresentedAmount: resData.tokenHoldersRepresentedAmount,
+              delegatedVotes: parseFloat(resData?.delegatedVotes ?? '0'),
+              tokenHoldersRepresentedAmount: resData?.tokenHoldersRepresentedAmount ?? 0,
               votes,
               EOA: isEOA
             })

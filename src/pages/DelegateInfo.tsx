@@ -110,8 +110,8 @@ function DelegateInfo({
 
   // get governance data and format amounts
   const delegateInfo = useDelegateInfo(delegateAddress)
-  const delegatedVotes = delegateInfo ? localNumber(delegateInfo.delegatedVotes) : '-'
-  const holdersRepresented = delegateInfo ? localNumber(delegateInfo.tokenHoldersRepresentedAmount) : '-'
+  const delegatedVotes = delegateInfo ? localNumber(delegateInfo.delegatedVotes) : <Loader />
+  const holdersRepresented = delegateInfo ? localNumber(delegateInfo.tokenHoldersRepresentedAmount) : <Loader />
 
   const isEOA = useIsEOA(delegateAddress)
 
@@ -224,7 +224,7 @@ function DelegateInfo({
               <DataRow>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
-                  <ResponsiveDataText>{govTokenBalance ? govTokenBalance?.toFixed(0) : '-'}</ResponsiveDataText>
+                  <ResponsiveDataText>{govTokenBalance ? govTokenBalance?.toFixed(0) : <Loader />}</ResponsiveDataText>
                 </AutoColumn>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">Votes</TYPE.main>

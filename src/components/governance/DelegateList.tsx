@@ -5,7 +5,13 @@ import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../t
 import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, isAddress } from '../../utils'
-import { DelegateData, useActiveProtocol, useGlobalData, useGovernanceToken } from '../../state/governance/hooks'
+import {
+  DelegateData,
+  useActiveProtocol,
+  useGlobalData,
+  useGovernanceToken,
+  useFilterActive
+} from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
@@ -16,10 +22,11 @@ import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { useAllPrioritizedNames } from '../../state/social/hooks'
+import { useAllPrioritizedNames, useAllIdentities, useMultipleTwitterProfileDatas } from '../../state/social/hooks'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
+  font-size: 15px;
 `
 
 const NoWrap = styled(TYPE.black)`
@@ -27,12 +34,12 @@ const NoWrap = styled(TYPE.black)`
 `
 
 const FixedAddressSize = styled(AutoColumn)`
-  width: 140px;
+  // width: 180px;
 `
 
 const DataRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 140px 100px 160px;
+  grid-template-columns: 1fr 132px 100px 140px;
   grid-column-gap: 1rem;
   padding: 0 2rem;
 
@@ -96,9 +103,40 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   // show indentity if it exists instead of address
   const names = useAllPrioritizedNames()
 
+  const [filter] = useFilterActive()
+  const [allIdentities] = useAllIdentities()
+
+  const manualEntries =
+    filter && allIdentities && topDelegates
+      ? Object.keys(allIdentities)
+          .filter(address => {
+            const found = topDelegates.find(d => isAddress(d.id) === isAddress(address))
+            return !found
+          })
+          .map((address: any) => {
+            const identity = allIdentities[address]
+            return { handle: identity?.twitter?.handle ?? undefined, address }
+          })
+      : []
+
+  const manualTwitterDatas = useMultipleTwitterProfileDatas(manualEntries.map(a => a.handle))
+
+  const formattedManualDelegates = manualEntries.map(entry => {
+    return {
+      id: entry.address,
+      delegatedVotes: 0,
+      delegatedVotesRaw: 0,
+      votePercent: new Percent(BIG_INT_ZERO),
+      votes: [],
+      EOA: true,
+      handle: entry.handle,
+      imageURL: entry?.handle ? manualTwitterDatas?.[entry?.handle]?.profileURL : undefined
+    }
+  })
+
   const delegateList = useMemo(() => {
     return chainId && topDelegates && activeProtocol
-      ? topDelegates.map((d, i) => {
+      ? topDelegates.concat(formattedManualDelegates).map((d, i) => {
           const formattedAddress = isAddress(d.id)
           return (
             <DataRow key={d.id}>
@@ -157,7 +195,16 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
           )
         })
       : null
-  }, [activeProtocol, chainId, globalData, names, showDelegateButton, toggelDelegateModal, topDelegates])
+  }, [
+    activeProtocol,
+    chainId,
+    formattedManualDelegates,
+    globalData,
+    names,
+    showDelegateButton,
+    toggelDelegateModal,
+    topDelegates
+  ])
 
   return (
     <GreyCard padding="2rem 0">

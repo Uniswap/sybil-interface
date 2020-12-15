@@ -18,17 +18,6 @@ interface GlobalResponse {
   }
 }
 
-interface HandlesResponse {
-  data: {
-    attestations: {
-      id: string
-      account: string
-      tweetID: string
-      timestamp: number
-    }[]
-  }
-}
-
 export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
   if (!client) {
     return null

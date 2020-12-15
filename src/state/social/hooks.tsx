@@ -191,6 +191,42 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
   return formattedData
 }
 
+export function useMultipleTwitterProfileDatas(
+  handles: (string | undefined)[]
+): { [handle: string]: TwitterProfileData | undefined } | undefined {
+  const [formattedData, setFormattedData] = useState<{ [handle: string]: TwitterProfileData | undefined }>()
+
+  const length = handles.length
+  useEffect(() => {
+    setFormattedData(undefined)
+  }, [length])
+
+  useEffect(() => {
+    async function fetchData() {
+      // for each handle attestation - verify which ones are legit,
+      Promise.all(
+        handles.map(async (handle: string) => {
+          const profileData = handle ? await fetchProfileData(handle) : undefined
+          return {
+            account: '',
+            handle,
+            profileURL: profileData?.data?.profile_image_url
+          }
+        })
+      ).then(handlesData => {
+        setFormattedData(Object.assign({}, ...handlesData.map(key => ({ [key.handle]: key }))))
+      })
+    }
+
+    // only fetch if valid list of handles
+    if (!formattedData) {
+      fetchData()
+    }
+  }, [handles, formattedData])
+
+  return formattedData
+}
+
 // check for tweet every couple seconds after theyve kicked off flow
 const POLL_DURATION_MS = 8000 // length after which to check
 export function useTweetWatcher(
