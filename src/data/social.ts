@@ -1,7 +1,7 @@
 import { Identities } from './../state/social/reducer'
 // Endpoints
 export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
-const VERIFIED_JSON = 'https://raw.githubusercontent.com/Uniswap/sybil-list/main/verified.json'
+const VERIFIED_JSON = 'https://raw.githubusercontent.com/Uniswap/sybil-list/master/verified.json'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
 export async function fetchAllIdentities(): Promise<Identities | undefined> {
