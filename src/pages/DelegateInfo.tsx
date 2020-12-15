@@ -253,7 +253,7 @@ function DelegateInfo({
               <AutoColumn gap="lg">
                 <TYPE.main fontSize="16px">Voting History</TYPE.main>
                 <Break />
-                {proposalStatuses &&
+                {delegateInfo && proposalStatuses ? (
                   delegateInfo?.votes?.map((vote, i) => {
                     const proposal = proposalData?.[vote.proposal - 1] // proposals start at 1
                     const index = proposalStatuses.length - vote.proposal // offset based on reverse index
@@ -276,9 +276,9 @@ function DelegateInfo({
                             </AutoColumn>
                             <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
                               <RowFixed>
-                                <TYPE.body mr="6px">{`${localNumber(vote.votes)} votes ${
-                                  vote.support ? 'in favor' : 'against'
-                                }`}</TYPE.body>
+                                <ResponsiveBodyText mr="6px" ml="6px" textAlign="right">
+                                  {`${localNumber(vote.votes)} votes ${vote.support ? 'in favor' : 'against'}`}
+                                </ResponsiveBodyText>
                                 {vote.support ? (
                                   <GreenIcon>
                                     <CheckCircle />
@@ -296,7 +296,10 @@ function DelegateInfo({
                         </div>
                       )
                     )
-                  })}
+                  })
+                ) : (
+                  <Loader />
+                )}
                 {delegateInfo && delegateInfo?.votes?.length === 0 && <TYPE.body>No past votes</TYPE.body>}
               </AutoColumn>
             </WhiteCard>
