@@ -41,13 +41,33 @@ export function useSignedHandle(
      * Need to use personal_sign as eth typed data is not
      * supported by most hardware wallets yet.
      */
-    if (account && library) {
+    if (account) {
+      //format as hex
+      const message = new Buffer(data).toString('hex')
+
+      // need to manually prefix with 0x for wallet connect
       library
-        .getSigner(account)
-        .signMessage(data)
-        .then(sig => setSig(sig))
-        .catch(error => console.log(error))
+        ?.send('personal_sign', ['0x' + message, account])
+        .catch(error => {
+          console.log(error)
+        })
+        .then(sig => {
+          setSig(sig)
+        })
     }
+
+    // new Buffer(data).toString('hex')
+
+    // if (account && library) {
+    //   library
+    //     .getSigner(account)
+    //     .signMessage(new Buffer(data).toString('hex'))
+    //     .then(sig => {
+    //       setSig(sig)
+    //       window.alert(sig)
+    //     })
+    //     .catch(error => console.log(error))
+    // }
   }, [account, library, twitterHandle])
 
   return { sig, signMessage, setSig }
