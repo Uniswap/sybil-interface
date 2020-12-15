@@ -1,6 +1,5 @@
 import React from 'react'
 import { BodyWrapper } from './AppBody'
-import { useTopDelegates } from '../state/governance/hooks'
 import DelegateList from '../components/governance/DelegateList'
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
@@ -21,15 +20,12 @@ export default function Delegates({
   // if on testnet, show warning
   const { chainId } = useActiveWeb3React()
 
-  // get top delegates
-  const [topDelegates] = useTopDelegates()
-
   return (
     <BodyWrapper>
       <AutoColumn gap="1rem">
         <Tabs />
         {chainId === ChainId.MAINNET ? (
-          <DelegateList topDelegates={topDelegates} />
+          <DelegateList />
         ) : (
           <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
         )}

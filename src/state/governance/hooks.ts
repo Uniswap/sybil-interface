@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive, updateTopDelegates } from './actions'
+import { updateActiveProtocol, updateFilterActive, updateTopDelegates, updateVerifiedDelegates } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo } from './reducer'
@@ -104,6 +104,23 @@ export function useTopDelegates(): [DelegateData[] | undefined, (topDelegates: D
     [dispatch]
   )
   return [topDelegates, setTopDelegates]
+}
+
+export function useVerifiedDelegates(): [
+  DelegateData[] | undefined,
+  (verifiedDelegates: DelegateData[] | undefined) => void
+] {
+  const dispatch = useDispatch<AppDispatch>()
+  const verifiedDelegates = useSelector<AppState, AppState['governance']['verifiedDelegates']>(state => {
+    return state.governance.verifiedDelegates
+  })
+  const setVerifiedDelegates = useCallback(
+    (verifiedDelegates: DelegateData[] | undefined) => {
+      dispatch(updateVerifiedDelegates({ verifiedDelegates }))
+    },
+    [dispatch]
+  )
+  return [verifiedDelegates, setVerifiedDelegates]
 }
 
 interface ProposalDetail {

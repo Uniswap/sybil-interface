@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useActiveWeb3React } from '../../hooks'
 import { useSubgraphClient } from '../application/hooks'
 import { useAllIdentities } from '../social/hooks'
-import { fetchDelegates } from '../../data/governance'
-import { useFilterActive, useTopDelegates, useActiveProtocol } from './hooks'
+import { fetchTopDelegates, fetchVerifiedDelegates } from '../../data/governance'
+import { useTopDelegates, useActiveProtocol, useVerifiedDelegates } from './hooks'
 
 export default function Updater(): null {
   // fetched all indentity info if haven't yet
@@ -14,35 +14,31 @@ export default function Updater(): null {
 
   const [allIdentities] = useAllIdentities()
 
-  const [filter] = useFilterActive()
-
   const [topDelegates, setTopDelegates] = useTopDelegates()
+  const [verifiedDelegates, setVerifiedDelegates] = useVerifiedDelegates()
 
-  // reset list on active protocol change
+  // reset lists on active protocol change
   const [activeProtocol] = useActiveProtocol()
 
   useEffect(() => {
     setTopDelegates(undefined)
-  }, [activeProtocol, setTopDelegates])
+    setVerifiedDelegates(undefined)
+  }, [activeProtocol, setTopDelegates, setVerifiedDelegates])
 
   // if verified handles update, reset
   useEffect(() => {
     if (allIdentities) {
       setTopDelegates(undefined)
+      setVerifiedDelegates(undefined)
     }
-  }, [allIdentities, setTopDelegates])
-
-  // if filter handles update, reset
-  useEffect(() => {
-    setTopDelegates(undefined)
-  }, [filter, setTopDelegates])
+  }, [allIdentities, setTopDelegates, setVerifiedDelegates])
 
   useEffect(() => {
-    async function fetchTopDelegates() {
+    async function fetchTopDelegateData() {
       try {
         library &&
           allIdentities &&
-          fetchDelegates(client, library, allIdentities, filter).then(async delegateData => {
+          fetchTopDelegates(client, library, allIdentities).then(async delegateData => {
             if (delegateData) {
               setTopDelegates(delegateData)
             }
@@ -52,9 +48,28 @@ export default function Updater(): null {
       }
     }
     if (!topDelegates && client && allIdentities) {
-      fetchTopDelegates()
+      fetchTopDelegateData()
     }
-  }, [library, client, topDelegates, allIdentities, filter, setTopDelegates])
+  }, [library, client, topDelegates, allIdentities, setTopDelegates])
+
+  useEffect(() => {
+    async function fetchVerifiedDelegateData() {
+      try {
+        library &&
+          allIdentities &&
+          fetchVerifiedDelegates(client, library, allIdentities).then(async delegateData => {
+            if (delegateData) {
+              setVerifiedDelegates(delegateData)
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    if (!verifiedDelegates && client && allIdentities) {
+      fetchVerifiedDelegateData()
+    }
+  }, [library, client, allIdentities, verifiedDelegates, setVerifiedDelegates])
 
   return null
 }

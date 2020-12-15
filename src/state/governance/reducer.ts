@@ -1,7 +1,7 @@
 import { DelegateData } from './hooks'
 import { SerializedToken } from './../user/actions'
 import { ChainId, Token } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive, updateTopDelegates } from './actions'
+import { updateActiveProtocol, updateFilterActive, updateTopDelegates, updateVerifiedDelegates } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
@@ -65,14 +65,18 @@ export interface GovernanceState {
   // filter only verified delegates
   filterActive: boolean
 
-  // top delegates
+  // top delegates based on votes
   topDelegates: DelegateData[] | undefined
+
+  // only delegates with verified usernames
+  verifiedDelegates: DelegateData[] | undefined
 }
 
 export const initialState: GovernanceState = {
   activeProtocol: undefined,
   filterActive: false,
-  topDelegates: undefined
+  topDelegates: undefined,
+  verifiedDelegates: undefined
 }
 
 export default createReducer(initialState, builder =>
@@ -85,5 +89,8 @@ export default createReducer(initialState, builder =>
     })
     .addCase(updateTopDelegates, (state, action) => {
       state.topDelegates = action.payload.topDelegates
+    })
+    .addCase(updateVerifiedDelegates, (state, action) => {
+      state.verifiedDelegates = action.payload.verifiedDelegates
     })
 )

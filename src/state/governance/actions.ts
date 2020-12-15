@@ -7,3 +7,6 @@ export const updateFilterActive = createAction<{ filterActive: boolean }>('/gove
 export const updateTopDelegates = createAction<{ topDelegates: DelegateData[] | undefined }>(
   `/governance/updateTopDelegates`
 )
+export const updateVerifiedDelegates = createAction<{ verifiedDelegates: DelegateData[] | undefined }>(
+  `/governance/updateVerifiedDelegates`
+)

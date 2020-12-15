@@ -5,6 +5,7 @@ import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks
 import { ethers } from 'ethers'
 import { fetchProfileData } from './social'
 import { isAddress } from '../utils'
+import { DocumentNode } from 'graphql'
 
 interface DelegateResponse {
   data: {
@@ -39,22 +40,21 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
     })
 }
 
-export async function fetchDelegates(
+interface DelegateQuery {
+  query: DocumentNode
+  variables?: { list: false | string[] | undefined }
+  fetchPolicy: string
+}
+
+async function fetchDelegatesFromClient(
   client: any,
   library: Web3Provider,
   allIdentities: Identities,
-  filter?: boolean
+  query: DelegateQuery
 ): Promise<DelegateData[] | null> {
-  const mapping = allIdentities && Object.keys(allIdentities)?.map(a => a.toLocaleLowerCase())
   try {
     return client
-      .query({
-        query: filter && allIdentities ? DELEGATES_FROM_LIST : TOP_DELEGATES,
-        variables: {
-          list: filter && allIdentities && mapping
-        },
-        fetchPolicy: 'cache-first'
-      })
+      .query(query)
       .then(async (res: DelegateResponse) => {
         // check if account is EOA or not
         const typed = await Promise.all(
@@ -62,8 +62,7 @@ export async function fetchDelegates(
             return library?.getCode(d.id)
           })
         )
-
-        // for each handle attestation - verify which ones are legit,
+        // for each handle - get twitter profile data ,
         const handles = await Promise.all(
           res.data.delegates.map(async (a: DelegateData) => {
             const checksummed = isAddress(a.id)
@@ -76,7 +75,6 @@ export async function fetchDelegates(
             }
           })
         )
-
         return res.data.delegates.map((d, i) => {
           return {
             ...d,
@@ -93,6 +91,35 @@ export async function fetchDelegates(
   } catch (e) {
     return Promise.reject('Unable to fetch delegates')
   }
+}
+
+export async function fetchTopDelegates(
+  client: any,
+  library: Web3Provider,
+  allIdentities: Identities
+): Promise<DelegateData[] | null> {
+  return fetchDelegatesFromClient(client, library, allIdentities, {
+    query: TOP_DELEGATES,
+    fetchPolicy: 'cache-first'
+  })
+}
+
+/**
+ * Used for filtering on verified entries only
+ */
+export async function fetchVerifiedDelegates(
+  client: any,
+  library: Web3Provider,
+  allIdentities: Identities
+): Promise<DelegateData[] | null> {
+  return fetchDelegatesFromClient(client, library, allIdentities, {
+    query: DELEGATES_FROM_LIST,
+    variables: {
+      // filter on address - graph needs lowercase
+      list: allIdentities && Object.keys(allIdentities)?.map(a => a.toLocaleLowerCase())
+    },
+    fetchPolicy: 'cache-first'
+  })
 }
 
 /**

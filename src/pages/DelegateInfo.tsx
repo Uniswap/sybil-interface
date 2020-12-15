@@ -121,7 +121,7 @@ function DelegateInfo({
 
   // get gov token balance
   const govToken: Token | undefined = useGovernanceToken()
-  const govTokenBalance = useTokenBalance(delegateAddress, govToken)
+  const delegateTokenBalance = useTokenBalance(delegateAddress, govToken)
 
   // get social data from Sybil list
   const identityInfo = useIdentityInfo(delegateAddress)
@@ -133,7 +133,8 @@ function DelegateInfo({
   const [prefilledDelegate, setPrefilledDelegate] = useState<string | undefined>()
 
   // detect if they can delegate
-  const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
+  const userTokenBalance = useTokenBalance(account ?? undefined, govToken)
+  const showDelegateButton = Boolean(userTokenBalance && JSBI.greaterThan(userTokenBalance.raw, BIG_INT_ZERO))
 
   // mainnet only
   if (chainId && chainId !== ChainId.MAINNET) {
@@ -224,7 +225,9 @@ function DelegateInfo({
               <DataRow>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
-                  <ResponsiveDataText>{govTokenBalance ? govTokenBalance?.toFixed(0) : <Loader />}</ResponsiveDataText>
+                  <ResponsiveDataText>
+                    {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
+                  </ResponsiveDataText>
                 </AutoColumn>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">Votes</TYPE.main>

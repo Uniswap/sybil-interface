@@ -6,11 +6,12 @@ import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress, isAddress } from '../../utils'
 import {
-  DelegateData,
   useActiveProtocol,
   useGlobalData,
   useGovernanceToken,
-  useFilterActive
+  useFilterActive,
+  useTopDelegates,
+  useVerifiedDelegates
 } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton } from './styled'
 import { GreyCard } from '../Card'
@@ -80,8 +81,14 @@ const VoteText = styled(NoWrap)`
   `};
 `
 
-export default function DelegateList({ topDelegates }: { topDelegates: DelegateData[] | undefined }) {
+export default function DelegateList() {
   const { chainId, account } = useActiveWeb3React()
+
+  // get delegate lists, filter if active
+  const [topDelegates] = useTopDelegates()
+  const [verifiedDelegates] = useVerifiedDelegates()
+  const [filterActive] = useFilterActive()
+  const filteredDelegates = filterActive ? verifiedDelegates : topDelegates
 
   // toggle for showing delegation modal with prefilled delegate
   const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
@@ -107,10 +114,10 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   const [allIdentities] = useAllIdentities()
 
   const manualEntries =
-    filter && allIdentities && topDelegates
+    filter && allIdentities && filteredDelegates
       ? Object.keys(allIdentities)
           .filter(address => {
-            const found = topDelegates.find(d => isAddress(d.id) === isAddress(address))
+            const found = filteredDelegates.find(d => isAddress(d.id) === isAddress(address))
             return !found
           })
           .map((address: any) => {
@@ -135,8 +142,8 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
   })
 
   const delegateList = useMemo(() => {
-    return chainId && topDelegates && activeProtocol
-      ? topDelegates.concat(formattedManualDelegates).map((d, i) => {
+    return chainId && filteredDelegates && activeProtocol
+      ? filteredDelegates.concat(formattedManualDelegates).map((d, i) => {
           const formattedAddress = isAddress(d.id)
           return (
             <DataRow key={d.id}>
@@ -203,7 +210,7 @@ export default function DelegateList({ topDelegates }: { topDelegates: DelegateD
     names,
     showDelegateButton,
     toggelDelegateModal,
-    topDelegates
+    filteredDelegates
   ])
 
   return (
