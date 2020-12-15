@@ -1,7 +1,7 @@
 import { JSBI, Percent } from '@uniswap/sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
-import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
+import { fortmatic, injected, portis, walletconnect } from '../connectors'
 
 export const SYBIL_ADDRESS = '0xa71330402Fcb7290D026F1dbB727d367E50EABF7'
 
