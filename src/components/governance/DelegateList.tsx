@@ -81,6 +81,10 @@ const VoteText = styled(NoWrap)`
   `};
 `
 
+const FixedRankWidth = styled.div`
+  width: 20px;
+`
+
 export default function DelegateList() {
   const { chainId, account } = useActiveWeb3React()
 
@@ -149,7 +153,9 @@ export default function DelegateList() {
             <DataRow key={d.id}>
               <AutoRow gap="10px">
                 <OnlyAboveSmall>
-                  <NoWrap>{i + 1}</NoWrap>
+                  <FixedRankWidth>
+                    <NoWrap>{i + 1}</NoWrap>
+                  </FixedRankWidth>
                 </OnlyAboveSmall>
                 <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
                   <AccountLinkGroup gap="10px" width="initial">
@@ -159,7 +165,7 @@ export default function DelegateList() {
                           <img src={d.imageURL} alt="profile" />
                         </RoundedProfileImage>
                       ) : (
-                        <WrappedListLogo src={EmptyProfile} />
+                        <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
                       )}
                     </OnlyAboveSmall>
                     <FixedAddressSize gap="6px">
