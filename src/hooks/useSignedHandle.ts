@@ -6,14 +6,25 @@ import { useActiveWeb3React } from '.'
 // return setter function to reset signature if needed
 export function useSignedHandle(
   twitterHandle: string | undefined
-): { sig: string | undefined; signMessage: () => void; setSig: Dispatch<SetStateAction<string | undefined>> } {
+): {
+  sig: string | undefined
+  signMessage: () => void
+  setSig: Dispatch<SetStateAction<string | undefined>>
+  error: string | undefined
+} {
   // get signer and account to sign data with
   const { library, account } = useActiveWeb3React()
 
   // store and set signature
   const [sig, setSig] = useState<string | undefined>()
 
+  // mark errors
+  const [error, setError] = useState<string | undefined>()
+
   const signMessage = useCallback(() => {
+    // reset error
+    setError(undefined)
+
     if (!library && account) {
       return
     }
@@ -50,25 +61,13 @@ export function useSignedHandle(
         ?.send('personal_sign', ['0x' + message, account])
         .catch(error => {
           console.log(error)
+          setError('Error signing message')
         })
         .then(sig => {
           setSig(sig)
         })
     }
-
-    // new Buffer(data).toString('hex')
-
-    // if (account && library) {
-    //   library
-    //     .getSigner(account)
-    //     .signMessage(new Buffer(data).toString('hex'))
-    //     .then(sig => {
-    //       setSig(sig)
-    //       window.alert(sig)
-    //     })
-    //     .catch(error => console.log(error))
-    // }
   }, [account, library, twitterHandle])
 
-  return { sig, signMessage, setSig }
+  return { sig, signMessage, setSig, error }
 }

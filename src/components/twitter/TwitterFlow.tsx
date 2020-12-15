@@ -43,7 +43,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const [allIndentities, setAllIdentities] = useAllIdentities()
 
   // monitor if user has signed message, reset if back arrow clicked
-  const { sig, signMessage, setSig } = useSignedHandle(twitterHandle)
+  const { sig, signMessage, setSig, error: sigError } = useSignedHandle(twitterHandle)
 
   // monitor verification attempt
   const { verifyCallback } = useVerifyCallback(tweetID)
@@ -170,6 +170,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           </TYPE.black>
           <TwitterAccountPreview />
           <ButtonPrimary onClick={signMessage}>Sign</ButtonPrimary>
+          {sigError && <TYPE.error error={true}>{sigError}</TYPE.error>}
         </AutoColumn>
       ) : !tweetID ? (
         <AutoColumn gap="lg">
