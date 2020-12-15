@@ -3,7 +3,7 @@
 [![Styled With Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
 - Interface: [https://sybil.org](https://sybil.org)
-- Read the Sybil announcement post: [link to post]()
+- Read the Sybil announcement post: [https://uniswap.org/blog/sybil/](https://uniswap.org/blog/sybil/)
 - Sybil list documentation: [https://github.com/Uniswap/sybil-list](https://github.com/Uniswap/sybil-list)
 
 Sybil is a governance tool for discovering delegates. Sybil maps on-chain addresses to digital identities to maintain a list of delegates. This interface displays governance data for supported protocols, and also allows users to link social profiles with their Ethereum addresses. 
