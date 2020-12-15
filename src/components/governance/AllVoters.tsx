@@ -28,6 +28,7 @@ const StyledDataCard = styled(DataCard)`
 export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
   padding: 1rem;
   z-index: 1;
+  height: fit-content;
   opacity: ${({ disabled }) => disabled && '0.4'};
 `
 
