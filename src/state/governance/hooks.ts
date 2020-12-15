@@ -470,7 +470,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
         ?.query({
           query: DELEGATE_INFO,
           variables: {
-            address
+            address: address?.toLocaleLowerCase()
           }
         })
         .then((res: DelegateInfoRes) => {
