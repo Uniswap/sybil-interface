@@ -93,34 +93,38 @@ export function useGlobalData(): GlobaData | undefined {
 }
 
 export function useTopDelegates(): [DelegateData[] | undefined, (topDelegates: DelegateData[] | undefined) => void] {
+  const [activeProtocol] = useActiveProtocol()
+
   const dispatch = useDispatch<AppDispatch>()
-  const topDelegates = useSelector<AppState, AppState['governance']['topDelegates']>(state => {
+  const delegates = useSelector<AppState, AppState['governance']['topDelegates']>(state => {
     return state.governance.topDelegates
   })
   const setTopDelegates = useCallback(
     (topDelegates: DelegateData[] | undefined) => {
-      dispatch(updateTopDelegates({ topDelegates }))
+      activeProtocol && dispatch(updateTopDelegates({ protocolID: activeProtocol?.id, topDelegates }))
     },
-    [dispatch]
+    [activeProtocol, dispatch]
   )
-  return [topDelegates, setTopDelegates]
+  return [activeProtocol ? delegates?.[activeProtocol.id] : undefined, setTopDelegates]
 }
 
 export function useVerifiedDelegates(): [
   DelegateData[] | undefined,
   (verifiedDelegates: DelegateData[] | undefined) => void
 ] {
+  const [activeProtocol] = useActiveProtocol()
+
   const dispatch = useDispatch<AppDispatch>()
-  const verifiedDelegates = useSelector<AppState, AppState['governance']['verifiedDelegates']>(state => {
+  const delegates = useSelector<AppState, AppState['governance']['verifiedDelegates']>(state => {
     return state.governance.verifiedDelegates
   })
   const setVerifiedDelegates = useCallback(
     (verifiedDelegates: DelegateData[] | undefined) => {
-      dispatch(updateVerifiedDelegates({ verifiedDelegates }))
+      activeProtocol && dispatch(updateVerifiedDelegates({ protocolID: activeProtocol?.id, verifiedDelegates }))
     },
-    [dispatch]
+    [activeProtocol, dispatch]
   )
-  return [verifiedDelegates, setVerifiedDelegates]
+  return [activeProtocol ? delegates?.[activeProtocol.id] : undefined, setVerifiedDelegates]
 }
 
 interface ProposalDetail {

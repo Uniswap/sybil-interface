@@ -47,7 +47,6 @@ export function useSignedHandle(
         console.log(error)
       })
       .then(sig => {
-        console.log(sig)
         setSig(sig)
       })
   }, [account, library, twitterHandle])

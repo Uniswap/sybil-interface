@@ -66,17 +66,20 @@ export interface GovernanceState {
   filterActive: boolean
 
   // top delegates based on votes
-  topDelegates: DelegateData[] | undefined
-
+  topDelegates: {
+    [protocolID: string]: DelegateData[] | undefined
+  }
   // only delegates with verified usernames
-  verifiedDelegates: DelegateData[] | undefined
+  verifiedDelegates: {
+    [protocolID: string]: DelegateData[] | undefined
+  }
 }
 
 export const initialState: GovernanceState = {
   activeProtocol: undefined,
   filterActive: false,
-  topDelegates: undefined,
-  verifiedDelegates: undefined
+  topDelegates: {},
+  verifiedDelegates: {}
 }
 
 export default createReducer(initialState, builder =>
@@ -88,9 +91,9 @@ export default createReducer(initialState, builder =>
       state.filterActive = action.payload.filterActive
     })
     .addCase(updateTopDelegates, (state, action) => {
-      state.topDelegates = action.payload.topDelegates
+      state.topDelegates[action.payload.protocolID] = action.payload.topDelegates
     })
     .addCase(updateVerifiedDelegates, (state, action) => {
-      state.verifiedDelegates = action.payload.verifiedDelegates
+      state.verifiedDelegates[action.payload.protocolID] = action.payload.verifiedDelegates
     })
 )
