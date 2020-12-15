@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Row, { RowBetween, RowFixed } from '../Row'
 import styled from 'styled-components'
+import ReactGA from 'react-ga'
 import { AutoColumn } from '../Column'
 import { TYPE, ExternalLink } from '../../theme'
 import { useTwitterProfileData, useVerifiedHandle } from '../../state/social/hooks'
@@ -119,7 +120,16 @@ export default function TwitterAccountDetails() {
         !twitterAccount ? (
           <TwitterLoginButton text="Announce yourself as a delegate" />
         ) : (
-          <TwitterButton onClick={() => setShowTwitterFlow(true)}>
+          <TwitterButton
+            onClick={() => {
+              ReactGA.event({
+                category: 'Social',
+                action: 'Start Link',
+                label: 'Not linked'
+              })
+              setShowTwitterFlow(true)
+            }}
+          >
             <RowBetween>
               <TYPE.white fontSize="14px">Announce yourself as a delegate</TYPE.white>
               <TwitterLogo src={TwitterIcon} />

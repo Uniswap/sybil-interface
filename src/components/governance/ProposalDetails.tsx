@@ -136,7 +136,11 @@ function ProposalDetails({
         <GreyCard padding="0">
           <ProposalInfo gap="lg" justify="start">
             <RowBetween style={{ width: '100%' }}>
-              <ArrowWrapper onClick={() => history.goBack()}>
+              <ArrowWrapper
+                onClick={() => {
+                  history?.length === 2 ? history.push('/') : history.goBack()
+                }}
+              >
                 <ArrowLeft size={20} /> Back
               </ArrowWrapper>
               {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}

@@ -138,8 +138,14 @@ function DelegateInfo({
 
   // mainnet only
   if (chainId && chainId !== ChainId.MAINNET) {
-    return <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
+    return (
+      <BodyWrapper>
+        <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
+      </BodyWrapper>
+    )
   }
+
+  console.log(history)
 
   return (
     <BodyWrapper>
@@ -156,7 +162,11 @@ function DelegateInfo({
         {delegateAddress && chainId ? (
           <AutoColumn gap="md">
             <RowBetween style={{ width: '100%' }}>
-              <ArrowWrapper onClick={() => history.goBack()}>
+              <ArrowWrapper
+                onClick={() => {
+                  history?.length === 2 ? history.push('/') : history.goBack()
+                }}
+              >
                 <ArrowLeft size={20} /> Back
               </ArrowWrapper>
             </RowBetween>
