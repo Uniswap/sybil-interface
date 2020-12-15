@@ -178,16 +178,18 @@ export default function DelegateList() {
                     </FixedAddressSize>
                   </AccountLinkGroup>
                 </BlankInternalLink>
-                <DelegateButton
-                  width="fit-content"
-                  disabled={!showDelegateButton}
-                  onClick={() => {
-                    setPrefilledDelegate(d.id)
-                    toggelDelegateModal()
-                  }}
-                >
-                  Delegate
-                </DelegateButton>
+                <OnlyAboveSmall>
+                  <DelegateButton
+                    width="fit-content"
+                    disabled={!showDelegateButton}
+                    onClick={() => {
+                      setPrefilledDelegate(d.id)
+                      toggelDelegateModal()
+                    }}
+                  >
+                    Delegate
+                  </DelegateButton>
+                </OnlyAboveSmall>
               </AutoRow>
               <OnlyAboveLarge>
                 <NoWrap textAlign="end">{d.votes.length}</NoWrap>
