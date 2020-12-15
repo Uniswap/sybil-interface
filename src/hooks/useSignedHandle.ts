@@ -1,7 +1,7 @@
 import { useState, useCallback, Dispatch, SetStateAction } from 'react'
 import { useActiveWeb3React } from '.'
 
-// sign handle based on EIP-712
+// sign handle based on data format from EIP-712
 // based on twitter handle, return signature and message signing function
 // return setter function to reset signature if needed
 export function useSignedHandle(
@@ -14,7 +14,7 @@ export function useSignedHandle(
   const [sig, setSig] = useState<string | undefined>()
 
   const signMessage = useCallback(() => {
-    if (!library && account && account !== null) {
+    if (!library && account) {
       return
     }
     const EIP712Domain = [
@@ -37,17 +37,19 @@ export function useSignedHandle(
       message
     })
 
-    if (account !== null) {
-      library
-        ?.getSigner(account)
-        .signMessage(data)
-        .then(sig => {
-          setSig(sig)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    }
+    /**
+     * Need to use personal_sign as eth typed data is not
+     * supported by most hardware wallets yet.
+     */
+    library
+      ?.send('personal_sign', [account, data])
+      .catch(error => {
+        console.log(error)
+      })
+      .then(sig => {
+        console.log(sig)
+        setSig(sig)
+      })
   }, [account, library, twitterHandle])
 
   return { sig, signMessage, setSig }
