@@ -15,12 +15,10 @@ export const WrappedListLogo = styled.img`
 
 export const RoundedProfileImage = styled.div`
   display: flex;
-  align-items; 
   justify-content: center;
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  
 
   & > img {
     height: 100%;

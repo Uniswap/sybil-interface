@@ -8,7 +8,7 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import Toggle from '../Toggle'
 
 const TabOption = styled.button<{ selected?: boolean }>`
-  padding: 6px;
+  padding: 6px 12px;
   border-radius: 12px;
   outline: none;
   border: none;
@@ -38,7 +38,7 @@ function Tabs({ location }: RouteComponentProps<{ location: string }>) {
   return (
     <GreyCard backgroundColor={activeProtocol?.secondaryColor}>
       <RowBetween>
-        <AutoRow gap="10px" width="fit-content">
+        <AutoRow gap="8px" width="fit-content">
           <TabOption
             as={Link}
             to={'/delegates/' + activeProtocol?.id}

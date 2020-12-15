@@ -13,16 +13,17 @@ import { TokenAmount, Token, ChainId, JSBI } from '@uniswap/sdk'
 import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../constants'
 import { GreyCard } from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { TYPE, ExternalLink } from '../../theme'
-import { ButtonBasic, ButtonGray, ButtonBlue } from '../../components/Button'
+import { TYPE, ExternalLink, BlankInternalLink } from '../../theme'
+import { ButtonBasic, ButtonGray, ButtonBlue, ButtonSecondary } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
-import { Settings } from 'react-feather'
+import { Settings, CornerDownRight, Type } from 'react-feather'
 import TwitterAccountDetails from '../../components/twitter/TwitterAccountDetails'
 import Loader from '../../components/Loader'
 import QuestionHelper from '../../components/QuestionHelper'
 import { useAllTransactions, isTransactionRecent } from '../../state/transactions/hooks'
 import { newTransactionsFirst } from '../../components/Web3Status'
 import { LoadingFlag } from '../../theme/components'
+import { isMobile } from 'react-device-detect'
 
 const SectionWrapper = styled.div`
   display: grid;
@@ -43,8 +44,48 @@ const EmptyCircle = styled.div`
 `
 
 const AccountCard = styled(GreyCard)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  z-index: 2;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 12px;
+  `};
+`
+
+const Votes = styled(GreyCard)`
   padding-top: 56px;
-  margin-top: -48px;
+  margin-top: -56px;
+  background-color: ${({ theme }) => theme.bg3};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+
+    gap: 12px;
+  `};
+`
+
+const VoteCount = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  color: #000;
+  background-color: white;
+  background: #ffffff;
+  border-radius: 12px;
+  flex-grow: 1;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex-grow: 0;
+  `};
 `
 
 const StyledSettings = styled(Settings)`
@@ -61,39 +102,8 @@ const StyledSettings = styled(Settings)`
 const UpdateButton = styled(ButtonGray)`
   font-size: 12px;
   width: fit-content;
-  padding: 4px;
-`
-
-const ResponsiveRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
-  padding: 0;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex-direction: column;
-    justify-content: flex-start;
-  `};
-`
-
-const MobilePadding = styled.div`
-  padding: 0;
-  display: flex;
-  width: 100%;
-  justify-content: flex-end;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    padding-top: 1rem;
-    justify-content: flex-start;
-  `};
-`
-
-const MobileColumn = styled(AutoColumn)`
-  justify-items: flex-end;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    justify-items: flex-start;
-  `};
+  padding: 4px 6px;
+  border-radius: 8px;
 `
 
 const FixedWidthAtSmall = styled(AutoColumn)`
@@ -147,27 +157,29 @@ export default function Overview() {
   return (
     <BodyWrapper>
       <SectionWrapper>
-        <AutoColumn gap="1rem">
-          <Dropdown />
+        <Dropdown />
+        {!account && (
           <AccountCard>
-            {!account ? (
-              <RowBetween>
-                <RowFixed>
-                  <EmptyCircle />
-                  <FixedWidthAtSmall gap="10px">
-                    <TYPE.main fontSize="20px">Your Address</TYPE.main>
-                    <TYPE.main fontSize="12px">Connect wallet to sign in or announce yourself as a delegate.</TYPE.main>
-                  </FixedWidthAtSmall>
-                </RowFixed>
-                <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-                  <ButtonText>Connect wallet</ButtonText>
-                </ButtonBasic>
-              </RowBetween>
-            ) : (
-              <ResponsiveRow>
-                <AutoColumn gap="md">
-                  {account && chainId && (
-                    <RowFixed style={{ width: 'fit-content' }}>
+            <RowFixed>
+              <EmptyCircle />
+              <FixedWidthAtSmall gap="10px">
+                <TYPE.main fontSize="20px">Your Address</TYPE.main>
+                <TYPE.main fontSize="12px">Connect wallet to sign in or announce yourself as a delegate.</TYPE.main>
+              </FixedWidthAtSmall>
+            </RowFixed>
+            <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
+              <ButtonText>Connect wallet</ButtonText>
+            </ButtonBasic>
+          </AccountCard>
+        )}
+        {account && (
+          <>
+            <AccountCard>
+              {account && chainId && (
+                <RowFixed style={{ width: 'fit-content' }}>
+                  <AutoColumn gap="sm">
+                    <TYPE.subHeader>Your delegate address</TYPE.subHeader>
+                    <RowFixed>
                       <ExternalLink href={getEtherscanLink(chainId, account, 'address')}>
                         <TYPE.mediumHeader mr="10px" color={theme.text1}>
                           {ensName ?? shortenAddress(account)}
@@ -180,53 +192,83 @@ export default function Overview() {
                         </LoadingFlag>
                       )}
                     </RowFixed>
-                  )}
-                  <TwitterAccountDetails />
-                </AutoColumn>
-                <MobilePadding>
-                  <MobileColumn gap="md">
-                    {!govTokenBalance && <Loader />}
-                    {voteCount && chainId === ChainId.MAINNET && (
-                      <RowFixed>
-                        <TYPE.mediumHeader>{voteCount.toSignificant(3)} votes</TYPE.mediumHeader>
-                        {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
-                          <QuestionHelper
-                            text={`Hold ${activeProtocol?.token.symbol} to be be able to self-delegate or delegate to others.`}
-                          />
-                        )}
-                      </RowFixed>
+                    {userDelegatee === ZERO_ADDRESS && govTokenBalance && (
+                      <TYPE.error fontSize={14} error={true}>
+                        Your votes are curently inactive.
+                      </TYPE.error>
                     )}
-                    {userDelegatee &&
-                      (userDelegatee === ZERO_ADDRESS &&
+                  </AutoColumn>
+                </RowFixed>
+              )}
+              <TwitterAccountDetails />
+            </AccountCard>
+            <Votes>
+              {!govTokenBalance && <Loader />}
+              {voteCount && chainId === ChainId.MAINNET && (
+                <VoteCount>
+                  <TYPE.black>
+                    <b>{voteCount.toSignificant(3)}</b> {!isMobile && 'votes'}
+                  </TYPE.black>
+                  {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
+                    <QuestionHelper
+                      text={`Hold ${activeProtocol?.token.symbol} to be be able to self-delegate or delegate to others.`}
+                    />
+                  )}
+                </VoteCount>
+              )}
+              {govTokenBalance && (
+                <span style={{ margin: '0 12px', width: 20, height: 20 }}>
+                  <CornerDownRight size={20} />
+                </span>
+              )}
+              {userDelegatee &&
+                (userDelegatee === ZERO_ADDRESS &&
+                govTokenBalance &&
+                JSBI.notEqual(BIG_INT_ZERO, govTokenBalance.raw) ? (
+                  <ButtonSecondary
+                    style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                    onClick={() => toggelDelegateModal()}
+                  >
+                    Delegate votes
+                  </ButtonSecondary>
+                ) : (
+                  <VoteCount>
+                    {userDelegatee === ZERO_ADDRESS && 'No votes to delegate'}
+                    {userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? (
+                      <RowFixed>
+                        {!isMobile && <TYPE.main mr="4px">Delegated to:</TYPE.main>}
+                        <BlankInternalLink to={activeProtocol?.id + '/' + userDelegatee}>
+                          <TYPE.blue mr="4px">{shortenAddress(userDelegatee)}</TYPE.blue>
+                        </BlankInternalLink>
+                        <UpdateButton onClick={() => toggelDelegateModal()}>
+                          {!isMobile ? 'change' : 'edit'}
+                        </UpdateButton>
+                      </RowFixed>
+                    ) : userDelegatee === ZERO_ADDRESS &&
                       govTokenBalance &&
                       JSBI.notEqual(BIG_INT_ZERO, govTokenBalance.raw) ? (
-                        <ButtonBlue onClick={() => toggelDelegateModal()}>Delegate</ButtonBlue>
-                      ) : (
-                        <RowFixed height="38px" style={{ display: 'flex' }}>
-                          {userDelegatee !== account && userDelegatee !== ZERO_ADDRESS ? (
-                            <RowFixed>
-                              <TYPE.main mr="4px">Delegated to: </TYPE.main>
-                              <ExternalLink
-                                style={{ margin: '0 6px' }}
-                                href={getEtherscanLink(ChainId.MAINNET, userDelegatee, 'address')}
-                              >
-                                {shortenAddress(userDelegatee)}
-                              </ExternalLink>
-                            </RowFixed>
-                          ) : (
-                            userDelegatee === account && <TYPE.main mr="8px">Self delegated</TYPE.main>
-                          )}
+                      <ButtonBlue
+                        style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                        onClick={() => toggelDelegateModal()}
+                      >
+                        Choose Delegate
+                      </ButtonBlue>
+                    ) : (
+                      userDelegatee === account && (
+                        <>
+                          {!isMobile && <TYPE.main mr="4px">Delegated to:</TYPE.main>}
+                          <TYPE.black mr="8px">Self</TYPE.black>{' '}
                           {govTokenBalance && JSBI.notEqual(BIG_INT_ZERO, govTokenBalance?.raw) && (
-                            <UpdateButton onClick={() => toggelDelegateModal()}>Update</UpdateButton>
+                            <UpdateButton onClick={() => toggelDelegateModal()}>Change</UpdateButton>
                           )}
-                        </RowFixed>
-                      ))}
-                  </MobileColumn>
-                </MobilePadding>
-              </ResponsiveRow>
-            )}
-          </AccountCard>
-        </AutoColumn>
+                        </>
+                      )
+                    )}
+                  </VoteCount>
+                ))}
+            </Votes>
+          </>
+        )}
       </SectionWrapper>
     </BodyWrapper>
   )

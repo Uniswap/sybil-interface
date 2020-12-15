@@ -4,7 +4,7 @@ import { RowBetween, RowFixed } from '../Row'
 import { TYPE, ExternalLink, BlankInternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
-import { Book, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
+import { GitHub, Code, HelpCircle, ChevronLeft, X } from 'react-feather'
 import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
 import Logo from '../../assets/images/sybil_logo.png'
@@ -22,6 +22,8 @@ const Wrapper = styled.div<{ open: boolean }>`
   align-items: ${({ open }) => (open ? 'unset' : 'center')};
   background: url(${MenuBG});
   background-size: cover;
+  border-right: 1px solid #efefef;
+  transition: width 0.1s linear;
 
   overflow: auto;
 
@@ -89,7 +91,7 @@ export default function SideMenu() {
             </RowFixed>
           </BlankInternalLink>
           <ExternalLink href="https://github.com/Uniswap/sybil-list">
-            <Book style={{ stroke: 'black' }} />
+            <GitHub size={20} style={{ stroke: 'black' }} />
           </ExternalLink>
         </RowBetween>
       </MobileHeader>
@@ -104,10 +106,12 @@ export default function SideMenu() {
         )}
         {open && !faqOpen && (
           <RowBetween>
-            <RowFixed style={{ gap: '8px' }}>
-              <SybilLogo />
-              <SybilWorkmark>sybil</SybilWorkmark>
-            </RowFixed>
+            <BlankInternalLink style={{ color: '#08052C' }} to="/">
+              <RowFixed style={{ gap: '8px' }}>
+                <SybilLogo />
+                <SybilWorkmark>sybil</SybilWorkmark>
+              </RowFixed>
+            </BlankInternalLink>
             <ButtonBasic
               onClick={() => closeBoth()}
               style={{ cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.4)', color: '#000' }}
@@ -128,7 +132,11 @@ export default function SideMenu() {
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
                 Currently, we support Compound and Uniswap governance. Feel free to
-                <ExternalLink href="https://github.com/Uniswap/sybil-interface"> add others</ExternalLink>.
+                <ExternalLink href="https://github.com/Uniswap/sybil-interface#adding-protocol-support">
+                  {' '}
+                  add others
+                </ExternalLink>
+                .
               </TYPE.black>
             </AutoColumn>
             <AutoColumn gap="1rem">
@@ -137,8 +145,8 @@ export default function SideMenu() {
                 href="https://github.com/Uniswap/sybil-list"
                 style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
               >
-                <Book size={20} />
-                <TYPE.black style={{ lineHeight: '125%', fontWeight: 500 }}>Sybil Documentation</TYPE.black>
+                <GitHub size={20} />
+                <TYPE.black style={{ lineHeight: '125%', fontWeight: 500 }}> Documentation</TYPE.black>
               </ButtonBasic>
               <ButtonBasic
                 onClick={() => setfaqOpen(!faqOpen)}
@@ -165,15 +173,15 @@ export default function SideMenu() {
           </AutoColumn>
         ) : !faqOpen ? (
           <AutoColumn gap="1rem" style={{ justifySelf: 'flex-end', marginTop: '1rem' }}>
-            <Code />
-            <Book />
-            <HelpCircle />
+            <Code size={20} />
+            <GitHub size={20} />
+            <HelpCircle size={20} />
           </AutoColumn>
         ) : (
           <RowBetween>
             <ButtonBasic
               onClick={() => setfaqOpen(!faqOpen)}
-              href="https://github.com/Uniswap/sybil-list"
+              href="https://GitHub.com/Uniswap/sybil-list"
               style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
             >
               <HelpCircle size={20} />
@@ -202,8 +210,11 @@ export default function SideMenu() {
               <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
               <TYPE.main>
                 At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
-                authentication methods. We are planning to add GitHub soon and feel free to suggest others in our repo
-                [link to github issues page].
+                authentication methods. We are planning to add GitHub soon and feel free to suggest others in our&nbsp;
+                <ExternalLink href="https://github.com/Uniswap/sybil-interface#adding-protocol-support">
+                  repo
+                </ExternalLink>
+                .
               </TYPE.main>
             </AutoColumn>
             <AutoColumn gap="0.5rem">

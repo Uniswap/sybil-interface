@@ -42,7 +42,7 @@ const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 132px 100px 140px;
   grid-column-gap: 1rem;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 
   margin: 6px 0;
   border-left: 3px solid transparent;
@@ -83,6 +83,8 @@ const VoteText = styled(NoWrap)`
 
 const FixedRankWidth = styled.div`
   width: 20px;
+  text-align: right;
+  margin-right: 12px;
 `
 
 export default function DelegateList() {
@@ -169,11 +171,15 @@ export default function DelegateList() {
                       )}
                     </OnlyAboveSmall>
                     <FixedAddressSize gap="6px">
-                      <TYPE.black>{(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(d.id)}</TYPE.black>
+                      <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>
+                        {(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(d.id)}
+                      </TYPE.black>
                       {d.handle ? (
                         <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                       ) : (
-                        <TYPE.black fontSize="12px">{d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}</TYPE.black>
+                        <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
+                          {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
+                        </TYPE.black>
                       )}
                     </FixedAddressSize>
                   </AccountLinkGroup>
@@ -222,7 +228,7 @@ export default function DelegateList() {
   ])
 
   return (
-    <GreyCard padding="2rem 0">
+    <GreyCard padding="1rem 0">
       <DelegateModal
         isOpen={showDelegateModal}
         onDismiss={() => {

@@ -16,7 +16,7 @@ const Wrapper = styled.div<{ backgroundColor?: string; open: boolean }>`
   padding: 1rem;
   border-radius: 20px;
   background-color: ${({ backgroundColor }) => backgroundColor ?? 'white'};
-  z-index: 2;
+  z-index: 3;
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '20px')};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '20px')}
   :hover {
@@ -37,6 +37,7 @@ const Flyout = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
   box-shadow: 0 10px 34px rgb(236 236 236 / 16%), 0 5px 6px rgb(140 140 140 / 23%);
   background-color: white;
   text-decoration: none;
+  z-index: 3;
 `
 
 export default function Dropdown() {
