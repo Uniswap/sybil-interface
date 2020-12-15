@@ -176,15 +176,19 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
     if (!handle) {
       setFormattedData(undefined)
     } else {
-      fetchProfileData(handle).then((profileData: ProfileDataResponse | null) => {
-        if (profileData?.data) {
-          setFormattedData({
-            name: profileData.data.name,
-            handle: profileData.data.username,
-            profileURL: profileData.data.profile_image_url
-          })
-        }
-      })
+      fetchProfileData(handle)
+        .then((profileData: ProfileDataResponse | null) => {
+          if (profileData?.data) {
+            setFormattedData({
+              name: profileData.data.name,
+              handle: profileData.data.username,
+              profileURL: profileData.data.profile_image_url
+            })
+          }
+        })
+        .catch(() => {
+          console.log('Error fetching profile data')
+        })
     }
   }, [handle])
 
@@ -206,16 +210,25 @@ export function useMultipleTwitterProfileDatas(
       // for each handle attestation - verify which ones are legit,
       Promise.all(
         handles.map(async (handle: string) => {
-          const profileData = handle ? await fetchProfileData(handle) : undefined
-          return {
-            account: '',
-            handle,
-            profileURL: profileData?.data?.profile_image_url
+          if (handle) {
+            return fetchProfileData(handle)
+              .then(profileData => {
+                return {
+                  account: '',
+                  handle,
+                  profileURL: profileData?.data?.profile_image_url
+                }
+              })
+              .catch(() => undefined)
+          } else {
+            return undefined
           }
         })
-      ).then(handlesData => {
-        setFormattedData(Object.assign({}, ...handlesData.map(key => ({ [key.handle]: key }))))
-      })
+      )
+        .then(handlesData => {
+          setFormattedData(Object.assign({}, ...handlesData.map(key => key && { [key.handle]: key })))
+        })
+        .catch(() => undefined)
     }
 
     // only fetch if valid list of handles
@@ -240,24 +253,29 @@ export function useTweetWatcher(
   useEffect(() => {
     const timer = setTimeout(() => {
       if (twitterHandle && watch) {
-        fetchLatestTweet(twitterHandle).then((res: LatestTweetResponse | null) => {
-          if (res?.data[0]) {
-            const tweetData = res?.data?.[0]
-            // check that tweet contains correct data
-            const passedRegex = sig && tweetData.text.includes('sig:' + sig)
-            if (passedRegex) {
-              setTweetID(tweetData.id)
-              setTweetError(undefined)
-              setWatch(false)
+        fetchLatestTweet(twitterHandle)
+          .then((res: LatestTweetResponse | null) => {
+            if (res?.data[0]) {
+              const tweetData = res?.data?.[0]
+              // check that tweet contains correct data
+              const passedRegex = sig && tweetData.text.includes('sig:' + sig)
+              if (passedRegex) {
+                setTweetID(tweetData.id)
+                setTweetError(undefined)
+                setWatch(false)
+              } else {
+                setWatch(false)
+                setTweetError('Tweet not found, try again with exact message.')
+              }
             } else {
               setWatch(false)
-              setTweetError('Tweet not found, try again with exact message.')
+              setTweetError('Tweet not found, try again.')
             }
-          } else {
+          })
+          .catch(() => {
             setWatch(false)
             setTweetError('Tweet not found, try again.')
-          }
-        })
+          })
       }
     }, POLL_DURATION_MS)
     return () => clearTimeout(timer)
