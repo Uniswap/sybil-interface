@@ -138,7 +138,7 @@ function ProposalDetails({
             <RowBetween style={{ width: '100%' }}>
               <ArrowWrapper
                 onClick={() => {
-                  history?.length === 2 ? history.push('/') : history.goBack()
+                  history?.length === 1 ? history.push('/') : history.goBack()
                 }}
               >
                 <ArrowLeft size={20} /> Back
