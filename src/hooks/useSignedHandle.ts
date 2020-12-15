@@ -41,14 +41,13 @@ export function useSignedHandle(
      * Need to use personal_sign as eth typed data is not
      * supported by most hardware wallets yet.
      */
-    library
-      ?.send('personal_sign', [account, data])
-      .catch(error => {
-        console.log(error)
-      })
-      .then(sig => {
-        setSig(sig)
-      })
+    if (account && library) {
+      library
+        .getSigner(account)
+        .signMessage(data)
+        .then(sig => setSig(sig))
+        .catch(error => console.log(error))
+    }
   }, [account, library, twitterHandle])
 
   return { sig, signMessage, setSig }
