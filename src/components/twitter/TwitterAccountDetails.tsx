@@ -65,12 +65,17 @@ const LoadingFlag = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid ${({ theme }) => theme.text3};
+  /* border: 1px solid ${({ theme }) => theme.text3}; */
+  background-color: ${({ theme }) => theme.bg3};
   color: ${({ theme }) => theme.text3};
   padding: 4px 8px;
   width: 180px;
+
   border-radius: 10px;
   font-size: 12px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+      width: 100%;
+  `};
 `
 
 const TwitterButton = styled(ButtonBasic)`
