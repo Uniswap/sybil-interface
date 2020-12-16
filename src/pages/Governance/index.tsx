@@ -12,7 +12,7 @@ import { useTokenBalance } from '../../state/wallet/hooks'
 import { TokenAmount, Token, ChainId, JSBI } from '@uniswap/sdk'
 import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../constants'
 import { GreyCard } from '../../components/Card'
-import { RowFixed } from '../../components/Row'
+import { RowFixed, RowBetween } from '../../components/Row'
 import { TYPE, ExternalLink, BlankInternalLink } from '../../theme'
 import { ButtonBasic, ButtonGray, ButtonBlue, ButtonSecondary } from '../../components/Button'
 import { shortenAddress, getEtherscanLink } from '../../utils'
@@ -159,7 +159,7 @@ export default function Overview() {
       <SectionWrapper>
         <Dropdown />
         {!account && (
-          <AccountCard>
+          <RowBetween>
             <RowFixed>
               <EmptyCircle />
               <FixedWidthAtSmall gap="10px">
@@ -170,7 +170,7 @@ export default function Overview() {
             <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
               <ButtonText>Connect wallet</ButtonText>
             </ButtonBasic>
-          </AccountCard>
+          </RowBetween>
         )}
         {account && (
           <>
