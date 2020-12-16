@@ -159,18 +159,20 @@ export default function Overview() {
       <SectionWrapper>
         <Dropdown />
         {!account && (
-          <RowBetween>
-            <RowFixed>
-              <EmptyCircle />
-              <FixedWidthAtSmall gap="10px">
-                <TYPE.main fontSize="20px">Your Address</TYPE.main>
-                <TYPE.main fontSize="12px">Connect wallet to sign in or announce yourself as a delegate.</TYPE.main>
-              </FixedWidthAtSmall>
-            </RowFixed>
-            <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-              <ButtonText>Connect wallet</ButtonText>
-            </ButtonBasic>
-          </RowBetween>
+          <GreyCard>
+            <RowBetween>
+              <RowFixed>
+                <EmptyCircle />
+                <FixedWidthAtSmall gap="10px">
+                  <TYPE.main fontSize="20px">Your Address</TYPE.main>
+                  <TYPE.main fontSize="12px">Connect wallet to sign in or announce yourself as a delegate.</TYPE.main>
+                </FixedWidthAtSmall>
+              </RowFixed>
+              <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
+                <ButtonText>Connect wallet</ButtonText>
+              </ButtonBasic>
+            </RowBetween>
+          </GreyCard>
         )}
         {account && (
           <>
