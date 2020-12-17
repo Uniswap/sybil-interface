@@ -31,9 +31,9 @@ const Wrapper = styled.div<{ open: boolean }>`
     cursor: ${({ open }) => (open ? 'unset' : 'pointer')};
   }
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  @media (max-width: 1080px) {
     display: none;
-  `};
+  }
 `
 
 const MobileHeader = styled.div`
@@ -43,9 +43,9 @@ const MobileHeader = styled.div`
   padding: 1rem;
   background: url(${MenuBG});
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  @media (max-width: 1080px) {
     display: initial;
-  `};
+  }
 `
 
 const FlippedText = styled.div`

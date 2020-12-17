@@ -31,16 +31,12 @@ const ColumnLabel = styled(TYPE.darkGray)`
 `
 
 const NoWrap = styled(TYPE.black)`
-  white-space: no-wrap;
-`
-
-const FixedAddressSize = styled(AutoColumn)`
-  // width: 180px;
+  white-space: nowrap;
 `
 
 const DataRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 132px 100px 140px;
+  grid-template-columns: 1fr 132px 100px 1fr;
   grid-column-gap: 1rem;
   padding: 0 1.5rem;
 
@@ -58,11 +54,11 @@ const DataRow = styled.div`
   }
 
   ${({ theme }) => theme.mediaWidth.upToExtraLarge`
-    grid-template-columns: 1fr 160px;
+    grid-template-columns: 1fr 1fr;
   `};
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  grid-template-columns: 1fr 160px;
+  grid-template-columns: 1fr 1fr;
     margin: 0;
     padding: 0 1.5rem;
   `};
@@ -73,9 +69,12 @@ const AccountLinkGroup = styled(AutoRow)`
     opacity: 0.5;
     border-radius: 8px;
   }
+
+  flex-wrap: nowrap;
 `
 
 const VoteText = styled(NoWrap)`
+  width: 140px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: 12px;
   `};
@@ -154,7 +153,7 @@ export default function DelegateList() {
           return (
             formattedAddress && (
               <DataRow key={d.id}>
-                <AutoRow gap="10px">
+                <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
                   <OnlyAboveSmall>
                     <FixedRankWidth>
                       <NoWrap>{i + 1}</NoWrap>
@@ -171,7 +170,7 @@ export default function DelegateList() {
                           <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
                         )}
                       </OnlyAboveSmall>
-                      <FixedAddressSize gap="6px">
+                      <AutoColumn gap="6px">
                         <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>
                           {(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(formattedAddress)}
                         </TYPE.black>
@@ -182,21 +181,9 @@ export default function DelegateList() {
                             {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
                           </TYPE.black>
                         )}
-                      </FixedAddressSize>
+                      </AutoColumn>
                     </AccountLinkGroup>
                   </BlankInternalLink>
-                  <OnlyAboveSmall>
-                    <DelegateButton
-                      width="fit-content"
-                      disabled={!showDelegateButton}
-                      onClick={() => {
-                        setPrefilledDelegate(formattedAddress)
-                        toggelDelegateModal()
-                      }}
-                    >
-                      Delegate
-                    </DelegateButton>
-                  </OnlyAboveSmall>
                 </AutoRow>
                 <OnlyAboveLarge>
                   <NoWrap textAlign="end">{d.votes.length}</NoWrap>
@@ -211,9 +198,24 @@ export default function DelegateList() {
                       : '-'}
                   </NoWrap>
                 </OnlyAboveLarge>
-                <VoteText textAlign="end">
-                  {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
-                </VoteText>
+                <Row style={{ justifyContent: 'flex-end' }}>
+                  <OnlyAboveSmall>
+                    <DelegateButton
+                      width="fit-content"
+                      mr="10px"
+                      disabled={!showDelegateButton}
+                      onClick={() => {
+                        setPrefilledDelegate(formattedAddress)
+                        toggelDelegateModal()
+                      }}
+                    >
+                      Delegate
+                    </DelegateButton>
+                  </OnlyAboveSmall>
+                  <VoteText textAlign="end">
+                    {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
+                  </VoteText>
+                </Row>
               </DataRow>
             )
           )

@@ -194,11 +194,13 @@ export default function Overview() {
                         </LoadingFlag>
                       )}
                     </RowFixed>
-                    {userDelegatee === ZERO_ADDRESS && govTokenBalance && (
-                      <TYPE.error fontSize={14} error={true}>
-                        Your votes are curently inactive.
-                      </TYPE.error>
-                    )}
+                    {userDelegatee === ZERO_ADDRESS &&
+                      govTokenBalance &&
+                      JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO) && (
+                        <TYPE.error fontSize={14} error={true}>
+                          Your votes are curently inactive.
+                        </TYPE.error>
+                      )}
                   </AutoColumn>
                 </RowFixed>
               )}

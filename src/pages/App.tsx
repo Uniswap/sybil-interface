@@ -24,22 +24,14 @@ const SiteWrapper = styled.div`
   grid-gap: 1.5em;
   overflow: auto;
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  @media (max-width: 1080px) {
     display: flex;
     flex-flow: column;
     align-items: flex-start;
     overflow-x: hidden;
     grid-gap: 0;
-  `};
+  }
 `
-
-// const AppWrapper = styled.div`
-//   display: flex;
-//   flex-flow: column;
-//   align-items: flex-start;
-//   overflow-x: hidden;
-//   width: 100%;
-// `
 
 const ContentWrapper = styled.div`
   display: flex;
