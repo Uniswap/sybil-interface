@@ -152,67 +152,70 @@ export default function DelegateList() {
       ? filteredDelegates.concat(formattedManualDelegates).map((d, i) => {
           const formattedAddress = isAddress(d.id)
           return (
-            <DataRow key={d.id}>
-              <AutoRow gap="10px">
-                <OnlyAboveSmall>
-                  <FixedRankWidth>
-                    <NoWrap>{i + 1}</NoWrap>
-                  </FixedRankWidth>
-                </OnlyAboveSmall>
-                <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
-                  <AccountLinkGroup gap="10px" width="initial">
-                    <OnlyAboveSmall>
-                      {d.imageURL ? (
-                        <RoundedProfileImage>
-                          <img src={d.imageURL} alt="profile" />
-                        </RoundedProfileImage>
-                      ) : (
-                        <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
-                      )}
-                    </OnlyAboveSmall>
-                    <FixedAddressSize gap="6px">
-                      <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>
-                        {(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(d.id)}
-                      </TYPE.black>
-                      {d.handle ? (
-                        <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
-                      ) : (
-                        <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
-                          {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
+            formattedAddress && (
+              <DataRow key={d.id}>
+                <AutoRow gap="10px">
+                  <OnlyAboveSmall>
+                    <FixedRankWidth>
+                      <NoWrap>{i + 1}</NoWrap>
+                    </FixedRankWidth>
+                  </OnlyAboveSmall>
+                  <BlankInternalLink to={activeProtocol?.id + '/' + formattedAddress}>
+                    <AccountLinkGroup gap="10px" width="initial">
+                      <OnlyAboveSmall>
+                        {d.imageURL ? (
+                          <RoundedProfileImage>
+                            <img src={d.imageURL} alt="profile" />
+                          </RoundedProfileImage>
+                        ) : (
+                          <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
+                        )}
+                      </OnlyAboveSmall>
+                      <FixedAddressSize gap="6px">
+                        <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>
+                          {(formattedAddress && names?.[formattedAddress]) ?? shortenAddress(formattedAddress)}
                         </TYPE.black>
-                      )}
-                    </FixedAddressSize>
-                  </AccountLinkGroup>
-                </BlankInternalLink>
-                <OnlyAboveSmall>
-                  <DelegateButton
-                    width="fit-content"
-                    disabled={!showDelegateButton}
-                    onClick={() => {
-                      setPrefilledDelegate(d.id)
-                      toggelDelegateModal()
-                    }}
-                  >
-                    Delegate
-                  </DelegateButton>
-                </OnlyAboveSmall>
-              </AutoRow>
-              <OnlyAboveLarge>
-                <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-              </OnlyAboveLarge>
-              <OnlyAboveLarge>
-                <NoWrap textAlign="end">
-                  {globalData
-                    ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(
-                        3
-                      ) + '%'
-                    : '-'}
-                </NoWrap>
-              </OnlyAboveLarge>
-              <VoteText textAlign="end">
-                {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
-              </VoteText>
-            </DataRow>
+                        {d.handle ? (
+                          <TYPE.black fontSize="12px">{shortenAddress(formattedAddress)}</TYPE.black>
+                        ) : (
+                          <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
+                            {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
+                          </TYPE.black>
+                        )}
+                      </FixedAddressSize>
+                    </AccountLinkGroup>
+                  </BlankInternalLink>
+                  <OnlyAboveSmall>
+                    <DelegateButton
+                      width="fit-content"
+                      disabled={!showDelegateButton}
+                      onClick={() => {
+                        setPrefilledDelegate(formattedAddress)
+                        toggelDelegateModal()
+                      }}
+                    >
+                      Delegate
+                    </DelegateButton>
+                  </OnlyAboveSmall>
+                </AutoRow>
+                <OnlyAboveLarge>
+                  <NoWrap textAlign="end">{d.votes.length}</NoWrap>
+                </OnlyAboveLarge>
+                <OnlyAboveLarge>
+                  <NoWrap textAlign="end">
+                    {globalData
+                      ? new Percent(
+                          JSBI.BigInt(d.delegatedVotesRaw),
+                          JSBI.BigInt(globalData.delegatedVotesRaw)
+                        ).toFixed(3) + '%'
+                      : '-'}
+                  </NoWrap>
+                </OnlyAboveLarge>
+                <VoteText textAlign="end">
+                  {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
+                </VoteText>
+              </DataRow>
+            )
           )
         })
       : null

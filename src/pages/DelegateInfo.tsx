@@ -24,7 +24,7 @@ import {
   ProposalStatusSmall,
   DelegateButton
 } from '../components/governance/styled'
-import { getTwitterProfileLink, getEtherscanLink, shortenAddress } from '../utils'
+import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
 import TwitterIcon from '../assets/images/Twitter_Logo_Blue.png'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
 import { useIdentityInfo, useTwitterProfileData } from '../state/social/hooks'
@@ -108,6 +108,8 @@ function DelegateInfo({
   const { chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
+  const formattedAddress = isAddress(delegateAddress)
+
   // get governance data and format amounts
   const delegateInfo = useDelegateInfo(delegateAddress)
   const delegatedVotes = delegateInfo ? localNumber(delegateInfo.delegatedVotes) : <Loader />
@@ -157,7 +159,7 @@ function DelegateInfo({
         prefilledDelegate={prefilledDelegate}
       />
       <GreyCard>
-        {delegateAddress && chainId ? (
+        {formattedAddress && chainId ? (
           <AutoColumn gap="md">
             <RowBetween style={{ width: '100%' }}>
               <ArrowWrapper
@@ -184,31 +186,31 @@ function DelegateInfo({
                         href={
                           identityInfo?.twitter?.handle
                             ? getTwitterProfileLink(identityInfo?.twitter?.handle)
-                            : getEtherscanLink(chainId, delegateAddress, 'address')
+                            : getEtherscanLink(chainId, formattedAddress, 'address')
                         }
                       >
                         <OnlyAboveSmall>
                           <TYPE.black>
-                            {identityInfo?.twitter?.handle ? `@${identityInfo.twitter.handle}` : delegateAddress}
+                            {identityInfo?.twitter?.handle ? `@${identityInfo.twitter.handle}` : formattedAddress}
                           </TYPE.black>
                         </OnlyAboveSmall>
                         <OnlyBelowSmall>
                           <TYPE.black>
                             {identityInfo?.twitter?.handle
                               ? `@${identityInfo.twitter.handle}`
-                              : shortenAddress(delegateAddress)}
+                              : shortenAddress(formattedAddress ?? '')}
                           </TYPE.black>
                         </OnlyBelowSmall>
                       </ExternalLink>
                       {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
-                      {!identityInfo?.twitter?.handle && <CopyHelper toCopy={delegateAddress} />}
+                      {!identityInfo?.twitter?.handle && <CopyHelper toCopy={formattedAddress} />}
                     </RowFixed>
                     {identityInfo?.twitter?.handle ? (
                       <RowFixed>
-                        <ExternalLink href={getEtherscanLink(chainId, delegateAddress, 'address')}>
+                        <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
                           <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
                         </ExternalLink>
-                        <CopyHelper toCopy={delegateAddress} />
+                        <CopyHelper toCopy={formattedAddress} />
                       </RowFixed>
                     ) : (
                       <TYPE.black fontSize="12px">
