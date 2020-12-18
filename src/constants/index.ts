@@ -3,6 +3,8 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 
 import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 
+export { PRELOADED_PROPOSALS } from './proposals'
+
 export const SYBIL_ADDRESS = '0xa71330402Fcb7290D026F1dbB727d367E50EABF7'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
