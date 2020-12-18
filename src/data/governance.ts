@@ -6,6 +6,7 @@ import { ethers } from 'ethers'
 import { fetchProfileData } from './social'
 import { isAddress } from '../utils'
 import { DocumentNode } from 'graphql'
+import { PRELOADED_PROPOSALS } from '../constants'
 
 interface DelegateResponse {
   data: {
@@ -176,32 +177,35 @@ export async function fetchProposals(client: any, key: string): Promise<Proposal
       })
       .then(async (res: ProposalResponse) => {
         if (res) {
-          return res.data.proposals.map(p => ({
-            id: p.id,
-            title: p.description?.split(/# |\n/g)[1] || 'Untitled',
-            description: p.description?.split(/# /)[1] || 'No description.',
-            proposer: p.proposer.id,
-            status: undefined, // initialize as 0
-            forCount: undefined, // initialize as 0
-            againstCount: undefined, // initialize as 0
-            startBlock: parseInt(p.startBlock),
-            endBlock: parseInt(p.endBlock),
-            forVotes: p.forVotes,
-            againstVotes: p.againstVotes,
-            details: p.targets.map((t, i) => {
-              const signature = p.signatures[i]
-              const [name, types] = signature.substr(0, signature.length - 1).split('(')
+          return res.data.proposals.map((p, i) => {
+            const description = PRELOADED_PROPOSALS.get(res.data.proposals.length - i - 1) || p.description
+            return {
+              id: p.id,
+              title: description?.split(/# |\n/g)[1] || 'Untitled',
+              description: description || 'No description.',
+              proposer: p.proposer.id,
+              status: undefined, // initialize as 0
+              forCount: undefined, // initialize as 0
+              againstCount: undefined, // initialize as 0
+              startBlock: parseInt(p.startBlock),
+              endBlock: parseInt(p.endBlock),
+              forVotes: p.forVotes,
+              againstVotes: p.againstVotes,
+              details: p.targets.map((t, i) => {
+                const signature = p.signatures[i]
+                const [name, types] = signature.substr(0, signature.length - 1).split('(')
 
-              const calldata = p.calldatas[i]
-              const decoded = ethers.utils.defaultAbiCoder.decode(types.split(','), calldata)
+                const calldata = p.calldatas[i]
+                const decoded = ethers.utils.defaultAbiCoder.decode(types.split(','), calldata)
 
-              return {
-                target: p.targets[i],
-                functionSig: name,
-                callData: decoded.toString()
-              }
-            })
-          }))
+                return {
+                  target: p.targets[i],
+                  functionSig: name,
+                  callData: decoded.toString()
+                }
+              })
+            }
+          })
         }
         return null
       })).catch(() => {

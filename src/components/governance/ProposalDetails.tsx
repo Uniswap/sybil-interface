@@ -199,7 +199,6 @@ function ProposalDetails({
               })}
             </AutoColumn>
             <AutoColumn gap="md">
-              <TYPE.mediumHeader fontWeight={600}>Description</TYPE.mediumHeader>
               <MarkDownWrapper>
                 <ReactMarkdown source={proposalData?.description} />
               </MarkDownWrapper>
