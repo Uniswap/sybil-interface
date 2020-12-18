@@ -96,8 +96,6 @@ export default function VoterList({
 
   const [allIdentities] = useAllIdentities()
 
-  console.log(allIdentities)
-
   return (
     <StyledDataCard>
       <Modal isOpen={showAll} onDismiss={() => setShowAll(false)}>
