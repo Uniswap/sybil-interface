@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { TYPE, StyledInternalLink } from '../../theme'
-import { shortenAddress } from '../../utils'
+import { shortenAddress, isAddress } from '../../utils'
 import Modal from '../Modal'
 import AllVoters from './AllVoters'
 import { ButtonEmpty } from '../Button'
 import Loader from '../Loader'
 import { useAllVotersForProposal, useActiveProtocol } from '../../state/governance/hooks'
-import { useAllPrioritizedNames } from '../../state/social/hooks'
+import { useAllPrioritizedNames, useAllIdentities } from '../../state/social/hooks'
+import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -59,6 +60,10 @@ export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
 const TopVoterWrapper = styled.div`
   padding: 1rem 0 0 0;
 `
+const TwitterLogo = styled.img`
+  height: 24px;
+  width: 24px;
+`
 
 export default function VoterList({
   title,
@@ -89,6 +94,10 @@ export default function VoterList({
   // format voter name with identity if it exists
   const prioritizedNames = useAllPrioritizedNames()
 
+  const [allIdentities] = useAllIdentities()
+
+  console.log(allIdentities)
+
   return (
     <StyledDataCard>
       <Modal isOpen={showAll} onDismiss={() => setShowAll(false)}>
@@ -117,11 +126,20 @@ export default function VoterList({
               <div />
             </RowBetween>
             {voters.map((p, i) => {
+              const formattedName = isAddress(p.voter.id)
+              const twitterName = formattedName && allIdentities?.[formattedName]?.twitter?.handle
               return (
                 <RowBetween key={'vote-for-' + i}>
                   <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {prioritizedNames?.[p.voter.id] ?? shortenAddress(p.voter.id)}
+                      {twitterName ? (
+                        <RowFixed>
+                          @{twitterName}
+                          <TwitterLogo src={TwitterIcon} />{' '}
+                        </RowFixed>
+                      ) : (
+                        prioritizedNames?.[p.voter.id] ?? shortenAddress(p.voter.id)
+                      )}
                     </TYPE.black>
                   </StyledInternalLink>
                   <TYPE.black fontWeight={400} fontSize="14px">

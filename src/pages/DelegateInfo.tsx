@@ -205,10 +205,10 @@ function DelegateInfo({
                       {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
                       {!identityInfo?.twitter?.handle && <CopyHelper toCopy={formattedAddress} />}
                     </RowFixed>
-                    {identityInfo?.twitter?.handle ? (
+                    {identityInfo?.twitter?.handle && delegateAddress ? (
                       <RowFixed>
                         <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
-                          <TYPE.black fontSize="12px">{delegateAddress}</TYPE.black>
+                          <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
                         </ExternalLink>
                         <CopyHelper toCopy={formattedAddress} />
                       </RowFixed>
