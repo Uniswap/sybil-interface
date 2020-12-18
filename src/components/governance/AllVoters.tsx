@@ -1,11 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { TYPE, StyledInternalLink } from '../../theme'
-import { shortenAddress } from '../../utils'
-import { useAllPrioritizedNames } from '../../state/social/hooks'
+import { shortenAddress, isAddress } from '../../utils'
+import { useAllIdentities } from '../../state/social/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
+import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -36,6 +37,11 @@ const TopVoterWrapper = styled.div`
   padding: 1rem 0 0 0;
 `
 
+const TwitterLogo = styled.img`
+  height: 24px;
+  width: 24px;
+`
+
 export default function AllVoters({
   title,
   amount,
@@ -53,9 +59,9 @@ export default function AllVoters({
     | undefined
 }) {
   // format voter name with indentity if it exists
-  const names = useAllPrioritizedNames()
-
   const [activeProtocol] = useActiveProtocol()
+
+  const [allIdentities] = useAllIdentities()
 
   return (
     <StyledDataCard>
@@ -71,11 +77,20 @@ export default function AllVoters({
         <TopVoterWrapper>
           <AutoColumn gap="1rem">
             {allVoters?.map((p, i) => {
+              const formattedName = isAddress(p.voter.id)
+              const twitterName = formattedName && allIdentities?.[formattedName]?.twitter?.handle
               return (
                 <RowBetween key={'vote-for-' + i}>
                   <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {names?.[p.voter.id] ?? shortenAddress(p.voter.id)}
+                      {twitterName ? (
+                        <RowFixed>
+                          @{twitterName}
+                          <TwitterLogo src={TwitterIcon} />{' '}
+                        </RowFixed>
+                      ) : (
+                        formattedName && shortenAddress(formattedName)
+                      )}
                     </TYPE.black>
                   </StyledInternalLink>
                   <TYPE.black fontWeight={400} fontSize="14px">
