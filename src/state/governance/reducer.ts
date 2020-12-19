@@ -54,7 +54,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(COMP),
   governanceAddress: COMP_GOVERNANCE_ADDRESS,
   social: '@compoundfinance',
-  emoji: '🏦',
+  emoji: '🏦'
 }
 
 export const YEARN_GOVERNANCE: GovernanceInfo = {
@@ -66,7 +66,7 @@ export const YEARN_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(YFI),
   governanceAddress: YEARN_GOVERNANCE_ADDRESS,
   social: '@iearnfinance',
-  emoji: '🔵',
+  emoji: '🔵'
 }
 
 // mapping for routing
