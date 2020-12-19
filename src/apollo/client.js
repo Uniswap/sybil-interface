@@ -9,10 +9,18 @@ export const uniswapClient = new ApolloClient({
   cache: new InMemoryCache(),
   shouldBatch: true
 })
-
+  
 export const compoundClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/protofire/compound-governance'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
+
+export const yearnClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/crazyrabbitltc/yearngovernance'
   }),
   cache: new InMemoryCache(),
   shouldBatch: true
