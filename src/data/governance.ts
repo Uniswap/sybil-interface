@@ -68,7 +68,19 @@ async function fetchDelegatesFromClient(
           res.data.delegates.map(async (a: DelegateData) => {
             const checksummed = isAddress(a.id)
             const handle = checksummed ? allIdentities?.[checksummed]?.twitter?.handle : undefined
-            const profileData = handle ? await fetchProfileData(handle) : undefined
+
+            let profileData
+            try {
+              if (handle) {
+                const res = await fetchProfileData(handle)
+                if (res) {
+                  profileData = res
+                }
+              }
+            } catch (e) {
+              profileData = undefined
+            }
+
             return {
               account: a.id,
               handle,
@@ -76,6 +88,7 @@ async function fetchDelegatesFromClient(
             }
           })
         )
+
         return res.data.delegates.map((d, i) => {
           return {
             ...d,

@@ -29,7 +29,7 @@ export default function Updater(): null {
             }
           })
       } catch (e) {
-        console.log(e)
+        console.log('ERROR:' + e)
       }
     }
     fetchTopDelegateData()

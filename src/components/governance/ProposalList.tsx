@@ -26,7 +26,7 @@ const ProposalItem = styled.div`
   }
 `
 
-export default function ProposalList({ allProposals }: { allProposals: ProposalData[] | undefined }) {
+export default function ProposalList({ allProposals }: { allProposals: { [id: string]: ProposalData } | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
   // used for displaying states
@@ -38,7 +38,7 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
   return (
     <Wrapper>
       <GreyCard>
-        {allProposals?.length === 0 && (
+        {allProposals && Object.keys(allProposals)?.length === 0 && (
           <EmptyProposals>
             <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
             <TYPE.subHeader>
@@ -48,32 +48,36 @@ export default function ProposalList({ allProposals }: { allProposals: ProposalD
         )}
         <AutoColumn gap="1rem">
           {allStatuses && allProposals ? (
-            allProposals.map((p: ProposalData, i) => {
-              const index = allStatuses.length - i - 1 // offset based on reverse index
-              const status = allStatuses[index] ? enumerateProposalState(allStatuses[index]) : enumerateProposalState(0)
-              return (
-                <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                  <RowBetween>
-                    <RowFixed>
+            Object.values(allProposals)
+              .reverse()
+              .map((p: ProposalData, i) => {
+                const index = parseInt(p.id) - 1 // offset based on reverse index
+                const status = allStatuses[index]
+                  ? enumerateProposalState(allStatuses[index])
+                  : enumerateProposalState(0)
+                return (
+                  <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
+                    <RowBetween>
+                      <RowFixed>
+                        <OnlyAboveSmall>
+                          <TYPE.black mr="8px">{p.id}</TYPE.black>
+                        </OnlyAboveSmall>
+                        <TYPE.black mr="10px">{p.title}</TYPE.black>
+                      </RowFixed>
+                      <OnlyBelowSmall>
+                        {allStatuses?.[i] ? (
+                          <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                        ) : (
+                          <Loader />
+                        )}
+                      </OnlyBelowSmall>
                       <OnlyAboveSmall>
-                        <TYPE.black mr="8px">{p.id}</TYPE.black>
+                        {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
                       </OnlyAboveSmall>
-                      <TYPE.black mr="10px">{p.title}</TYPE.black>
-                    </RowFixed>
-                    <OnlyBelowSmall>
-                      {allStatuses?.[i] ? (
-                        <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                      ) : (
-                        <Loader />
-                      )}
-                    </OnlyBelowSmall>
-                    <OnlyAboveSmall>
-                      {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
-                    </OnlyAboveSmall>
-                  </RowBetween>
-                </ProposalItem>
-              )
-            })
+                    </RowBetween>
+                  </ProposalItem>
+                )
+              })
           ) : (
             <Row justify="center">
               <Loader />
