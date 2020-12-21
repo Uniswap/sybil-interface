@@ -226,12 +226,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
   const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(
-    amount ? govContract : undefined,
-    'proposals',
-    ids,
-    NEVER_RELOAD
-  ).reverse()
+  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids)
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format

@@ -8,8 +8,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import { ArrowLeft } from 'react-feather'
 import { ProposalStatus } from './styled'
 import { DateTime } from 'luxon'
-import { useTimestampFromBlock } from '../../hooks/useTimestampFromBlock'
-import { PROPOSAL_LENGTH_IN_DAYS } from '../../constants'
+import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants'
 import { isAddress, getEtherscanLink } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
@@ -19,6 +18,9 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../state'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import { GreyCard } from '../Card'
+import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
+import { useBlockNumber } from '../../state/application/hooks'
+import { BigNumber } from 'ethers'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   // width: 100%;
@@ -100,10 +102,16 @@ function ProposalDetails({
   const status = useProposalStatus(proposalID) // @TODO shoudlnt use spearate data for this
 
   // get and format data
-  const startTimestamp: number | undefined = useTimestampFromBlock(proposalData?.startBlock)
-  const endDate: DateTime | undefined = startTimestamp
-    ? DateTime.fromSeconds(startTimestamp).plus({ days: PROPOSAL_LENGTH_IN_DAYS })
-    : undefined
+  const currentTimestamp = useCurrentBlockTimestamp()
+  const currentBlock = useBlockNumber()
+  const endDate: DateTime | undefined =
+    proposalData && currentTimestamp && currentBlock
+      ? DateTime.fromSeconds(
+          currentTimestamp
+            .add(BigNumber.from(AVERAGE_BLOCK_TIME_IN_SECS).mul(BigNumber.from(proposalData.endBlock - currentBlock)))
+            .toNumber()
+        )
+      : undefined
   const now: DateTime = DateTime.local()
 
   // get total votes and format percentages for UI
