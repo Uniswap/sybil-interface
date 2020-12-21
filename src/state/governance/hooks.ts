@@ -226,12 +226,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
   const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(
-    amount ? govContract : undefined,
-    'proposals',
-    ids,
-    NEVER_RELOAD
-  ).reverse()
+  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids).reverse()
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
@@ -260,15 +255,17 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
 
   useEffect(() => {
     if (counts && proposals && govToken) {
-      Object.values(proposals).map((p, i) => {
-        p.forCount = counts?.[i]?.result?.forVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
-          : undefined
-        p.againstCount = counts?.[i]?.result?.againstVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
-          : undefined
-        return true
-      })
+      Object.values(proposals)
+        .reverse()
+        .map((p, i) => {
+          p.forCount = counts?.[i]?.result?.forVotes
+            ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
+            : undefined
+          p.againstCount = counts?.[i]?.result?.againstVotes
+            ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
+            : undefined
+          return true
+        })
     }
   }, [counts, govToken, proposals])
 

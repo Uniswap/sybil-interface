@@ -9,8 +9,7 @@ export const SYBIL_ADDRESS = '0xa71330402Fcb7290D026F1dbB727d367E50EABF7'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-// TODO this is only approximate, it's actually based on blocks
-export const PROPOSAL_LENGTH_IN_DAYS = 7
+export const AVERAGE_BLOCK_TIME_IN_SECS = 13
 
 export interface WalletInfo {
   connector?: AbstractConnector
