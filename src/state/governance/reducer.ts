@@ -65,7 +65,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   secondaryColor: '#2EBAC6',
   token: serializeToken(AAVE),
   governanceAddress: AAVE_GOVERNANCE_ADDRESS,
-  social: '@AAVEAAVE',
+  social: '@AaveAave',
   emoji: '👻'
 }
 
