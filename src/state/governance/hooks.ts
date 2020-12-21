@@ -202,11 +202,12 @@ export function useAllProposalStates(): number[] | undefined {
 
 export function useProposalStatus(id: string): string | undefined {
   const allStatuses = useAllProposalStates()
+
   return allStatuses ? enumerateProposalState(allStatuses[parseInt(id) - 1]) : undefined
 }
 
-export function useAllProposals() {
-  const [proposals, setProposals] = useState<ProposalData[] | undefined>()
+export function useAllProposals(): { [id: string]: ProposalData } | undefined {
+  const [proposals, setProposals] = useState<{ [id: string]: ProposalData } | undefined>()
 
   // get subgraph client for active protocol
   const govClient = useSubgraphClient()
@@ -238,9 +239,13 @@ export function useAllProposals() {
     async function fetchData() {
       try {
         if (govToken) {
-          fetchProposals(govClient, govToken.address).then((res: ProposalData[] | null) => {
-            if (res) {
-              setProposals(res)
+          fetchProposals(govClient, govToken.address).then((data: ProposalData[] | null) => {
+            if (data) {
+              const proposalMap = data.reduce<{ [id: string]: ProposalData }>((accum, proposal: ProposalData) => {
+                accum[proposal.id] = proposal
+                return accum
+              }, {})
+              setProposals(proposalMap)
             }
           })
         }
@@ -255,7 +260,7 @@ export function useAllProposals() {
 
   useEffect(() => {
     if (counts && proposals && govToken) {
-      proposals.map((p, i) => {
+      Object.values(proposals).map((p, i) => {
         p.forCount = counts?.[i]?.result?.forVotes
           ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
           : undefined
@@ -272,7 +277,7 @@ export function useAllProposals() {
 
 export function useProposalData(id: string): ProposalData | undefined {
   const allProposalData = useAllProposals()
-  return allProposalData?.find(p => p.id === id)
+  return allProposalData?.[id]
 }
 
 // get the users delegatee if it exists

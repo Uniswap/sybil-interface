@@ -40,7 +40,7 @@ export function useAllPrioritizedNames(): { [address: string]: string | ReactNod
     } else if (allIdentities[address].other) {
       return (prioritizedNames[address] = allIdentities[address].other?.name)
     }
-    return null
+    return address
   })
   return prioritizedNames
 }
@@ -194,6 +194,39 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
 
   return formattedData
 }
+
+// // get handle and profile image from twitter
+// export function useTwitterProfileDatas(handles: string[] | undefined | null): TwitterProfileData[] | undefined {
+//   const [formattedData, setFormattedData] = useState<TwitterProfileData[] | undefined>()
+
+//   useEffect(() => {
+//     if (!handles) {
+//       setFormattedData(undefined)
+//     } else {
+//       Promise.all(
+//         handles.map(handle => {
+//           return fetchProfileData(handle)
+//             .then((profileData: ProfileDataResponse | null) => {
+//               if (profileData?.data) {
+//                 return {
+//                   name: profileData.data.name,
+//                   handle: profileData.data.username,
+//                   profileURL: profileData.data.profile_image_url
+//                 }
+//               }
+//               return undefined
+//             })
+//             .catch(() => {
+//               console.log('Error fetching profile data')
+//               return undefined
+//             })
+//         })
+//       ).then(datas => setFormattedData(datas))
+//     }
+//   }, [handles])
+
+//   return formattedData
+// }
 
 export function useMultipleTwitterProfileDatas(
   handles: (string | undefined)[]
