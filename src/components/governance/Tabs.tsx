@@ -1,10 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useActiveProtocol, useFilterActive } from '../../state/governance/hooks'
-import { AutoRow, RowBetween } from '../Row'
+import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { GreyCard } from '../Card'
 import { TYPE } from '../../theme'
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Toggle from '../Toggle'
 
 const TabOption = styled.button<{ selected?: boolean }>`
@@ -31,9 +31,17 @@ const AboveSmall = styled.div`
   `};
 `
 
-function Tabs({ location }: RouteComponentProps<{ location: string }>) {
+const StyledCheckbox = styled.input`
+  border: 1px solid ${({ theme }) => theme.bg1};
+  height: 20px;
+  color: ${({ theme }) => theme.text1};
+`
+
+function Tabs({ hideZero, setHideZero }: { hideZero?: boolean; setHideZero?: (val: boolean) => void }) {
   const [activeProtocol] = useActiveProtocol()
   const [filter, setFilter] = useFilterActive()
+
+  const location = useLocation()
 
   return (
     <GreyCard backgroundColor={activeProtocol?.secondaryColor}>
@@ -54,12 +62,24 @@ function Tabs({ location }: RouteComponentProps<{ location: string }>) {
             <TYPE.black fontSize={'16px'}>Proposals</TYPE.black>
           </TabOption>
         </AutoRow>
-        <AboveSmall>
-          {location.pathname.includes('delegates') && <Toggle isActive={filter} toggle={() => setFilter(!filter)} />}
-        </AboveSmall>
+        {location.pathname.includes('delegates') && (
+          <AboveSmall>
+            <RowFixed>
+              <StyledCheckbox
+                type="checkbox"
+                checked={hideZero}
+                onChange={() => setHideZero && setHideZero(!hideZero)}
+              />
+              <TYPE.main mr="10px" onClick={() => setHideZero && setHideZero(!hideZero)} style={{ cursor: 'pointer' }}>
+                Hide 0 votes
+              </TYPE.main>
+              <Toggle isActive={filter} toggle={() => setFilter(!filter)} />
+            </RowFixed>
+          </AboveSmall>
+        )}
       </RowBetween>
     </GreyCard>
   )
 }
 
-export default withRouter(Tabs)
+export default Tabs
