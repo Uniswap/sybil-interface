@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BodyWrapper } from './AppBody'
 import DelegateList from '../components/governance/DelegateList'
 import { RouteComponentProps } from 'react-router-dom'
@@ -20,12 +20,15 @@ export default function Delegates({
   // if on testnet, show warning
   const { chainId } = useActiveWeb3React()
 
+  // filter out zerio votes, value from tabs
+  const [hideZero, setHideZero] = useState<boolean>(true)
+
   return (
     <BodyWrapper>
       <AutoColumn gap="1rem">
-        <Tabs />
+        <Tabs hideZero={hideZero} setHideZero={setHideZero} />
         {chainId === ChainId.MAINNET ? (
-          <DelegateList />
+          <DelegateList hideZero={hideZero} />
         ) : (
           <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
         )}

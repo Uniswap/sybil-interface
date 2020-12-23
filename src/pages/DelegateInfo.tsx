@@ -256,48 +256,50 @@ function DelegateInfo({
                 <TYPE.main fontSize="16px">Voting History</TYPE.main>
                 <Break />
                 {delegateInfo && proposalStatuses ? (
-                  delegateInfo?.votes?.map((vote, i) => {
-                    const proposal = proposalData?.[vote.proposal] // proposals start at 1
-                    const status = proposalStatuses[vote.proposal - 1]
-                      ? enumerateProposalState(proposalStatuses[vote.proposal - 1])
-                      : enumerateProposalState(0)
-                    return (
-                      proposal && (
-                        <div key={i}>
-                          <RowBetween key={i + proposal.id}>
-                            <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
-                              <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
-                                <ResponsiveBodyText>{proposal.title}</ResponsiveBodyText>
-                              </StyledInternalLink>
-                              {status && (
-                                <RowFixed>
-                                  <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                                </RowFixed>
-                              )}
-                            </AutoColumn>
-                            <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
-                              <RowFixed>
-                                <ResponsiveBodyText mr="6px" ml="6px" textAlign="right">
-                                  {`${localNumber(vote.votes)} votes ${vote.support ? 'in favor' : 'against'}`}
-                                </ResponsiveBodyText>
-                                {vote.support ? (
-                                  <GreenIcon>
-                                    <CheckCircle />
-                                  </GreenIcon>
-                                ) : (
-                                  <RedIcon>
-                                    <XCircle />
-                                  </RedIcon>
+                  delegateInfo?.votes
+                    ?.map((vote, i) => {
+                      const proposal = proposalData?.[vote.proposal] // proposals start at 1
+                      const status = proposalStatuses[vote.proposal - 1]
+                        ? enumerateProposalState(proposalStatuses[vote.proposal - 1])
+                        : enumerateProposalState(0)
+                      return (
+                        proposal && (
+                          <div key={i}>
+                            <RowBetween key={i + proposal.id}>
+                              <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
+                                <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
+                                  <ResponsiveBodyText>{proposal.title}</ResponsiveBodyText>
+                                </StyledInternalLink>
+                                {status && (
+                                  <RowFixed>
+                                    <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                                  </RowFixed>
                                 )}
-                              </RowFixed>
-                              <div> </div>
-                            </AutoColumn>
-                          </RowBetween>
-                          {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
-                        </div>
+                              </AutoColumn>
+                              <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
+                                <RowFixed>
+                                  <ResponsiveBodyText mr="6px" ml="6px" textAlign="right">
+                                    {`${localNumber(vote.votes)} votes ${vote.support ? 'in favor' : 'against'}`}
+                                  </ResponsiveBodyText>
+                                  {vote.support ? (
+                                    <GreenIcon>
+                                      <CheckCircle />
+                                    </GreenIcon>
+                                  ) : (
+                                    <RedIcon>
+                                      <XCircle />
+                                    </RedIcon>
+                                  )}
+                                </RowFixed>
+                                <div> </div>
+                              </AutoColumn>
+                            </RowBetween>
+                            {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
+                          </div>
+                        )
                       )
-                    )
-                  })
+                    })
+                    .reverse()
                 ) : (
                   <Loader />
                 )}
