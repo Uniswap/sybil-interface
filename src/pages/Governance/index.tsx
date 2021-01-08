@@ -194,13 +194,6 @@ export default function Overview() {
                         </LoadingFlag>
                       )}
                     </RowFixed>
-                    {userDelegatee === ZERO_ADDRESS &&
-                      govTokenBalance &&
-                      JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO) && (
-                        <TYPE.error fontSize={14} error={true}>
-                          Your votes are curently inactive.
-                        </TYPE.error>
-                      )}
                   </AutoColumn>
                 </RowFixed>
               )}
@@ -213,6 +206,13 @@ export default function Overview() {
                   <TYPE.black>
                     <b>{voteCount.toSignificant(3)}</b> {!isMobile && 'votes'}
                   </TYPE.black>
+                  {userDelegatee === ZERO_ADDRESS &&
+                    govTokenBalance &&
+                    JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO) && (
+                      <TYPE.error fontSize={14} error={true} ml="8px">
+                        (currently inactive)
+                      </TYPE.error>
+                    )}
                   {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
                     <QuestionHelper
                       text={`Hold ${activeProtocol?.token.symbol} to be be able to self-delegate or delegate to others.`}

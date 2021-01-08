@@ -37,6 +37,7 @@ import DelegateModal from '../components/vote/DelegateModal'
 import { useModalOpen, useToggleModal } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
+import useENS from '../hooks/useENS'
 
 const ArrowWrapper = styled.div`
   display: flex;
@@ -129,6 +130,9 @@ function DelegateInfo({
   const identityInfo = useIdentityInfo(delegateAddress)
   const twitterData = useTwitterProfileData(identityInfo?.twitter?.handle)
 
+  // ens name if they have it
+  const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
+
   // toggle for showing delegation modal with prefilled delegate
   const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
@@ -191,7 +195,9 @@ function DelegateInfo({
                       >
                         <OnlyAboveSmall>
                           <TYPE.black>
-                            {identityInfo?.twitter?.handle ? `@${identityInfo.twitter.handle}` : formattedAddress}
+                            {identityInfo?.twitter?.handle
+                              ? `@${identityInfo.twitter.handle}`
+                              : ensName ?? formattedAddress}
                           </TYPE.black>
                         </OnlyAboveSmall>
                         <OnlyBelowSmall>
