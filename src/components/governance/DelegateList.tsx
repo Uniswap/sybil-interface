@@ -150,10 +150,11 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       ? filteredDelegates
           .concat(formattedManualDelegates)
           // filter for non zero votes
-          .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 0) : true))
+          .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .map((d, i) => {
             const formattedAddress = isAddress(d.id)
             const name = formattedAddress ? names?.[formattedAddress] ?? shortenAddress(formattedAddress) : ''
+            const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
             return (
               formattedAddress && (
                 <DataRow key={d.id}>
@@ -214,9 +215,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
                         Delegate
                       </DelegateButton>
                     </OnlyAboveSmall>
-                    <VoteText textAlign="end">
-                      {parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()} Votes
-                    </VoteText>
+                    <VoteText textAlign="end">{votes === '0' ? '< 1' : votes} Votes</VoteText>
                   </Row>
                 </DataRow>
               )
