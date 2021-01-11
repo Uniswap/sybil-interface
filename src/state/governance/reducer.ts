@@ -62,7 +62,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   name: 'Aave Governance',
   logo: AaveLogo,
   primaryColor: '#B6509E',
-  secondaryColor: '#2EBAC6',
+  secondaryColor: '#eaf9fa',
   token: serializeToken(AAVE),
   governanceAddress: AAVE_GOVERNANCE_ADDRESS,
   social: '@AaveAave',
