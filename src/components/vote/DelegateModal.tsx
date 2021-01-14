@@ -43,7 +43,7 @@ interface VoteModalProps {
 export default function DelegateModal({ isOpen, onDismiss, title }: VoteModalProps) {
   const { account } = useActiveWeb3React()
 
-  const [prefilledDelegate, setDelegate] = useModalDelegatee()
+  const [prefilledDelegate] = useModalDelegatee()
 
   // state for delegate input
   const [usingDelegate, setUsingDelegate] = useState(!!!prefilledDelegate)
