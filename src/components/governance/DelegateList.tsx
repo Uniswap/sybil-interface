@@ -24,7 +24,8 @@ import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { useAllPrioritizedNames, useAllIdentities, useMultipleTwitterProfileDatas } from '../../state/social/hooks'
+import { useAllIdentities, useMultipleTwitterProfileDatas } from '../../state/social/hooks'
+import { nameOrAddress } from '../../utils/getName'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -114,8 +115,6 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
   // show indentity if it exists instead of address
-  const names = useAllPrioritizedNames()
-
   const [allIdentities] = useAllIdentities()
 
   const manualEntries =
@@ -148,7 +147,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
     const formattedAddress = isAddress(d.id)
-    const name = formattedAddress ? names?.[formattedAddress] ?? shortenAddress(formattedAddress) : ''
+    const [identities] = useAllIdentities()
+    const name = nameOrAddress(d.id, identities, true)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
 
     return formattedAddress ? (

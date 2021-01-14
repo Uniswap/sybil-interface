@@ -1,0 +1,20 @@
+{
+  "folders": [
+	{
+		"path": "../../../../V2/uniswap-interface"
+	},
+	{
+		"path": "../../../../default-token-list"
+	},
+	{
+		"path": "../.."
+	},
+	{
+		"path": "../../../twitter-worker"
+	}
+],
+  "settings": {
+    "git.ignoreLimitWarning": true,
+    "editor.formatOnSave": true
+  }
+}

@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { TYPE, StyledInternalLink } from '../../theme'
-import { shortenAddress, isAddress } from '../../utils'
-import { useAllPrioritizedNames } from '../../state/social/hooks'
+import { useAllIdentities } from '../../state/social/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
+import { nameOrAddress } from '../../utils/getName'
 
 const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
@@ -55,7 +55,8 @@ export default function AllVoters({
   // format voter name with indentity if it exists
   const [activeProtocol] = useActiveProtocol()
 
-  const names = useAllPrioritizedNames()
+  // used to format name
+  const [allIdentities] = useAllIdentities()
 
   return (
     <StyledDataCard>
@@ -71,20 +72,17 @@ export default function AllVoters({
         <TopVoterWrapper>
           <AutoColumn gap="1rem">
             {allVoters?.map((p, i) => {
-              const formattedName = isAddress(p.voter.id)
               return (
-                formattedName && (
-                  <RowBetween key={'vote-for-' + i}>
-                    <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
-                      <TYPE.black fontWeight={400} fontSize="14px">
-                        {names?.[formattedName] ?? shortenAddress(formattedName)}
-                      </TYPE.black>
-                    </StyledInternalLink>
+                <RowBetween key={'vote-for-' + i}>
+                  <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      {nameOrAddress(p.voter.id, allIdentities, true)}
                     </TYPE.black>
-                  </RowBetween>
-                )
+                  </StyledInternalLink>
+                  <TYPE.black fontWeight={400} fontSize="14px">
+                    {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  </TYPE.black>
+                </RowBetween>
               )
             })}
           </AutoColumn>

@@ -21,19 +21,15 @@ import { GreyCard } from '../Card'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { useBlockNumber } from '../../state/application/hooks'
 import { BigNumber } from 'ethers'
+import { nameOrAddress } from '../../utils/getName'
+import { useAllIdentities } from '../../state/social/hooks'
 
-const Wrapper = styled.div<{ backgroundColor?: string }>`
-  // width: 100%;
-`
+const Wrapper = styled.div<{ backgroundColor?: string }>``
 
 const ProposalInfo = styled(AutoColumn)`
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-
-  `};
 `
 
 const ArrowWrapper = styled.div`
@@ -119,6 +115,7 @@ function ProposalDetails({
     proposalData?.forCount !== undefined && proposalData?.againstCount !== undefined
       ? proposalData.forCount + proposalData.againstCount
       : undefined
+
   const forPercentage: string =
     proposalData?.forCount !== undefined && totalVotes
       ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) + '%'
@@ -129,13 +126,18 @@ function ProposalDetails({
       ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) + '%'
       : '0%'
 
+  const [allIdentities] = useAllIdentities()
+
   // show links in propsoal details if content is an address
-  // if content is contract with common name, replace address with common name
   const linkIfAddress = (content: string) => {
     if (isAddress(content) && chainId) {
-      return <ExternalLink href={getEtherscanLink(chainId, content, 'address')}>{content}</ExternalLink>
+      return (
+        <ExternalLink href={getEtherscanLink(chainId, content, 'address')}>
+          {nameOrAddress(content, allIdentities)}
+        </ExternalLink>
+      )
     }
-    return <span>{content}</span>
+    return <span>{nameOrAddress(content, allIdentities)}</span>
   }
 
   return (
@@ -218,11 +220,7 @@ function ProposalDetails({
                   proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
                 }
               >
-                <MarkDownWrapper>
-                  <DetailText>
-                    <ReactMarkdown source={proposalData?.proposer} />
-                  </DetailText>
-                </MarkDownWrapper>
+                <TYPE.blue fontWeight={500}>{nameOrAddress(proposalData?.proposer, allIdentities)}</TYPE.blue>
               </ExternalLink>
             </AutoColumn>
           </ProposalInfo>
