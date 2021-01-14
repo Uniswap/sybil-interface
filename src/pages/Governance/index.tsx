@@ -24,6 +24,8 @@ import { useAllTransactions, isTransactionRecent } from '../../state/transaction
 import { newTransactionsFirst } from '../../components/Web3Status'
 import { LoadingFlag } from '../../theme/components'
 import { isMobile } from 'react-device-detect'
+import { useAllIdentities } from '../../state/social/hooks'
+import { nameOrAddress } from '../../utils/getName'
 
 const SectionWrapper = styled.div`
   display: grid;
@@ -154,6 +156,9 @@ export default function Overview() {
   const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
   const hasPendingTransactions = !!pending.length
 
+  // used for displaying names
+  const [allIdentities] = useAllIdentities()
+
   return (
     <BodyWrapper>
       <SectionWrapper>
@@ -242,7 +247,7 @@ export default function Overview() {
                       <RowFixed>
                         {!isMobile && <TYPE.main mr="4px">Delegated to:</TYPE.main>}
                         <BlankInternalLink to={activeProtocol?.id + '/' + userDelegatee}>
-                          <TYPE.blue mr="4px">{shortenAddress(userDelegatee)}</TYPE.blue>
+                          <TYPE.blue mr="4px">{nameOrAddress(userDelegatee, allIdentities, true)}</TYPE.blue>
                         </BlankInternalLink>
                         <UpdateButton onClick={() => toggelDelegateModal()}>
                           {!isMobile ? 'change' : 'edit'}

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
-import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal } from './actions'
+import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal, setModalDelegatee } from './actions'
 import { useActiveProtocol } from '../governance/hooks'
 import { UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE } from '../governance/reducer'
 import { uniswapClient, compoundClient } from '../../apollo/client'
@@ -22,6 +22,12 @@ export function useToggleModal(modal: ApplicationModal): () => void {
   const open = useModalOpen(modal)
   const dispatch = useDispatch<AppDispatch>()
   return useCallback(() => dispatch(setOpenModal(open ? null : modal)), [dispatch, modal, open])
+}
+
+export function useModalDelegatee(): [string | null | undefined, (delegatee: string | null | undefined) => void] {
+  const delegatee = useSelector((state: AppState) => state.application.modalDelegatee)
+  const dispatch = useDispatch<AppDispatch>()
+  return [delegatee, useCallback((delegatee: string | null) => dispatch(setModalDelegatee({ delegatee })), [dispatch])]
 }
 
 export function useOpenModal(modal: ApplicationModal): () => void {

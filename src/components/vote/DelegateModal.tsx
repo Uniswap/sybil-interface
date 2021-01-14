@@ -15,6 +15,7 @@ import { useDelegateCallback, useGovernanceToken, useActiveProtocol } from '../.
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { Text } from 'rebass'
+import { useModalDelegatee } from '../../state/application/hooks'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -37,11 +38,12 @@ interface VoteModalProps {
   isOpen: boolean
   onDismiss: () => void
   title: string
-  prefilledDelegate?: string // optionally prefil with delegate
 }
 
-export default function DelegateModal({ isOpen, onDismiss, title, prefilledDelegate }: VoteModalProps) {
+export default function DelegateModal({ isOpen, onDismiss, title }: VoteModalProps) {
   const { account } = useActiveWeb3React()
+
+  const [prefilledDelegate, setDelegate] = useModalDelegatee()
 
   // state for delegate input
   const [usingDelegate, setUsingDelegate] = useState(!!!prefilledDelegate)
