@@ -12,7 +12,8 @@ describe('application reducer', () => {
       blockNumber: {
         [ChainId.MAINNET]: 3
       },
-      openModal: null
+      openModal: null,
+      modalDelegatee: null
     })
   })
 
@@ -45,8 +46,6 @@ describe('application reducer', () => {
       expect(store.getState().openModal).toEqual(ApplicationModal.WALLET)
       store.dispatch(setOpenModal(ApplicationModal.WALLET))
       expect(store.getState().openModal).toEqual(ApplicationModal.WALLET)
-      store.dispatch(setOpenModal(ApplicationModal.CLAIM_POPUP))
-      expect(store.getState().openModal).toEqual(ApplicationModal.CLAIM_POPUP)
       store.dispatch(setOpenModal(null))
       expect(store.getState().openModal).toEqual(null)
     })

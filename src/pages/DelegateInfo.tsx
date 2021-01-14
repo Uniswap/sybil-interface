@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { BodyWrapper } from './AppBody'
 import {
@@ -33,8 +33,7 @@ import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
 import CopyHelper from '../components/AccountDetails/Copy'
 import { useIsEOA } from '../hooks/useIsEOA'
-import DelegateModal from '../components/vote/DelegateModal'
-import { useModalOpen, useToggleModal } from '../state/application/hooks'
+import { useToggleModal, useModalDelegatee } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
@@ -134,9 +133,8 @@ function DelegateInfo({
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
 
   // toggle for showing delegation modal with prefilled delegate
-  const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
-  const [prefilledDelegate, setPrefilledDelegate] = useState<string | undefined>()
+  const [, setPrefilledDelegate] = useModalDelegatee()
 
   // detect if they can delegate
   const userTokenBalance = useTokenBalance(account ?? undefined, govToken)
@@ -153,15 +151,6 @@ function DelegateInfo({
 
   return (
     <BodyWrapper>
-      <DelegateModal
-        isOpen={showDelegateModal}
-        onDismiss={() => {
-          setPrefilledDelegate(undefined)
-          toggelDelegateModal()
-        }}
-        title="Delegate Votes"
-        prefilledDelegate={prefilledDelegate}
-      />
       <GreyCard>
         {formattedAddress && chainId ? (
           <AutoColumn gap="md">

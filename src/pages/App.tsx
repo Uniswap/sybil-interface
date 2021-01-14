@@ -15,6 +15,9 @@ import Delegates from './Delegates'
 import Proposals from './Proposals'
 import ProposalDetails from '../components/governance/ProposalDetails'
 import DelegateInfo from './DelegateInfo'
+import DelegateModal from '../components/vote/DelegateModal'
+import { useModalOpen, useToggleModal } from '../state/application/hooks'
+import { ApplicationModal } from '../state/application/actions'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -57,6 +60,12 @@ const Marginer = styled.div`
   margin-top: 5rem;
 `
 
+function TopLevelModals() {
+  const open = useModalOpen(ApplicationModal.DELEGATE)
+  const toggle = useToggleModal(ApplicationModal.DELEGATE)
+  return <DelegateModal isOpen={open} onDismiss={toggle} title="Delegate" />
+}
+
 export default function App() {
   return (
     <Suspense fallback={null}>
@@ -65,12 +74,12 @@ export default function App() {
       <Route component={TwitterAccountQueryParamReader} />
       <SiteWrapper>
         <SideMenu />
-        {/* <AppWrapper> */}
         <ContentWrapper>
           <Web3Status />
           <Popups />
           <Polling />
           <Overview />
+          <TopLevelModals />
           <Web3ReactManager>
             <Switch>
               <Route exact strict path="/delegates/:protocolID" component={Delegates} />
@@ -82,7 +91,6 @@ export default function App() {
           </Web3ReactManager>
           <Marginer />
         </ContentWrapper>
-        {/* </AppWrapper> */}
       </SiteWrapper>
     </Suspense>
   )

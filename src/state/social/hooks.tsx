@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useCallback, ReactNode } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { fetchProfileData, ProfileDataResponse, fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { useActiveWeb3React } from '../../hooks'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppState } from '..'
 import { updateIdentities } from './actions'
-import { TwitterEntry, UncategorizedContentEntry, Identities, Identity } from './reducer'
+import { TwitterEntry, Identities, Identity } from './reducer'
 import { isAddress } from '../../utils'
-import LogoText from '../../components/governance/LogoText'
 
 const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 
@@ -22,48 +21,6 @@ export function useAllIdentities(): [Identities | undefined, (identities: Identi
     [dispatch]
   )
   return [identities, setIdentities]
-}
-
-/**
- * When displaying identities in a list, show them in this order of priority (if multiple identities)
- */
-export function useAllPrioritizedNames(): { [address: string]: string | ReactNode | undefined } | undefined {
-  const [allIdentities] = useAllIdentities()
-
-  if (!allIdentities) return undefined
-  const prioritizedNames: { [address: string]: string | ReactNode | undefined } = {}
-  Object.keys(allIdentities).map(address => {
-    const formattedAddress = isAddress(address)
-    if (!formattedAddress) {
-      return undefined
-    }
-    if (allIdentities[formattedAddress]?.twitter) {
-      return (prioritizedNames[formattedAddress] = (
-        <LogoText type="twitter">{'@' + allIdentities[address].twitter?.handle}</LogoText>
-      ))
-    } else if (allIdentities[address]?.other) {
-      return (prioritizedNames[address] = allIdentities[address].other?.name)
-    }
-    return undefined
-  })
-  return prioritizedNames
-}
-
-// filter for only entities with uncategorized names
-export function useAllUncategorizedNames(): { [address: string]: UncategorizedContentEntry | undefined } | undefined {
-  const [allIdentities] = useAllIdentities()
-  if (allIdentities) {
-    const uncategorizedOnly: { [address: string]: UncategorizedContentEntry | undefined } | undefined = {}
-    Object.keys(allIdentities).map(address => {
-      if (allIdentities[address].other !== undefined) {
-        uncategorizedOnly[address] = allIdentities[address].other
-      }
-      return true
-    })
-    return uncategorizedOnly
-  } else {
-    return undefined
-  }
 }
 
 // filter for only entities with uncategorized names
