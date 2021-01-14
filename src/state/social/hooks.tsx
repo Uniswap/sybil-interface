@@ -56,7 +56,7 @@ export function useVerifiedHandle(address: string | null | undefined): TwitterEn
 
 // check for any indentity info
 // undefined is no verification, null is loading
-export function useIdentityInfo(address: string | null | undefined): Identity | undefined | null {
+export function useIdentity(address: string | null | undefined): Identity | undefined | null {
   const [allIdentities] = useAllIdentities()
   const formattedAddress = address && isAddress(address)
   if (!allIdentities) {

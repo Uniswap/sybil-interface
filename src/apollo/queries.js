@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+import { FETCHING_INTERVAL } from '../state/governance/reducer'
 
 export const GLOBAL_DATA = gql`
   query governance {
@@ -14,7 +15,24 @@ export const GLOBAL_DATA = gql`
 // fetch top delegates by votes delegated at current time
 export const TOP_DELEGATES = gql`
   query delegates {
-    delegates(first: 50, orderBy: delegatedVotes, orderDirection: desc) {
+    delegates(first: 20, orderBy: delegatedVotes, orderDirection: desc) {
+      id
+      delegatedVotes
+      delegatedVotesRaw
+      tokenHoldersRepresentedAmount
+      votes {
+        id
+        votes
+        support
+      }
+    }
+  }
+`
+
+// fetch top delegates by votes delegated at current time
+export const TOP_DELEGATES_OFFSET = gql`
+  query delegates($skip: Int!) {
+    delegates(first: ${FETCHING_INTERVAL}, skip: $skip, orderBy: delegatedVotes, orderDirection: desc) {
       id
       delegatedVotes
       delegatedVotesRaw

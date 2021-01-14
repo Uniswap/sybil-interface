@@ -1,9 +1,16 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive, updateTopDelegates, updateVerifiedDelegates } from './actions'
+import {
+  updateActiveProtocol,
+  updateFilterActive,
+  updateTopDelegates,
+  updateVerifiedDelegates,
+  updateGlobalData,
+  updateMaxFetched
+} from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo } from './reducer'
+import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
@@ -11,18 +18,10 @@ import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
 import { useSubgraphClient } from '../application/hooks'
-import { fetchProposals, fetchGlobalData, enumerateProposalState } from '../../data/governance'
+import { fetchProposals, enumerateProposalState } from '../../data/governance'
 import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
-
-export interface GlobaData {
-  id: string
-  totalTokenHolders: number
-  totalDelegates: number
-  delegatedVotes: number
-  delegatedVotesRaw: number
-}
 
 export interface DelegateData {
   id: string
@@ -76,20 +75,38 @@ export function useGovernanceToken(): Token | undefined {
 }
 
 // @todo add typed query response
-export function useGlobalData(): GlobaData | undefined {
-  const { library } = useActiveWeb3React()
-  const client = useSubgraphClient()
-  const [globalData, setGlobalData] = useState<GlobaData | undefined>()
+export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | undefined) => void] {
+  const dispatch = useDispatch<AppDispatch>()
 
-  useEffect(() => {
-    fetchGlobalData(client).then((data: GlobaData | null) => {
-      if (data) {
-        setGlobalData(data)
-      }
-    })
-  }, [library, client])
+  const [activeProtocol] = useActiveProtocol()
 
-  return globalData
+  const globalData = useSelector<AppState, AppState['governance']['globalData']>(state => state.governance.globalData)
+
+  const setGlobalData = useCallback(
+    (data: GlobaData | undefined) => {
+      activeProtocol && dispatch(updateGlobalData({ protocolID: activeProtocol.id, data }))
+    },
+    [activeProtocol, dispatch]
+  )
+
+  return [activeProtocol ? globalData[activeProtocol.id] : undefined, setGlobalData]
+}
+
+export function useMaxFetched(): [number | undefined, (maxFetched: number | undefined) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+
+  const [activeProtocol] = useActiveProtocol()
+
+  const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>(state => state.governance.maxFetched)
+
+  const setMaxFetched = useCallback(
+    (maxFetched: number | undefined) => {
+      activeProtocol && dispatch(updateMaxFetched({ protocolID: activeProtocol.id, maxFetched }))
+    },
+    [activeProtocol, dispatch]
+  )
+
+  return [activeProtocol ? maxFetched[activeProtocol.id] : undefined, setMaxFetched]
 }
 
 export function useTopDelegates(): [DelegateData[] | undefined, (topDelegates: DelegateData[] | undefined) => void] {

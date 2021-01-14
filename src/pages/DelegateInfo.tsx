@@ -27,7 +27,7 @@ import {
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
 import TwitterIcon from '../assets/images/Twitter_Logo_Blue.png'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
-import { useIdentityInfo, useTwitterProfileData } from '../state/social/hooks'
+import { useIdentity, useTwitterProfileData } from '../state/social/hooks'
 import { useTokenBalance } from '../state/wallet/hooks'
 import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
@@ -126,8 +126,9 @@ function DelegateInfo({
   const delegateTokenBalance = useTokenBalance(delegateAddress, govToken)
 
   // get social data from Sybil list
-  const identityInfo = useIdentityInfo(delegateAddress)
-  const twitterData = useTwitterProfileData(identityInfo?.twitter?.handle)
+  const identity = useIdentity(delegateAddress)
+  const twitterHandle = identity?.twitter?.handle
+  const twitterData = useTwitterProfileData(twitterHandle)
 
   // ens name if they have it
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
@@ -177,30 +178,24 @@ function DelegateInfo({
                     <RowFixed>
                       <ExternalLink
                         href={
-                          identityInfo?.twitter?.handle
-                            ? getTwitterProfileLink(identityInfo?.twitter?.handle)
+                          twitterHandle
+                            ? getTwitterProfileLink(twitterHandle)
                             : getEtherscanLink(chainId, formattedAddress, 'address')
                         }
                       >
                         <OnlyAboveSmall>
-                          <TYPE.black>
-                            {identityInfo?.twitter?.handle
-                              ? `@${identityInfo.twitter.handle}`
-                              : ensName ?? formattedAddress}
-                          </TYPE.black>
+                          <TYPE.black>{twitterHandle ? `@${twitterHandle}` : ensName ?? formattedAddress}</TYPE.black>
                         </OnlyAboveSmall>
                         <OnlyBelowSmall>
                           <TYPE.black>
-                            {identityInfo?.twitter?.handle
-                              ? `@${identityInfo.twitter.handle}`
-                              : shortenAddress(formattedAddress ?? '')}
+                            {twitterHandle ? `@${twitterHandle}` : shortenAddress(formattedAddress ?? '')}
                           </TYPE.black>
                         </OnlyBelowSmall>
                       </ExternalLink>
-                      {identityInfo?.twitter?.handle && <TwitterLogo src={TwitterIcon} />}
-                      {!identityInfo?.twitter?.handle && <CopyHelper toCopy={formattedAddress} />}
+                      {twitterHandle && <TwitterLogo src={TwitterIcon} />}
+                      {!twitterHandle && <CopyHelper toCopy={formattedAddress} />}
                     </RowFixed>
-                    {identityInfo?.twitter?.handle && delegateAddress ? (
+                    {twitterHandle && delegateAddress ? (
                       <RowFixed>
                         <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
                           <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>

@@ -1,7 +1,14 @@
 import { DelegateData } from './hooks'
 import { SerializedToken } from './../user/actions'
 import { ChainId, Token } from '@uniswap/sdk'
-import { updateActiveProtocol, updateFilterActive, updateTopDelegates, updateVerifiedDelegates } from './actions'
+import {
+  updateActiveProtocol,
+  updateFilterActive,
+  updateTopDelegates,
+  updateVerifiedDelegates,
+  updateGlobalData,
+  updateMaxFetched
+} from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
@@ -17,6 +24,15 @@ export interface GovernanceInfo {
   governanceAddress: string
   social: string
   emoji?: string
+}
+
+// protocol wide data
+export interface GlobaData {
+  id: string
+  totalTokenHolders: number
+  totalDelegates: number
+  delegatedVotes: number
+  delegatedVotesRaw: number
 }
 
 // constant addresses for supported protocols
@@ -58,6 +74,8 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   compound: COMPOUND_GOVERNANCE
 }
 
+export const FETCHING_INTERVAL = 50
+
 export interface GovernanceState {
   // the selected option from supported protocol options
   activeProtocol: GovernanceInfo | undefined
@@ -69,17 +87,32 @@ export interface GovernanceState {
   topDelegates: {
     [protocolID: string]: DelegateData[] | undefined
   }
+
+  // used for paginated delegate lookup
+  maxFetched: {
+    [protocolID: string]: number | undefined
+  }
+
   // only delegates with verified usernames
   verifiedDelegates: {
     [protocolID: string]: DelegateData[] | undefined
+  }
+
+  globalData: {
+    [protocolID: string]: GlobaData | undefined
   }
 }
 
 export const initialState: GovernanceState = {
   activeProtocol: undefined,
   filterActive: false,
+
+  // top delegates and pagination details
   topDelegates: {},
-  verifiedDelegates: {}
+  maxFetched: {},
+
+  verifiedDelegates: {},
+  globalData: {}
 }
 
 export default createReducer(initialState, builder =>
@@ -95,5 +128,11 @@ export default createReducer(initialState, builder =>
     })
     .addCase(updateVerifiedDelegates, (state, action) => {
       state.verifiedDelegates[action.payload.protocolID] = action.payload.verifiedDelegates
+    })
+    .addCase(updateGlobalData, (state, action) => {
+      state.globalData[action.payload.protocolID] = action.payload.data
+    })
+    .addCase(updateMaxFetched, (state, action) => {
+      state.maxFetched[action.payload.protocolID] = action.payload.maxFetched
     })
 )
