@@ -2,8 +2,14 @@ import { useEffect } from 'react'
 import { useActiveWeb3React } from '../../hooks'
 import { useSubgraphClient } from '../application/hooks'
 import { useAllIdentities } from '../social/hooks'
-import { fetchTopDelegates, fetchVerifiedDelegates } from '../../data/governance'
-import { useTopDelegates, useVerifiedDelegates } from './hooks'
+import {
+  fetchTopDelegates,
+  fetchVerifiedDelegates,
+  fetchGlobalData,
+  fetchTopDelegatesOffset
+} from '../../data/governance'
+import { useTopDelegates, useVerifiedDelegates, useGlobalData, useMaxFetched, useActiveProtocol } from './hooks'
+import { GlobaData, FETCHING_INTERVAL } from './reducer'
 
 export default function Updater(): null {
   // fetched all indentity info if haven't yet
@@ -14,8 +20,31 @@ export default function Updater(): null {
 
   const [allIdentities] = useAllIdentities()
 
-  const [, setTopDelegates] = useTopDelegates()
+  const [activeProtocol] = useActiveProtocol()
+
+  const [topDelegates, setTopDelegates] = useTopDelegates()
   const [, setVerifiedDelegates] = useVerifiedDelegates()
+
+  // fetch global data stats for protocol if not loaded
+  const [globalData, setGlobalData] = useGlobalData()
+  useEffect(() => {
+    if (!globalData) {
+      fetchGlobalData(client).then((data: GlobaData | null) => {
+        if (data) {
+          setGlobalData(data)
+        }
+      })
+    }
+  }, [client, globalData, setGlobalData])
+
+  const [maxFetched, setMaxFetched] = useMaxFetched()
+
+  // udpate maxed fetched amount if protocol is active
+  useEffect(() => {
+    if (activeProtocol && !maxFetched) {
+      setMaxFetched(FETCHING_INTERVAL)
+    }
+  }, [activeProtocol, maxFetched, setMaxFetched])
 
   useEffect(() => {
     async function fetchTopDelegateData() {
@@ -34,6 +63,24 @@ export default function Updater(): null {
     }
     fetchTopDelegateData()
   }, [library, client, allIdentities, setTopDelegates])
+
+  // fetch additional data and concat if needed
+  useEffect(() => {
+    async function fetchTopDelegateData() {
+      if (library && allIdentities && client && topDelegates && maxFetched && topDelegates.length < maxFetched) {
+        try {
+          fetchTopDelegatesOffset(client, library, allIdentities, maxFetched).then(async delegateData => {
+            if (delegateData) {
+              setTopDelegates(topDelegates.concat(delegateData))
+            }
+          })
+        } catch (e) {
+          console.log('ERROR:' + e)
+        }
+      }
+    }
+    fetchTopDelegateData()
+  }, [library, client, allIdentities, setTopDelegates, topDelegates, maxFetched])
 
   useEffect(() => {
     async function fetchVerifiedDelegateData() {

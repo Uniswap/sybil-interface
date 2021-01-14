@@ -1,4 +1,4 @@
-import { GovernanceInfo } from './reducer'
+import { GovernanceInfo, GlobaData } from './reducer'
 import { createAction } from '@reduxjs/toolkit'
 import { DelegateData } from './hooks'
 
@@ -11,3 +11,13 @@ export const updateVerifiedDelegates = createAction<{
   protocolID: string
   verifiedDelegates: DelegateData[] | undefined
 }>(`/governance/updateVerifiedDelegates`)
+
+export const updateGlobalData = createAction<{
+  protocolID: string
+  data: GlobaData | undefined
+}>('/governance/updateGlobalData')
+
+export const updateMaxFetched = createAction<{
+  protocolID: string
+  maxFetched: number | undefined
+}>('/governance/updateMaxFetched')

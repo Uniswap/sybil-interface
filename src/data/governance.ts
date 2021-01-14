@@ -1,12 +1,13 @@
 import { Identities } from './../state/social/reducer'
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST } from '../apollo/queries'
-import { DelegateData, ProposalData, GlobaData } from '../state/governance/hooks'
+import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST, TOP_DELEGATES_OFFSET } from '../apollo/queries'
+import { DelegateData, ProposalData } from '../state/governance/hooks'
 import { ethers } from 'ethers'
 import { fetchProfileData } from './social'
 import { isAddress } from '../utils'
 import { DocumentNode } from 'graphql'
 import { PRELOADED_PROPOSALS } from '../constants'
+import { GlobaData } from '../state/governance/reducer'
 
 interface DelegateResponse {
   data: {
@@ -43,7 +44,7 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
 
 interface DelegateQuery {
   query: DocumentNode
-  variables?: { list: false | string[] | undefined }
+  variables?: { list?: false | string[] | undefined; skip?: number | undefined }
   fetchPolicy: string
 }
 
@@ -90,6 +91,10 @@ async function fetchDelegatesFromClient(
         )
 
         return res.data.delegates.map((d, i) => {
+          const checksummed = isAddress(d.id)
+          if (checksummed) {
+            d.id = checksummed
+          }
           return {
             ...d,
             EOA: typed[i] === '0x',
@@ -114,6 +119,21 @@ export async function fetchTopDelegates(
 ): Promise<DelegateData[] | null> {
   return fetchDelegatesFromClient(client, library, allIdentities, {
     query: TOP_DELEGATES,
+    fetchPolicy: 'cache-first'
+  })
+}
+
+export async function fetchTopDelegatesOffset(
+  client: any,
+  library: Web3Provider,
+  allIdentities: Identities,
+  maxFetched: number
+): Promise<DelegateData[] | null> {
+  return fetchDelegatesFromClient(client, library, allIdentities, {
+    query: TOP_DELEGATES_OFFSET,
+    variables: {
+      skip: maxFetched
+    },
     fetchPolicy: 'cache-first'
   })
 }
