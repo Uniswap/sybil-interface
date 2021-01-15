@@ -12,6 +12,7 @@ import ENS_ABI from '../constants/abis/ens-registrar.json'
 import { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_ABI from '../constants/abis/erc20.json'
 import WETH_ABI from '../constants/abis/weth.json'
+import AUTONOMOUS_ABI from '../constants/abis/autonomous.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
@@ -87,4 +88,8 @@ export function useGovernanceContract(): Contract | null {
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
   return useContract(govToken ? govToken.address : undefined, UNI_ABI, true)
+}
+
+export function useAutonomousContract(tokenAddress?: string): Contract | null {
+  return useContract(tokenAddress ?? undefined, AUTONOMOUS_ABI, true)
 }

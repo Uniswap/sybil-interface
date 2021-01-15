@@ -145,7 +145,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const maxPage = maxCount ? Math.floor(maxCount / FETCHING_INTERVAL) + 1 : 1
 
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
-    const name = nameOrAddress(d.id, allIdentities, true)
+    const name = nameOrAddress(d.id, allIdentities, true, d.autonomous)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
 
     return (
@@ -169,7 +169,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
               </OnlyAboveSmall>
               <AutoColumn gap="6px">
                 <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>{name}</TYPE.black>
-                {d.handle ? (
+                {d.handle || d.autonomous ? (
                   <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                 ) : (
                   <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>

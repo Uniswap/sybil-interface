@@ -6,7 +6,8 @@ import LogoText from '../components/governance/LogoText'
 export function nameOrAddress(
   address: string | undefined,
   identities: { [address: string]: Identity } | undefined,
-  shortern?: boolean | undefined
+  shortern?: boolean | undefined,
+  autonomous?: boolean | undefined
 ): string | ReactNode {
   if (!address) {
     return ''
@@ -20,6 +21,10 @@ export function nameOrAddress(
 
   if (identity?.other) {
     return identity.other.name
+  }
+
+  if (autonomous) {
+    return 'Autonomous Proposal Contract ⚙️'
   }
 
   if (shortern) {

@@ -8,6 +8,7 @@ import { isAddress } from '../utils'
 import { DocumentNode } from 'graphql'
 import { PRELOADED_PROPOSALS } from '../constants'
 import { GlobaData } from '../state/governance/reducer'
+import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../constants/proposals'
 
 interface DelegateResponse {
   data: {
@@ -95,9 +96,11 @@ async function fetchDelegatesFromClient(
           if (checksummed) {
             d.id = checksummed
           }
+
           return {
             ...d,
             EOA: typed[i] === '0x',
+            autonomous: typed[i] === AUTONOMOUS_PROPOSAL_BYTECODE,
             handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
             imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
           }
