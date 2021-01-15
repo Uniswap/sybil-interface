@@ -22,6 +22,7 @@ import { fetchProposals, enumerateProposalState } from '../../data/governance'
 import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
+import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 
 export interface DelegateData {
   id: string
@@ -34,6 +35,7 @@ export interface DelegateData {
     votes: number
   }[]
   EOA: boolean | undefined //
+  autonomous: boolean | undefined
   handle: string | undefined // twitter handle
   imageURL?: string | undefined
 }
@@ -454,12 +456,14 @@ export interface DelegateInfo {
   }[]
 
   EOA: boolean | null // null means loading
+  autonomous?: boolean
 }
 
 interface DelegateInfoRes {
   data:
     | {
         delegates: {
+          id: string
           delegatedVotes: string
           tokenHoldersRepresentedAmount: number
           votes: {
@@ -475,6 +479,7 @@ interface DelegateInfoRes {
 }
 
 export function useDelegateInfo(address: string | undefined): DelegateInfo | undefined {
+  const { library } = useActiveWeb3React()
   const client = useSubgraphClient()
 
   const [data, setData] = useState<DelegateInfo | undefined>()
@@ -490,8 +495,9 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
             address: address?.toLocaleLowerCase()
           }
         })
-        .then((res: DelegateInfoRes) => {
+        .then(async (res: DelegateInfoRes) => {
           if (res?.data) {
+            const source = await library?.getCode(res.data.delegates[0].id)
             const resData = res.data.delegates[0]
             const votes = resData
               ? resData.votes
@@ -507,7 +513,8 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
               delegatedVotes: parseFloat(resData?.delegatedVotes ?? '0'),
               tokenHoldersRepresentedAmount: resData?.tokenHoldersRepresentedAmount ?? 0,
               votes,
-              EOA: isEOA
+              EOA: isEOA,
+              autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE
             })
           }
         })
@@ -515,10 +522,10 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
           console.log(e)
         })
     }
-    if (!data && address) {
+    if (!data && address && library) {
       fetchData()
     }
-  }, [address, client, data, isEOA])
+  }, [address, client, data, isEOA, library])
 
   return data
 }

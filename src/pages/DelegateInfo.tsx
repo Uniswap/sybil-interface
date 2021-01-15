@@ -25,9 +25,8 @@ import {
   DelegateButton
 } from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
-import TwitterIcon from '../assets/images/Twitter_Logo_Blue.png'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
-import { useIdentity, useTwitterProfileData } from '../state/social/hooks'
+import { useIdentity, useTwitterProfileData, useAllIdentities } from '../state/social/hooks'
 import { useTokenBalance } from '../state/wallet/hooks'
 import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
@@ -37,6 +36,7 @@ import { useToggleModal, useModalDelegatee } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
+import { nameOrAddress } from '../utils/getName'
 
 const ArrowWrapper = styled.div`
   display: flex;
@@ -53,12 +53,6 @@ const ArrowWrapper = styled.div`
     text-decoration: none;
     cursor: pointer;
   }
-`
-
-const TwitterLogo = styled.img`
-  height: 24px;
-  width: 24px;
-  margin-left: 4px;
 `
 
 const DataRow = styled.div`
@@ -133,6 +127,23 @@ function DelegateInfo({
   // ens name if they have it
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
 
+  const [allIdentities] = useAllIdentities()
+  const name = nameOrAddress(
+    formattedAddress ? formattedAddress : undefined,
+    allIdentities,
+    false,
+    delegateInfo?.autonomous
+  )
+
+  const nameShortened = nameOrAddress(
+    formattedAddress ? formattedAddress : undefined,
+    allIdentities,
+    true,
+    delegateInfo?.autonomous
+  )
+
+  const formattedName = name === formattedAddress ? ensName ?? name : name
+
   // toggle for showing delegation modal with prefilled delegate
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
   const [, setPrefilledDelegate] = useModalDelegatee()
@@ -184,18 +195,22 @@ function DelegateInfo({
                         }
                       >
                         <OnlyAboveSmall>
-                          <TYPE.black>{twitterHandle ? `@${twitterHandle}` : ensName ?? formattedAddress}</TYPE.black>
+                          <TYPE.black>{formattedName}</TYPE.black>
                         </OnlyAboveSmall>
                         <OnlyBelowSmall>
-                          <TYPE.black>
-                            {twitterHandle ? `@${twitterHandle}` : shortenAddress(formattedAddress ?? '')}
-                          </TYPE.black>
+                          <TYPE.black>{nameShortened}</TYPE.black>
                         </OnlyBelowSmall>
                       </ExternalLink>
-                      {twitterHandle && <TwitterLogo src={TwitterIcon} />}
-                      {!twitterHandle && <CopyHelper toCopy={formattedAddress} />}
+                      {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
                     </RowFixed>
                     {twitterHandle && delegateAddress ? (
+                      <RowFixed>
+                        <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
+                          <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
+                        </ExternalLink>
+                        <CopyHelper toCopy={formattedAddress} />
+                      </RowFixed>
+                    ) : delegateInfo && delegateInfo.autonomous && delegateAddress ? (
                       <RowFixed>
                         <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
                           <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
