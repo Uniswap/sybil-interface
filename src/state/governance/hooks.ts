@@ -478,11 +478,12 @@ interface DelegateInfoRes {
     | undefined
 }
 
-export function useDelegateInfo(address: string | undefined): DelegateInfo | undefined {
+// undefined means loading, null means no delegate found
+export function useDelegateInfo(address: string | undefined): DelegateInfo | undefined | null {
   const { library } = useActiveWeb3React()
   const client = useSubgraphClient()
 
-  const [data, setData] = useState<DelegateInfo | undefined>()
+  const [data, setData] = useState<DelegateInfo | undefined | null>()
 
   const isEOA = useIsEOA(address)
 
@@ -496,9 +497,20 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
           }
         })
         .then(async (res: DelegateInfoRes) => {
-          if (res?.data) {
+          if (res && res.data && res.data?.delegates[0]) {
             const source = await library?.getCode(res.data.delegates[0].id)
             const resData = res.data.delegates[0]
+
+            if (!resData) {
+              setData({
+                delegatedVotes: 0,
+                tokenHoldersRepresentedAmount: 0,
+                votes: [],
+                EOA: isEOA,
+                autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE
+              })
+            }
+
             const votes = resData
               ? resData.votes
                   // sort in order created
@@ -516,6 +528,8 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
               EOA: isEOA,
               autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE
             })
+          } else {
+            setData(null)
           }
         })
         .catch(e => {

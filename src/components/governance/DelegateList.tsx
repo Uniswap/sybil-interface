@@ -131,12 +131,42 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   // show indentity if it exists instead of address
   const [allIdentities] = useAllIdentities()
 
+  const manualEntries = useMemo(() => {
+    return allIdentities && filteredDelegates
+      ? Object.keys(allIdentities)
+          .filter(address => {
+            const found = filteredDelegates.find(d => d.id === address)
+            return !found
+          })
+          .map((address: any) => {
+            const identity = allIdentities[address]
+            return { handle: identity?.twitter?.handle ?? undefined, address }
+          })
+      : []
+  }, [allIdentities, filteredDelegates])
+
+  const formattedManualDelegates: DelegateData[] = manualEntries.map(entry => {
+    return {
+      id: entry.address,
+      delegatedVotes: 0,
+      delegatedVotesRaw: 0,
+      votePercent: new Percent(BIG_INT_ZERO),
+      votes: [],
+      EOA: true,
+      autonomous: undefined,
+      handle: entry.handle,
+      imageURL: undefined
+    }
+  })
+
   const [page, setPage] = useState(1)
   const [maxFetched, setMaxFetched] = useMaxFetched()
 
+  const combinedDelegates = filterActive ? filteredDelegates?.concat(formattedManualDelegates) : filteredDelegates
+
   const maxCount = filterActive
-    ? filteredDelegates
-      ? filteredDelegates.filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
+    ? combinedDelegates
+      ? combinedDelegates.filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
       : 0
     : globalData
     ? globalData.totalDelegates
@@ -205,15 +235,17 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
               Delegate
             </DelegateButton>
           </OnlyAboveSmall>
-          <VoteText textAlign="end">{votes === '0' ? '< 1' : votes} Votes</VoteText>
+          <VoteText textAlign="end">
+            {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
+          </VoteText>
         </Row>
       </DataRow>
     )
   }
 
   const delegateList = useMemo(() => {
-    return chainId && filteredDelegates && activeProtocol
-      ? filteredDelegates
+    return chainId && combinedDelegates && activeProtocol
+      ? combinedDelegates
           // filter for non zero votes
           .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
@@ -221,7 +253,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             return <DelegateRow d={d} index={i} key={i} />
           })
       : null
-  }, [chainId, filteredDelegates, activeProtocol, page, hideZero])
+  }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
 
   return (
     <GreyCard padding="1rem 0">

@@ -106,8 +106,20 @@ function DelegateInfo({
 
   // get governance data and format amounts
   const delegateInfo = useDelegateInfo(delegateAddress)
-  const delegatedVotes = delegateInfo ? localNumber(delegateInfo.delegatedVotes) : <Loader />
-  const holdersRepresented = delegateInfo ? localNumber(delegateInfo.tokenHoldersRepresentedAmount) : <Loader />
+  const delegatedVotes = delegateInfo ? (
+    localNumber(delegateInfo.delegatedVotes)
+  ) : delegateInfo === null ? (
+    '0'
+  ) : (
+    <Loader />
+  )
+  const holdersRepresented = delegateInfo ? (
+    localNumber(delegateInfo.tokenHoldersRepresentedAmount)
+  ) : delegateInfo === null ? (
+    '0'
+  ) : (
+    <Loader />
+  )
 
   const isEOA = useIsEOA(delegateAddress)
 
@@ -260,8 +272,8 @@ function DelegateInfo({
               <AutoColumn gap="lg">
                 <TYPE.main fontSize="16px">Voting History</TYPE.main>
                 <Break />
-                {delegateInfo && proposalStatuses ? (
-                  delegateInfo?.votes
+                {delegateInfo && proposalStatuses && delegateInfo.votes ? (
+                  delegateInfo.votes
                     ?.map((vote, i) => {
                       const proposal = proposalData?.[vote.proposal] // proposals start at 1
                       const status = proposalStatuses[vote.proposal - 1]
@@ -305,6 +317,8 @@ function DelegateInfo({
                       )
                     })
                     .reverse()
+                ) : delegateInfo === null ? (
+                  <TYPE.body>No past votes</TYPE.body>
                 ) : (
                   <Loader />
                 )}
