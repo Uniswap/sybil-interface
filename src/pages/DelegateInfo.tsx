@@ -129,7 +129,7 @@ function DelegateInfo({
 
   // get gov token balance
   const govToken: Token | undefined = useGovernanceToken()
-  const delegateTokenBalance = useTokenBalance(delegateAddress, govToken)
+  const delegateTokenBalance = useTokenBalance(formattedAddress ? formattedAddress : undefined, govToken)
 
   // get social data from Sybil list
   const identity = useIdentity(delegateAddress)
