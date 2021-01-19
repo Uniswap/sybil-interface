@@ -24,7 +24,7 @@ import { Percent, JSBI } from '@uniswap/sdk'
 import Loader from '../Loader'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
-import { useAllIdentities } from '../../state/social/hooks'
+import { useAllIdentities, useTwitterProfileData } from '../../state/social/hooks'
 import { nameOrAddress } from '../../utils/getName'
 import { FETCHING_INTERVAL } from '../../state/governance/reducer'
 
@@ -178,6 +178,10 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const name = nameOrAddress(d.id, allIdentities, true, d.autonomous)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
 
+    const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
+
+    const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
+
     return (
       <DataRow>
         <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
@@ -189,16 +193,16 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
           <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
             <AccountLinkGroup gap="10px" width="initial">
               <OnlyAboveSmall>
-                {d.imageURL ? (
+                {imageURL ? (
                   <RoundedProfileImage>
-                    <img src={d.imageURL} alt="profile" />
+                    <img src={imageURL} alt="profile" />
                   </RoundedProfileImage>
                 ) : (
                   <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
                 )}
               </OnlyAboveSmall>
               <AutoColumn gap="6px">
-                <TYPE.black style={{ fontWeight: d.imageURL ? 500 : 400 }}>{name}</TYPE.black>
+                <TYPE.black style={{ fontWeight: imageURL ? 500 : 400 }}>{name}</TYPE.black>
                 {d.handle || d.autonomous ? (
                   <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                 ) : (
