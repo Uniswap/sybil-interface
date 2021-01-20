@@ -27,6 +27,7 @@ import { useTokenBalance } from '../../state/wallet/hooks'
 import { useAllIdentities, useTwitterProfileData } from '../../state/social/hooks'
 import { nameOrAddress } from '../../utils/getName'
 import { FETCHING_INTERVAL } from '../../state/governance/reducer'
+import useENSName from '../../hooks/useENSName'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -182,6 +183,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
 
+    const { ENSName } = useENSName(d.id ?? undefined)
+
     return (
       <DataRow>
         <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
@@ -204,7 +207,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
               <AutoColumn gap="6px">
                 <TYPE.black style={{ fontWeight: imageURL ? 500 : 400 }}>{name}</TYPE.black>
                 {d.handle || d.autonomous ? (
-                  <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                  <TYPE.black fontSize="12px">{ENSName !== null ? ENSName : shortenAddress(d.id)}</TYPE.black>
                 ) : (
                   <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
                     {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
