@@ -27,4 +27,4 @@ declare module 'multihashes' {
 
 declare module '*.ttf'
 
-declare module 'react-filter-search';
+declare module 'react-filter-search'

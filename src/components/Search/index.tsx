@@ -36,12 +36,12 @@ const StyledSearch = styled.form`
 `
 
 interface SearchProps {
-  handleChange: (event: { target: HTMLInputElement; }) => void
+  handleChange: (event: { target: HTMLInputElement }) => void
   value: any
   setValue: (value: string) => void
 }
 
-export default function Search({ handleChange, value, setValue}:SearchProps ) {
+export default function Search({ handleChange, value, setValue }: SearchProps) {
   return (
     <StyledSearch className="search">
       <SearchIcon
@@ -49,17 +49,17 @@ export default function Search({ handleChange, value, setValue}:SearchProps ) {
         style={{
           marginLeft: '8px',
           pointerEvents: 'none',
-          position: 'absolute',
+          position: 'absolute'
         }}
         size={16}
       />
-      <input placeholder="Search" type="text" value={value} onChange={(e) => handleChange(e)} />
+      <input placeholder="Search" type="text" value={value} onChange={e => handleChange(e)} />
 
       {value !== '' ? (
         <X
           style={{
             marginLeft: '-24px',
-            cursor: 'pointer',
+            cursor: 'pointer'
           }}
           onClick={() => setValue('')}
           size={20}
@@ -69,7 +69,7 @@ export default function Search({ handleChange, value, setValue}:SearchProps ) {
           style={{
             marginLeft: '-24px',
             cursor: 'pointer',
-            opacity: 0,
+            opacity: 0
           }}
           onClick={() => setValue('')}
           size={20}

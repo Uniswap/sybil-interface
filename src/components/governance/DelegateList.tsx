@@ -176,12 +176,12 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     : 1
 
   const maxPage = maxCount ? Math.floor(maxCount / FETCHING_INTERVAL) + 1 : 1
-  
+
   const [value, setValue] = useState('')
 
-  function handleChange(event: { target: HTMLInputElement; }) {
+  function handleChange(event: { target: HTMLInputElement }) {
     const { value } = event.target
-    console.log("HERE", value)
+    console.log('HERE', value)
 
     setValue(value)
   }
@@ -262,33 +262,35 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   }
 
   const delegateList = useMemo(() => {
-    return chainId && combinedDelegates && activeProtocol
-      ? 
+    return chainId && combinedDelegates && activeProtocol ? (
       <FilterResults
         value={value}
         data={combinedDelegates}
-        renderResults={(results: DelegateData[]) => 
-          results.length === 0
-            ? <AutoRow  justify='center' height='100px'><TYPE.black  textAlign="center" style={{ opacity: '0.6' }}>
-            None found!
-          </TYPE.black></AutoRow>
-            : 
+        renderResults={(results: DelegateData[]) =>
+          results.length === 0 ? (
+            <AutoRow justify="center" height="100px">
+              <TYPE.black textAlign="center" style={{ opacity: '0.6' }}>
+                None found!
+              </TYPE.black>
+            </AutoRow>
+          ) : (
             results
-          // filter for non zero votes
-          .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
-          .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
-          .map((d, i) => <DelegateRow d={d} index={i} key={i} />)
+              // filter for non zero votes
+              .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
+              .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
+              .map((d, i) => <DelegateRow d={d} index={i} key={i} />)
+          )
         }
       />
-      : null
+    ) : null
   }, [chainId, activeProtocol, combinedDelegates, page, hideZero, value])
 
   return (
     <>
       <GreyCard padding="1rem 1rem">
-        <AutoRow  justify='center'>
-          <Search handleChange={handleChange} value={value} setValue={setValue}/>
-          </AutoRow>
+        <AutoRow justify="center">
+          <Search handleChange={handleChange} value={value} setValue={setValue} />
+        </AutoRow>
       </GreyCard>
       <GreyCard padding="1rem 0">
         <AutoColumn gap="lg">
