@@ -8,6 +8,7 @@ import { TYPE } from '../../theme'
 import { ChevronDown } from 'react-feather'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import useOnClickOutside from '../../hooks/useClickOutside'
+import Column from '../Column'
 
 const Wrapper = styled.div<{ backgroundColor?: string; open: boolean }>`
   width: 100%;
@@ -24,20 +25,24 @@ const Wrapper = styled.div<{ backgroundColor?: string; open: boolean }>`
   }
 `
 
-// dont pass style props to DOM link element
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Flyout = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
+const FlyoutContainer = styled(({ ...props }) => <Column {...props} />)`
   width: 100%;
-  padding: 1rem;
   position: absolute;
-  bottom: -68px;
+  top: 68px;
   left: 0px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   box-shadow: 0 10px 34px rgb(236 236 236 / 16%), 0 5px 6px rgb(140 140 140 / 23%);
   background-color: white;
-  text-decoration: none;
   z-index: 3;
+`
+
+// dont pass style props to DOM link element
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Flyout = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
+  width: 100%;
+  padding: 1rem;
+  text-decoration: none;
 `
 
 export default function Dropdown() {
@@ -59,24 +64,27 @@ export default function Dropdown() {
       </RowBetween>
       {open &&
         activeProtocol &&
-        Object.keys(SUPPORTED_PROTOCOLS)
-          .filter(k => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
-          .map((k, i) => (
-            <Flyout
-              key={i}
-              backgroundColor={SUPPORTED_PROTOCOLS[k].secondaryColor}
-              to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
-            >
-              <RowBetween>
-                <RowFixed style={{ gap: '16px' }}>
-                  <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
-                  <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
-                    {SUPPORTED_PROTOCOLS[k].name}
-                  </TYPE.mediumHeader>
-                </RowFixed>
-              </RowBetween>
-            </Flyout>
-          ))}
+        <FlyoutContainer>
+          {Object.keys(SUPPORTED_PROTOCOLS)
+            .filter(k => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
+            .map((k, i) => (
+              <Flyout
+                key={i}
+                backgroundColor={SUPPORTED_PROTOCOLS[k].secondaryColor}
+                to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
+              >
+                <RowBetween>
+                  <RowFixed style={{ gap: '16px' }}>
+                    <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
+                    <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
+                      {SUPPORTED_PROTOCOLS[k].name}
+                    </TYPE.mediumHeader>
+                  </RowFixed>
+                </RowBetween>
+              </Flyout>
+            ))}
+        </FlyoutContainer>
+      }
     </Wrapper>
   )
 }
