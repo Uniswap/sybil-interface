@@ -15,7 +15,7 @@ export const GLOBAL_DATA = gql`
 // fetch top delegates by votes delegated at current time
 export const TOP_DELEGATES = gql`
   query delegates {
-    delegates(first: 20, orderBy: delegatedVotes, orderDirection: desc) {
+    delegates(first: ${FETCHING_INTERVAL}, orderBy: delegatedVotes, orderDirection: desc) {
       id
       delegatedVotes
       delegatedVotesRaw
