@@ -12,6 +12,7 @@ import {
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
+import NdxLogo from '../../assets/images/ndxLogo.png'
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -44,6 +45,10 @@ export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
 const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
 
+export const NDX_GOVERNANCE_ADDRESS = '0x95129751769f99CC39824a0793eF4933DD8Bb74B'
+export const NDX_ADDRESS = '0x86772b1409b61c639EaAc9Ba0AcfBb6E238e5F83'
+const NDX = new Token(ChainId.MAINNET, NDX_ADDRESS, 18, 'NDX', 'Indexed')
+
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   id: 'uniswap',
   name: 'Uniswap Governance',
@@ -68,10 +73,23 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   emoji: '🏦'
 }
 
+export const INDEXED_GOVERNANCE: GovernanceInfo = {
+  id: 'indexed',
+  name: 'Indexed Governance',
+  logo: NdxLogo,
+  primaryColor: '#111111',
+  secondaryColor: '#f2f2f2',
+  token: serializeToken(NDX),
+  governanceAddress: NDX_GOVERNANCE_ADDRESS,
+  social: '@ndxfi',
+  emoji: '🏦'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
-  compound: COMPOUND_GOVERNANCE
+  compound: COMPOUND_GOVERNANCE,
+  indexed: INDEXED_GOVERNANCE
 }
 
 export const FETCHING_INTERVAL = 50
