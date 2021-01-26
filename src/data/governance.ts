@@ -217,7 +217,7 @@ export async function fetchProposals(client: any, key: string): Promise<Proposal
             const description = PRELOADED_PROPOSALS.get(res.data.proposals.length - i - 1) || p.description
             return {
               id: p.id,
-              title: description?.split(/# |\n/g)[1] || 'Untitled',
+              title: description?.split(/# |\n/g)[1] || description?.split(/# |\n/g)[2] || 'Untitled',
               description: description || 'No description.',
               proposer: p.proposer.id,
               status: undefined, // initialize as 0
