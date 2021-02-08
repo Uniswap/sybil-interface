@@ -4,8 +4,8 @@ import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal, setModalDelegatee } from './actions'
 import { useActiveProtocol } from '../governance/hooks'
-import { UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE } from '../governance/reducer'
-import { uniswapClient, compoundClient } from '../../apollo/client'
+import { UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE, AAVE_GOVERNANCE } from '../governance/reducer'
+import { uniswapClient, compoundClient, aaveClient } from '../../apollo/client'
 
 export function useBlockNumber(): number | undefined {
   const { chainId } = useActiveWeb3React()
@@ -86,6 +86,10 @@ export function useSubgraphClient() {
 
   if (activeProtocol?.id === COMPOUND_GOVERNANCE.id) {
     return compoundClient
+  }
+
+  if (activeProtocol?.id === AAVE_GOVERNANCE.id) {
+    return aaveClient
   }
 
   return undefined

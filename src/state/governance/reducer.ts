@@ -12,6 +12,7 @@ import {
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
+import AaveLogo from '../../assets/images/aave-logo.png'
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -44,6 +45,10 @@ export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
 const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
 
+export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
+export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
+const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
+
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   id: 'uniswap',
   name: 'Uniswap Governance',
@@ -68,10 +73,23 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   emoji: '🏦'
 }
 
+export const AAVE_GOVERNANCE: GovernanceInfo = {
+  id: 'aave',
+  name: 'Aave Governance',
+  logo: AaveLogo,
+  primaryColor: '#B6509E',
+  secondaryColor: '#ebfeff',
+  token: serializeToken(AAVE),
+  governanceAddress: AAVE_GOVERNANCE_ADDRESS,
+  social: '@AaveAave',
+  emoji: '👻'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
-  compound: COMPOUND_GOVERNANCE
+  compound: COMPOUND_GOVERNANCE,
+  aave: AAVE_GOVERNANCE
 }
 
 export const FETCHING_INTERVAL = 50
