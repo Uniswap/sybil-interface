@@ -12,7 +12,7 @@ import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import { useGovernanceContract, useGovTokenContract } from '../../hooks/useContract'
+import { useGovernanceContract, useGovTokenContract, isAaveGov, isAaveToken } from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
@@ -182,7 +182,7 @@ export interface ProposalData {
 // get count of all proposals made
 export function useProposalCount(): number | undefined {
   const gov = useGovernanceContract()
-  const res = useSingleCallResult(gov, 'proposalCount')
+  const res = useSingleCallResult(gov, isAaveGov(gov) ? 'getProposalsCount' : 'proposalCount')
   if (res.result && !res.loading) {
     return parseInt(res.result[0])
   }
@@ -201,7 +201,11 @@ export function useAllProposalStates(): number[] | undefined {
   const proposalCount = useProposalCount()
   const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [k + 1]) : [['']]
 
-  const statusRes = useSingleContractMultipleData(proposalCount ? govContract : undefined, 'state', ids, NEVER_RELOAD)
+  const statusRes = useSingleContractMultipleData(
+    proposalCount ? govContract : undefined, 
+    isAaveGov(govContract) ? 'getProposalState' : 'state', 
+    ids, 
+    NEVER_RELOAD)
 
   useEffect(() => {
     if (!statuses) {
@@ -221,7 +225,6 @@ export function useAllProposalStates(): number[] | undefined {
 
 export function useProposalStatus(id: string): string | undefined {
   const allStatuses = useAllProposalStates()
-
   return allStatuses ? enumerateProposalState(allStatuses[parseInt(id) - 1]) : undefined
 }
 
@@ -245,7 +248,11 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
   const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids)
+  const counts = useSingleContractMultipleData(
+    amount ? govContract : undefined,
+    isAaveGov(govContract) ? 'getProposalById' : 'proposals',
+    ids
+  )
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
@@ -296,9 +303,13 @@ export function useProposalData(id: string): ProposalData | undefined {
 
 // get the users delegatee if it exists
 export function useUserDelegatee(): string {
-  const { account } = useActiveWeb3React()
-  const uniContract = useGovTokenContract()
-  const { result } = useSingleCallResult(uniContract, 'delegates', [account ?? undefined])
+  const { account } = useActiveWeb3React()  
+  const tokenContract = useGovTokenContract()
+  const { result } = useSingleCallResult(
+    tokenContract,
+    isAaveToken(tokenContract) ? 'getDelegateeByType' : 'delegates',
+    isAaveToken(tokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+  )
   return result?.[0] ?? undefined
 }
 
@@ -310,7 +321,11 @@ export function useUserVotes(): TokenAmount | undefined {
   const govToken = useGovernanceToken()
 
   // check for available votes
-  const votes = useSingleCallResult(govTokenContract, 'getCurrentVotes', [account ?? undefined])?.result?.[0]
+  const votes = useSingleCallResult(
+    govTokenContract, 
+    isAaveToken(govTokenContract) ? 'getPowerCurrent' : 'getCurrentVotes', 
+    isAaveToken(govTokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+  )?.result?.[0]
   return votes && govToken ? new TokenAmount(govToken, votes) : undefined
 }
 
@@ -322,8 +337,13 @@ export function useUserVotesAsOfBlock(block: number | undefined): TokenAmount | 
   const govToken = useGovernanceToken()
 
   // check for available votes
-  const votes = useSingleCallResult(govTokenContract, 'getPriorVotes', [account ?? undefined, block ?? undefined])
-    ?.result?.[0]
+  const votes = useSingleCallResult(
+    govTokenContract,
+    isAaveToken(govTokenContract) ? 'getPowerAtBlock' : 'getPriorVotes',
+    isAaveToken(govTokenContract)
+      ? [account ?? undefined, block ?? undefined, 0]
+      : [account ?? undefined, block ?? undefined]
+  )?.result?.[0]
   return votes && govToken ? new TokenAmount(govToken, votes) : undefined
 }
 
@@ -337,7 +357,7 @@ export function useDelegateCallback(): (delegatee: string | undefined) => undefi
     (delegatee: string | undefined) => {
       if (!library || !chainId || !account || !isAddress(delegatee ?? '')) return undefined
       const args = [delegatee]
-      if (!govTokenContract) throw new Error('No UNI Contract!')
+      if (!govTokenContract) throw new Error('No Governance Contract!')
       return govTokenContract.estimateGas.delegate(...args, {}).then(estimatedGasLimit => {
         return govTokenContract
           .delegate(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
@@ -360,23 +380,37 @@ export function useVoteCallback(): {
 
   const govContract = useGovernanceContract()
   const addTransaction = useTransactionAdder()
+  const isAaveGovCheck = isAaveGov(govContract)
 
   const voteCallback = useCallback(
     (proposalId: string | undefined, support: boolean) => {
       if (!account || !govContract || !proposalId) return
       const args = [proposalId, support]
-      return govContract.estimateGas.castVote(...args, {}).then(estimatedGasLimit => {
-        return govContract
-          .castVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
-          .then((response: TransactionResponse) => {
-            addTransaction(response, {
-              summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+      if (isAaveGovCheck) {
+        return govContract.estimateGas.submitVote(...args, {}).then(estimatedGasLimit => {
+          return govContract
+            .submitVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
+            .then((response: TransactionResponse) => {
+              addTransaction(response, {
+                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+              })
+              return response.hash
             })
-            return response.hash
-          })
-      })
+        })
+      } else {
+        return govContract.estimateGas.castVote(...args, {}).then(estimatedGasLimit => {
+          return govContract
+            .castVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
+            .then((response: TransactionResponse) => {
+              addTransaction(response, {
+                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+              })
+              return response.hash
+            })
+        })
+      }
     },
-    [account, addTransaction, govContract]
+    [account, addTransaction, govContract, isAaveGovCheck]
   )
   return { voteCallback }
 }
