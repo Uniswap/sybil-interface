@@ -1,7 +1,7 @@
 import { Contract } from '@ethersproject/contracts'
 import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.json'
 import { abi as UNI_ABI } from '@uniswap/governance/build/Uni.json'
-import { ChainId, WETH } from '@uniswap/sdk'
+import { ChainId, Token, WETH } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import GOVERNANCE_AAVE_ABI from '../constants/abis/aave-governance.json'
 import AAVE_ABI from '../constants/abis/aave-token.json'
@@ -92,7 +92,7 @@ export function useGovernanceContract(): Contract | null {
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
   return useContract(govToken ? govToken.address : undefined, 
-    govToken?.address === AAVE_ADDRESS ? AAVE_ABI : UNI_ABI, true)
+    isAaveToken(govToken) ? AAVE_ABI : UNI_ABI, true)
 }
 
 export function useAutonomousContract(tokenAddress?: string): Contract | null {
@@ -100,9 +100,13 @@ export function useAutonomousContract(tokenAddress?: string): Contract | null {
 }
 
 export function isAaveGov(gov: Contract | null): boolean {
-  return gov?.address === AAVE_GOVERNANCE_ADDRESS
+  return gov?.address.toLowerCase() === AAVE_GOVERNANCE_ADDRESS.toLowerCase()
 }
 
-export function isAaveToken(token: Contract | null): boolean {
-  return token?.address === AAVE_ADDRESS
+export function isAaveToken(token: Token | undefined): boolean {
+  return token?.address.toLowerCase() === AAVE_ADDRESS.toLowerCase()
+}
+
+export function isAaveTokenContract(token: Contract | null): boolean {
+  return token?.address.toLowerCase() === AAVE_ADDRESS.toLowerCase()
 }

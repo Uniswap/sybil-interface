@@ -12,7 +12,13 @@ import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import { useGovernanceContract, useGovTokenContract, isAaveGov, isAaveToken } from '../../hooks/useContract'
+import {
+  useGovernanceContract,
+  useGovTokenContract,
+  isAaveGov,
+  isAaveToken,
+  isAaveTokenContract
+} from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
@@ -196,16 +202,18 @@ export function useAllProposalStates(): number[] | undefined {
   const govContract = useGovernanceContract()
 
   const [statuses, setStatuses] = useState<number[] | undefined>()
+  const isAaveGovCheck = isAaveGov(govContract)
 
   // get total amount
   const proposalCount = useProposalCount()
-  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [k + 1]) : [['']]
+  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGovCheck ? k : k + 1]) : [['']]
 
   const statusRes = useSingleContractMultipleData(
-    proposalCount ? govContract : undefined, 
-    isAaveGov(govContract) ? 'getProposalState' : 'state', 
-    ids, 
-    NEVER_RELOAD)
+    proposalCount ? govContract : undefined,
+    isAaveGovCheck ? 'getProposalState' : 'state',
+    ids,
+    NEVER_RELOAD
+  )
 
   useEffect(() => {
     if (!statuses) {
@@ -307,8 +315,8 @@ export function useUserDelegatee(): string {
   const tokenContract = useGovTokenContract()
   const { result } = useSingleCallResult(
     tokenContract,
-    isAaveToken(tokenContract) ? 'getDelegateeByType' : 'delegates',
-    isAaveToken(tokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+    isAaveTokenContract(tokenContract) ? 'getDelegateeByType' : 'delegates',
+    isAaveTokenContract(tokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
   )
   return result?.[0] ?? undefined
 }
@@ -322,9 +330,9 @@ export function useUserVotes(): TokenAmount | undefined {
 
   // check for available votes
   const votes = useSingleCallResult(
-    govTokenContract, 
-    isAaveToken(govTokenContract) ? 'getPowerCurrent' : 'getCurrentVotes', 
-    isAaveToken(govTokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+    govTokenContract,
+    isAaveTokenContract(govTokenContract) ? 'getPowerCurrent' : 'getCurrentVotes',
+    isAaveTokenContract(govTokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
   )?.result?.[0]
   return votes && govToken ? new TokenAmount(govToken, votes) : undefined
 }
@@ -339,8 +347,8 @@ export function useUserVotesAsOfBlock(block: number | undefined): TokenAmount | 
   // check for available votes
   const votes = useSingleCallResult(
     govTokenContract,
-    isAaveToken(govTokenContract) ? 'getPowerAtBlock' : 'getPriorVotes',
-    isAaveToken(govTokenContract)
+    isAaveTokenContract(govTokenContract) ? 'getPowerAtBlock' : 'getPriorVotes',
+    isAaveTokenContract(govTokenContract)
       ? [account ?? undefined, block ?? undefined, 0]
       : [account ?? undefined, block ?? undefined]
   )?.result?.[0]
