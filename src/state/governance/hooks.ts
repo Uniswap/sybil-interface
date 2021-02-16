@@ -252,8 +252,8 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (govToken) {
-          fetchProposals(govClient, govToken.address).then((data: ProposalData[] | null) => {
+        if (govToken && activeProtocol) {
+          fetchProposals(govClient, govToken.address, activeProtocol.id).then((data: ProposalData[] | null) => {
             if (data) {
               const proposalMap = data.reduce<{ [id: string]: ProposalData }>((accum, proposal: ProposalData) => {
                 accum[proposal.id] = proposal
@@ -270,7 +270,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     if (!proposals && govToken) {
       fetchData()
     }
-  }, [govClient, govToken, proposals, states])
+  }, [activeProtocol, govClient, govToken, proposals, states])
 
   useEffect(() => {
     if (counts && proposals && govToken) {
