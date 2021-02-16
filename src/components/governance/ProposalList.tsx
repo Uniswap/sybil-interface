@@ -55,6 +55,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                 const status = allStatuses[index]
                   ? enumerateProposalState(allStatuses[index])
                   : enumerateProposalState(0)
+
                 return (
                   <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
                     <RowBetween>

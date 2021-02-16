@@ -12,13 +12,7 @@ import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import {
-  useGovernanceContract,
-  useGovTokenContract,
-  isAaveGov,
-  isAaveToken,
-  isAaveTokenContract
-} from '../../hooks/useContract'
+import { useGovernanceContract, useGovTokenContract, isAaveGov, isAaveTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
@@ -267,8 +261,8 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (govToken) {
-          fetchProposals(govClient, govToken.address).then((data: ProposalData[] | null) => {
+        if (govToken && activeProtocol) {
+          fetchProposals(govClient, govToken.address, activeProtocol.id).then((data: ProposalData[] | null) => {
             if (data) {
               const proposalMap = data.reduce<{ [id: string]: ProposalData }>((accum, proposal: ProposalData) => {
                 accum[proposal.id] = proposal
@@ -285,7 +279,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     if (!proposals && govToken) {
       fetchData()
     }
-  }, [govClient, govToken, proposals, states])
+  }, [activeProtocol, govClient, govToken, proposals, states])
 
   useEffect(() => {
     if (counts && proposals && govToken) {
@@ -311,7 +305,7 @@ export function useProposalData(id: string): ProposalData | undefined {
 
 // get the users delegatee if it exists
 export function useUserDelegatee(): string {
-  const { account } = useActiveWeb3React()  
+  const { account } = useActiveWeb3React()
   const tokenContract = useGovTokenContract()
   const { result } = useSingleCallResult(
     tokenContract,
