@@ -203,7 +203,7 @@ export const enumerateProposalState = (state: number) => {
 // @todo add typed query response
 const PROPOSAL_PROMISES: { [key: string]: Promise<ProposalData[] | null> } = {}
 
-export async function fetchProposals(client: any, key: string): Promise<ProposalData[] | null> {
+export async function fetchProposals(client: any, key: string, govId: string): Promise<ProposalData[] | null> {
   return (PROPOSAL_PROMISES[key] =
     PROPOSAL_PROMISES[key] ??
     client
@@ -214,7 +214,7 @@ export async function fetchProposals(client: any, key: string): Promise<Proposal
       .then(async (res: ProposalResponse) => {
         if (res) {
           return res.data.proposals.map((p, i) => {
-            const description = PRELOADED_PROPOSALS.get(res.data.proposals.length - i - 1) || p.description
+            const description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
 
             return {
               id: p.id,
@@ -229,7 +229,9 @@ export async function fetchProposals(client: any, key: string): Promise<Proposal
               forVotes: p.forVotes,
               againstVotes: p.againstVotes,
               details: p.targets.map((t, i) => {
-                let name = '', types = '', callData = ''
+                let name = '',
+                  types = '',
+                  callData = ''
                 const signature = p.signatures[i]
                 if (signature) {
                   const sigSplit = signature.substr(0, signature.length - 1).split('(')
