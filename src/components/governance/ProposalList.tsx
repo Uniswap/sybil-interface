@@ -49,11 +49,9 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
         <AutoColumn gap="1rem">
           {allStatuses && allProposals ? (
             Object.values(allProposals)
-              .reverse()
               .map((p: ProposalData, i) => {
-                const index = parseInt(p.id) - 1 // offset based on reverse index
-                const status = allStatuses[index]
-                  ? enumerateProposalState(allStatuses[index])
+                const status = allStatuses[i]
+                  ? enumerateProposalState(allStatuses[i])
                   : enumerateProposalState(0)
                 return (
                   <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
@@ -78,6 +76,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                   </ProposalItem>
                 )
               })
+            .reverse()
           ) : (
             <Row justify="center">
               <Loader />
