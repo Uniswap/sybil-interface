@@ -13200,6 +13200,11 @@ react-feather@^2.0.8:
   dependencies:
     prop-types "^15.7.2"
 
+react-filter-search@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/react-filter-search/-/react-filter-search-1.0.11.tgz#8f38d968c56ca55431bd1353f02a137276181ec1"
+  integrity sha512-iHTUToEyUYbXqb/hNn8KM4zo0NtbGamEKuBJc0kvnXyJZBCUbkD9TQW+DaeA3wwV0sRZ0r64MXIEHJWHPw+Omw==
+
 react-focus-lock@^2.3.1:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/react-focus-lock/-/react-focus-lock-2.5.0.tgz#12e3a3940e897c26e2c2a0408cd25ea3c99b3709"
