@@ -41,14 +41,6 @@ export const UNI_GOVERNANCE_ADDRESS = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58
 export const UNI_ADDRESS = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'
 const UNI = new Token(ChainId.MAINNET, UNI_ADDRESS, 18, 'UNI', 'Uniswap')
 
-export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
-export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
-const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
-
-export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
-export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
-const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
-
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   id: 'uniswap',
   name: 'Uniswap Governance',
@@ -61,6 +53,10 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   emoji: '🦄'
 }
 
+export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
+export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
+const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
+
 export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   id: 'compound',
   name: 'Compound Governance',
@@ -72,6 +68,10 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   social: '@compoundfinance',
   emoji: '🏦'
 }
+
+export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
+export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
+const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
 
 export const AAVE_GOVERNANCE: GovernanceInfo = {
   id: 'aave',
