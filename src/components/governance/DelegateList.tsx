@@ -250,6 +250,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     return chainId && combinedDelegates && activeProtocol
       ? combinedDelegates
           // filter for non zero votes
+          // eslint-disable-next-line react/prop-types
           .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
           .map((d, i) => {
