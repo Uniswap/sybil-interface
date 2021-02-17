@@ -67,7 +67,16 @@ export default function Updater(): null {
   // fetch additional data and concat if needed
   useEffect(() => {
     async function fetchTopDelegateData() {
-      if (library && allIdentities && client && topDelegates && maxFetched && topDelegates.length < maxFetched) {
+      if (
+        library &&
+        allIdentities &&
+        client &&
+        topDelegates &&
+        maxFetched &&
+        globalData &&
+        topDelegates.length < maxFetched &&
+        maxFetched < globalData.totalDelegates // dont fetch if we'eve reach max amount of delegates
+      ) {
         try {
           fetchTopDelegatesOffset(client, library, allIdentities, maxFetched).then(async delegateData => {
             if (delegateData) {
@@ -80,7 +89,7 @@ export default function Updater(): null {
       }
     }
     fetchTopDelegateData()
-  }, [library, client, allIdentities, setTopDelegates, topDelegates, maxFetched])
+  }, [library, client, allIdentities, setTopDelegates, topDelegates, maxFetched, globalData])
 
   useEffect(() => {
     async function fetchVerifiedDelegateData() {

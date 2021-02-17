@@ -47,42 +47,47 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
           </EmptyProposals>
         )}
         <AutoColumn gap="1rem">
-          {allStatuses && allProposals ? (
-            Object.values(allProposals)
-              .reverse()
-              .map((p: ProposalData, i) => {
-                const index = parseInt(p.id) - 1 // offset based on reverse index
-                const status = allStatuses[index]
-                  ? enumerateProposalState(allStatuses[index])
-                  : enumerateProposalState(0)
-                return (
-                  <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                    <RowBetween>
-                      <RowFixed>
+          {allStatuses && allProposals
+            ? Object.values(allProposals)
+                .reverse()
+                .map((p: ProposalData, i) => {
+                  const index = parseInt(p.id) - 1 // offset based on reverse index
+                  const status = allStatuses[index]
+                    ? enumerateProposalState(allStatuses[index])
+                    : enumerateProposalState(0)
+                  return (
+                    <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
+                      <RowBetween>
+                        <RowFixed>
+                          <OnlyAboveSmall>
+                            <TYPE.black mr="8px">{p.id}</TYPE.black>
+                          </OnlyAboveSmall>
+                          <TYPE.black mr="10px">{p.title}</TYPE.black>
+                        </RowFixed>
+                        <OnlyBelowSmall>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                          ) : (
+                            <Loader />
+                          )}
+                        </OnlyBelowSmall>
                         <OnlyAboveSmall>
-                          <TYPE.black mr="8px">{p.id}</TYPE.black>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatus status={status}>{status}</ProposalStatus>
+                          ) : (
+                            <Loader />
+                          )}
                         </OnlyAboveSmall>
-                        <TYPE.black mr="10px">{p.title}</TYPE.black>
-                      </RowFixed>
-                      <OnlyBelowSmall>
-                        {allStatuses?.[i] ? (
-                          <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                        ) : (
-                          <Loader />
-                        )}
-                      </OnlyBelowSmall>
-                      <OnlyAboveSmall>
-                        {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
-                      </OnlyAboveSmall>
-                    </RowBetween>
-                  </ProposalItem>
-                )
-              })
-          ) : (
-            <Row justify="center">
-              <Loader />
-            </Row>
-          )}
+                      </RowBetween>
+                    </ProposalItem>
+                  )
+                })
+            : !allProposals &&
+              !(allProposals && Object.keys(allProposals)?.length === 0) && (
+                <Row justify="center">
+                  <Loader />
+                </Row>
+              )}
         </AutoColumn>
       </GreyCard>
     </Wrapper>

@@ -96,18 +96,14 @@ export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | unde
 
 export function useMaxFetched(): [number | undefined, (maxFetched: number | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
-
   const [activeProtocol] = useActiveProtocol()
-
   const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>(state => state.governance.maxFetched)
-
   const setMaxFetched = useCallback(
     (maxFetched: number | undefined) => {
       activeProtocol && dispatch(updateMaxFetched({ protocolID: activeProtocol.id, maxFetched }))
     },
     [activeProtocol, dispatch]
   )
-
   return [activeProtocol ? maxFetched[activeProtocol.id] : undefined, setMaxFetched]
 }
 
@@ -337,7 +333,7 @@ export function useDelegateCallback(): (delegatee: string | undefined) => undefi
     (delegatee: string | undefined) => {
       if (!library || !chainId || !account || !isAddress(delegatee ?? '')) return undefined
       const args = [delegatee]
-      if (!govTokenContract) throw new Error('No UNI Contract!')
+      if (!govTokenContract) throw new Error('No Governance Contract!')
       return govTokenContract.estimateGas.delegate(...args, {}).then(estimatedGasLimit => {
         return govTokenContract
           .delegate(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })

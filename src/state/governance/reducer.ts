@@ -12,6 +12,7 @@ import {
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
+import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -68,10 +69,27 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   emoji: '🏦'
 }
 
+export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
+export const POOL_ADDRESS = '0x0cEC1A9154Ff802e7934Fc916Ed7Ca50bDE6844e'
+const POOL = new Token(ChainId.MAINNET, POOL_ADDRESS, 18, 'POOL', 'PoolTogether')
+
+export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
+  id: 'pool',
+  name: 'PoolTogether Governance',
+  logo: PoolLogo,
+  primaryColor: '#5c0ef3',
+  secondaryColor: '#f2eeff',
+  token: serializeToken(POOL),
+  governanceAddress: POOL_TOGETHER_GOVERNANCE_ADDRESS,
+  social: '@PoolTogether_',
+  emoji: '🏆'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
-  compound: COMPOUND_GOVERNANCE
+  compound: COMPOUND_GOVERNANCE,
+  pool: POOL_TOGETHER_GOVERNANCE
 }
 
 export const FETCHING_INTERVAL = 50
