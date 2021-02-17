@@ -75,7 +75,7 @@ const POOL = new Token(ChainId.MAINNET, POOL_ADDRESS, 18, 'POOL', 'PoolTogether'
 
 export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   id: 'pool',
-  name: 'Pool Together Governance',
+  name: 'PoolTogether Governance',
   logo: PoolLogo,
   primaryColor: '#5c0ef3',
   secondaryColor: '#f2eeff',

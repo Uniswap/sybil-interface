@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useActiveProtocol } from '../../state/governance/hooks'
@@ -58,26 +58,28 @@ export default function Dropdown() {
   const ref = useRef(null)
   useOnClickOutside(ref, () => setOpen(false))
 
-  const options = activeProtocol
-    ? Object.keys(SUPPORTED_PROTOCOLS)
-        .filter(k => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
-        .map((k, i) => (
-          <Option
-            key={i}
-            backgroundColor={SUPPORTED_PROTOCOLS[k].secondaryColor}
-            to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
-          >
-            <RowBetween>
-              <RowFixed style={{ gap: '16px' }}>
-                <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
-                <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
-                  {SUPPORTED_PROTOCOLS[k].name}
-                </TYPE.mediumHeader>
-              </RowFixed>
-            </RowBetween>
-          </Option>
-        ))
-    : []
+  const options = useMemo(() => {
+    return activeProtocol
+      ? Object.keys(SUPPORTED_PROTOCOLS)
+          .filter(k => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
+          .map((k, i) => (
+            <Option
+              key={i}
+              backgroundColor={SUPPORTED_PROTOCOLS[k].secondaryColor}
+              to={`/delegates/${SUPPORTED_PROTOCOLS[k].id}`}
+            >
+              <RowBetween>
+                <RowFixed style={{ gap: '16px' }}>
+                  <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
+                  <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
+                    {SUPPORTED_PROTOCOLS[k].name}
+                  </TYPE.mediumHeader>
+                </RowFixed>
+              </RowBetween>
+            </Option>
+          ))
+      : []
+  }, [activeProtocol])
 
   return (
     <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open} ref={ref}>
