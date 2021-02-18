@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
-import { EmptyProposals, ProposalStatus, ProposalStatusSmall } from './styled'
+import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
 import { TYPE, OnlyAboveSmall, OnlyBelowSmall } from '../../theme'
 import { GreyCard } from '../Card'
 import Row, { RowBetween, RowFixed } from '../Row'
@@ -39,12 +39,12 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
     <Wrapper>
       <GreyCard>
         {allProposals && Object.keys(allProposals)?.length === 0 && (
-          <EmptyProposals>
+          <EmptyWrapper>
             <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
             <TYPE.subHeader>
               <i>Proposals submitted by community members will appear here.</i>
             </TYPE.subHeader>
-          </EmptyProposals>
+          </EmptyWrapper>
         )}
         <AutoColumn gap="1rem">
           {allStatuses && allProposals

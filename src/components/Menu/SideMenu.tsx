@@ -131,8 +131,8 @@ export default function SideMenu() {
                 identities to maintain a list of delegates.
               </TYPE.black>
               <TYPE.black style={{ lineHeight: '125%', fontWeight: 400 }}>
-                Currently, we support Compound and Uniswap governance. Feel free to
-                <ExternalLink href="https://github.com/Uniswap/sybil-interface#adding-protocol-support">
+                Sybil can support many governance systems. Feel free to
+                <ExternalLink href="https://github.com/Uniswap/sybil-interface/issues/new?assignees=&labels=&template=new-protocol.md&title=">
                   {' '}
                   add others
                 </ExternalLink>
