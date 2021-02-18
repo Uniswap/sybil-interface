@@ -4,7 +4,12 @@ import { useActiveWeb3React } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal, setModalDelegatee } from './actions'
 import { useActiveProtocol } from '../governance/hooks'
-import { UNISWAP_GOVERNANCE, COMPOUND_GOVERNANCE, POOL_TOGETHER_GOVERNANCE, RADICLE_GOVERNANCE } from '../governance/reducer'
+import {
+  UNISWAP_GOVERNANCE,
+  COMPOUND_GOVERNANCE,
+  POOL_TOGETHER_GOVERNANCE,
+  RADICLE_GOVERNANCE
+} from '../governance/reducer'
 import { uniswapClient, compoundClient, poolClient, radicleClient } from '../../apollo/client'
 
 export function useBlockNumber(): number | undefined {
