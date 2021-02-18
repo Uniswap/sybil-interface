@@ -274,10 +274,10 @@ function DelegateInfo({
                 <Break />
                 {delegateInfo && proposalStatuses && delegateInfo.votes ? (
                   delegateInfo.votes
-                    ?.map((vote, i) => {
-                      const proposal = proposalData?.[vote.proposal] // proposals start at 1
-                      const status = proposalStatuses[vote.proposal - 1]
-                        ? enumerateProposalState(proposalStatuses[vote.proposal - 1])
+                  ?.map((vote, i) => {
+                    const proposal = proposalData?.[vote.proposal] // proposals start at 1
+                    const status = proposalStatuses[i]
+                        ? enumerateProposalState(proposalStatuses[i])
                         : enumerateProposalState(0)
                       return (
                         proposal && (
