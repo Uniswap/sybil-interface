@@ -1,3 +1,4 @@
+import { updateLastSelectedProtocolID } from './../user/actions'
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
 import {
@@ -49,6 +50,7 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
   const setActiveProtocol = useCallback(
     (activeProtocol: GovernanceInfo) => {
       dispatch(updateActiveProtocol({ activeProtocol }))
+      dispatch(updateLastSelectedProtocolID({ protocolID: activeProtocol.id }))
     },
     [dispatch]
   )
