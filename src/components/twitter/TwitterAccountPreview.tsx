@@ -70,6 +70,22 @@ function TwitterAccountPreview() {
         <StyledClose onClick={() => setTwitterAccount(undefined)} />
       </RowBetween>
     </Wrapper>
+  ) : twitterAccount ? (
+    <Wrapper>
+      <RowBetween>
+        <RowFixed>
+          <AutoColumn>
+            <RowFixed>
+              <TYPE.body mr="12px" fontSize="18px" fontWeight="500">
+                @{twitterAccount}
+              </TYPE.body>
+              <PendingFlag verified={false}>Unverified</PendingFlag>
+            </RowFixed>
+          </AutoColumn>
+        </RowFixed>
+        <StyledClose onClick={() => setTwitterAccount(undefined)} />
+      </RowBetween>
+    </Wrapper>
   ) : null
 }
 
