@@ -14,7 +14,8 @@ export enum ApplicationModal {
   SELF_CLAIM,
   ADDRESS_CLAIM,
   DELEGATE,
-  MENU
+  MENU,
+  VOTE
 }
 
 export const updateBlockNumber = createAction<{ chainId: number; blockNumber: number }>('application/updateBlockNumber')
@@ -24,3 +25,4 @@ export const addPopup = createAction<{ key?: string; removeAfterMs?: number | nu
 )
 export const removePopup = createAction<{ key: string }>('application/removePopup')
 export const setModalDelegatee = createAction<{ delegatee: string | null | undefined }>('application/setModalDelegatee')
+export const setModalVote = createAction<{ proposalId: number | null | undefined }>('application/setModalVote')

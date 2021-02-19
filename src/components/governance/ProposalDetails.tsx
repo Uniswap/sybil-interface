@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useProposalData, useActiveProtocol, useProposalStatus } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
@@ -12,6 +12,7 @@ import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants'
 import { isAddress, getEtherscanLink } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
+import VoteModal from '../vote/VoteModal'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BodyWrapper } from '../../pages/AppBody'
 import { useDispatch } from 'react-redux'
@@ -19,10 +20,12 @@ import { AppDispatch } from '../../state'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import { GreyCard } from '../Card'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
-import { useBlockNumber } from '../../state/application/hooks'
+import { ApplicationModal } from '../../state/application/actions'
+import { useBlockNumber, useModalOpen, useToggleModal } from '../../state/application/hooks'
 import { BigNumber } from 'ethers'
 import { nameOrAddress } from '../../utils/getName'
 import { useAllIdentities } from '../../state/social/hooks'
+import { ButtonError } from '../../components/Button'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>``
 
@@ -139,9 +142,20 @@ function ProposalDetails({
     }
     return <span>{nameOrAddress(content, allIdentities)}</span>
   }
+  const [support, setSupport] = useState(false)
+  const toggleVoteModal = useToggleModal(ApplicationModal.VOTE)
+  const voteModalOpen = useModalOpen(ApplicationModal.VOTE)
+  const voteModelToggle = useToggleModal(ApplicationModal.VOTE)
 
   return (
     <BodyWrapper>
+      <VoteModal
+        isOpen={voteModalOpen}
+        onDismiss={voteModelToggle}
+        support={support}
+        proposalId={proposalID}
+        proposalTitle={proposalData?.title}
+      />
       <Wrapper>
         <GreyCard padding="0">
           <ProposalInfo gap="lg" justify="start">
@@ -156,7 +170,9 @@ function ProposalDetails({
               {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
             </RowBetween>
             <AutoColumn gap="10px" style={{ width: '100%' }}>
-              <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>{proposalData?.title}</TYPE.largeHeader>
+              <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>
+                #{proposalID} - {proposalData?.title}
+              </TYPE.largeHeader>
               <RowBetween>
                 <TYPE.main>
                   {endDate && endDate < now
@@ -188,6 +204,25 @@ function ProposalDetails({
                   />
                 </>
               )}
+              <ButtonError
+                style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                onClick={() => {
+                  setSupport(true)
+                  toggleVoteModal()
+                }}
+              >
+                Support Proposal
+              </ButtonError>
+              <ButtonError
+                error
+                style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                onClick={() => {
+                  setSupport(false)
+                  toggleVoteModal()
+                }}
+              >
+                Reject Proposal
+              </ButtonError>
             </CardWrapper>
             <AutoColumn gap="md">
               <TYPE.mediumHeader fontWeight={600}>Details</TYPE.mediumHeader>
