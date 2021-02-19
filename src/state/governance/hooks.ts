@@ -255,7 +255,8 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
 
   // need to manually fetch counts and states as not in subgraph
   const govContract = useGovernanceContract()
-  const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
+  const isAaveGovCheck = isAaveGov(govContract)
+  const ids = amount ? Array.from({ length: amount }, (v, k) => [isAaveGovCheck ? k : k + 1]) : [['']]
   const counts = useSingleContractMultipleData(
     amount ? govContract : undefined,
     isAaveGov(govContract) ? 'getProposalById' : 'proposals',
@@ -290,16 +291,16 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   useEffect(() => {
     if (counts && proposals && govToken) {
       Object.values(proposals).map((p, i) => {
-        p.forCount = counts?.[i]?.result?.forVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
-          : undefined
-        p.againstCount = counts?.[i]?.result?.againstVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
-          : undefined
+        const forCount = isAaveGov(govContract) ? counts?.[i]?.result?.[0]?.forVotes : counts?.[i]?.result?.forVotes
+        const againstCount = isAaveGov(govContract)
+          ? counts?.[i]?.result?.[0]?.againstVotes
+          : counts?.[i]?.result?.againstVotes
+        p.forCount = forCount ? parseFloat(new TokenAmount(govToken, forCount).toExact()) : undefined
+        p.againstCount = againstCount ? parseFloat(new TokenAmount(govToken, againstCount).toExact()) : undefined
         return true
       })
     }
-  }, [counts, govToken, proposals])
+  }, [counts, govContract, govToken, proposals])
 
   return proposals
 }
