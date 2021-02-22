@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useProposalData, useActiveProtocol, useProposalStatus } from '../../state/governance/hooks'
+import { useProposalData, useActiveProtocol, useProposalStatus, useUserVotes } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
@@ -8,7 +8,7 @@ import { TYPE, ExternalLink } from '../../theme'
 import { ArrowLeft } from 'react-feather'
 import { ProposalStatus } from './styled'
 import { DateTime } from 'luxon'
-import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants'
+import { AVERAGE_BLOCK_TIME_IN_SECS, BIG_INT_ZERO } from '../../constants'
 import { isAddress, getEtherscanLink } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
@@ -147,7 +147,9 @@ function ProposalDetails({
   const voteModalOpen = useModalOpen(ApplicationModal.VOTE)
   const voteModelToggle = useToggleModal(ApplicationModal.VOTE)
 
-  return (
+  const userAvailableVotes = useUserVotes()
+
+  https: return (
     <BodyWrapper>
       <VoteModal
         isOpen={voteModalOpen}
@@ -207,25 +209,29 @@ function ProposalDetails({
                   />
                 </>
               )}
-              <ButtonError
-                style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
-                onClick={() => {
-                  setSupport(true)
-                  toggleVoteModal()
-                }}
-              >
-                Support Proposal
-              </ButtonError>
-              <ButtonError
-                error
-                style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
-                onClick={() => {
-                  setSupport(false)
-                  toggleVoteModal()
-                }}
-              >
-                Reject Proposal
-              </ButtonError>
+              {userAvailableVotes && userAvailableVotes?.greaterThan(BIG_INT_ZERO) && (
+                <>
+                  <ButtonError
+                    style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                    onClick={() => {
+                      setSupport(true)
+                      toggleVoteModal()
+                    }}
+                  >
+                    Support Proposal
+                  </ButtonError>
+                  <ButtonError
+                    error
+                    style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                    onClick={() => {
+                      setSupport(false)
+                      toggleVoteModal()
+                    }}
+                  >
+                    Reject Proposal
+                  </ButtonError>
+                </>
+              )}
             </CardWrapper>
             <AutoColumn gap="md">
               <TYPE.mediumHeader fontWeight={600}>Details</TYPE.mediumHeader>
