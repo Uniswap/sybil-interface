@@ -6,7 +6,8 @@ import {
   useDelegateInfo,
   useGovernanceToken,
   useAllProposals,
-  useAllProposalStates
+  useAllProposalStates,
+  useUserDelegatee,
 } from '../state/governance/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
@@ -32,6 +33,7 @@ import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
 import CopyHelper from '../components/AccountDetails/Copy'
 import { useIsEOA } from '../hooks/useIsEOA'
+import { useIsAave } from '../hooks/useContract'
 import { useToggleModal, useModalDelegatee } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
@@ -130,6 +132,13 @@ function DelegateInfo({
   // get gov token balance
   const govToken: Token | undefined = useGovernanceToken()
   const delegateTokenBalance = useTokenBalance(formattedAddress ? formattedAddress : undefined, govToken)
+
+  // user gov data
+  const userDelegatee: string | undefined = useUserDelegatee()
+  const isDelegatee = (userDelegatee && delegateAddress) ? userDelegatee.toLowerCase() === delegateAddress.toLowerCase() : false
+
+  // don't show govToken balance for Aave until multi-token support implemented in Sybil
+  const isAave = useIsAave()
 
   // get social data from Sybil list
   const identity = useIdentity(delegateAddress)
@@ -238,24 +247,26 @@ function DelegateInfo({
                 </AutoRow>
                 <DelegateButton
                   width="fit-content"
-                  disabled={!showDelegateButton || !account}
+                  disabled={!showDelegateButton || !account || isDelegatee}
                   onClick={() => {
                     setPrefilledDelegate(delegateAddress)
                     toggelDelegateModal()
                   }}
                 >
-                  Delegate
+                  {isDelegatee ? "Delegated" : "Delegate" }
                 </DelegateButton>
               </RowBetween>
             </WhiteCard>
             <WhiteCard>
               <DataRow>
-                <AutoColumn gap="sm">
+                {!isAave && (
+                  <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
                   <ResponsiveDataText>
                     {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
                   </ResponsiveDataText>
                 </AutoColumn>
+                )}
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">Votes</TYPE.main>
                   <ResponsiveDataText>{delegatedVotes}</ResponsiveDataText>

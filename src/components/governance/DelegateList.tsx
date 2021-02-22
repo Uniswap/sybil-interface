@@ -11,6 +11,7 @@ import {
   useGovernanceToken,
   useFilterActive,
   useTopDelegates,
+  useUserDelegatee,
   useVerifiedDelegates,
   DelegateData,
   useMaxFetched
@@ -128,6 +129,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const govTokenBalance = useTokenBalance(account ?? undefined, govToken)
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
+  // user gov data
+  const userDelegatee: string | undefined = useUserDelegatee()
+
   // show indentity if it exists instead of address
   const [allIdentities] = useAllIdentities()
 
@@ -181,6 +185,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
 
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
+    const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
 
     return (
       <DataRow>
@@ -230,13 +235,13 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             <DelegateButton
               width="fit-content"
               mr="10px"
-              disabled={!showDelegateButton}
+              disabled={!showDelegateButton || isDelegatee}
               onClick={() => {
                 setPrefilledDelegate(d.id)
                 toggelDelegateModal()
               }}
             >
-              Delegate
+              {isDelegatee ? "Delegated" : "Delegate" }
             </DelegateButton>
           </OnlyAboveSmall>
           <VoteText textAlign="end">
