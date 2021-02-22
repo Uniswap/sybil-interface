@@ -149,7 +149,7 @@ function ProposalDetails({
 
   const userAvailableVotes = useUserVotes()
 
-  https: return (
+  return (
     <BodyWrapper>
       <VoteModal
         isOpen={voteModalOpen}
