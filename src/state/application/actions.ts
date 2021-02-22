@@ -25,4 +25,3 @@ export const addPopup = createAction<{ key?: string; removeAfterMs?: number | nu
 )
 export const removePopup = createAction<{ key: string }>('application/removePopup')
 export const setModalDelegatee = createAction<{ delegatee: string | null | undefined }>('application/setModalDelegatee')
-export const setModalVote = createAction<{ proposalId: number | null | undefined }>('application/setModalVote')
