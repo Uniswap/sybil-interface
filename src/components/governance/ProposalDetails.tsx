@@ -148,6 +148,12 @@ function ProposalDetails({
   const voteModelToggle = useToggleModal(ApplicationModal.VOTE)
 
   const userAvailableVotes = useUserVotes()
+  // only show voting if user has > 0 votes at proposal start block and proposal is active,
+  const showVotingButtons =
+    userAvailableVotes &&
+    userAvailableVotes.greaterThan(BIG_INT_ZERO) &&
+    proposalData &&
+    proposalData.status === 'active'
 
   return (
     <BodyWrapper>
@@ -209,7 +215,7 @@ function ProposalDetails({
                   />
                 </>
               )}
-              {userAvailableVotes && userAvailableVotes?.greaterThan(BIG_INT_ZERO) && (
+              {showVotingButtons && (
                 <>
                   <ButtonError
                     style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
