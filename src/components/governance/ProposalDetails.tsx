@@ -174,7 +174,7 @@ function ProposalDetails({
                     title="For"
                     amount={proposalData?.forCount}
                     percentage={forPercentage}
-                    voters={proposalData?.forVotes}
+                    voters={proposalData?.forVotes.slice(0, Math.min(10, Object.keys(proposalData?.forVotes)?.length))}
                     support="for"
                     id={proposalData?.id}
                   />
@@ -182,7 +182,10 @@ function ProposalDetails({
                     title="Against"
                     amount={proposalData?.againstCount}
                     percentage={againstPercentage}
-                    voters={proposalData?.againstVotes}
+                    voters={proposalData?.againstVotes.slice(
+                      0,
+                      Math.min(10, Object.keys(proposalData?.againstVotes)?.length)
+                    )}
                     support={'against'}
                     id={proposalData?.id}
                   />

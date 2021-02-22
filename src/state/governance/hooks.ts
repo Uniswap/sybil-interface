@@ -24,6 +24,7 @@ import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
+import { count } from 'console'
 
 export interface DelegateData {
   id: string
@@ -237,13 +238,6 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     setProposals(undefined)
   }, [activeProtocol])
 
-  // get number of proposals
-  const amount = useProposalCount()
-
-  // need to manually fetch counts and states as not in subgraph
-  const govContract = useGovernanceContract()
-  const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(amount ? govContract : undefined, 'proposals', ids)
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
@@ -271,18 +265,14 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   }, [activeProtocol, govClient, govToken, proposals, states])
 
   useEffect(() => {
-    if (counts && proposals && govToken) {
-      Object.values(proposals).map((p, i) => {
-        p.forCount = counts?.[i]?.result?.forVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
-          : undefined
-        p.againstCount = counts?.[i]?.result?.againstVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
-          : undefined
+    if (proposals && govToken) {
+      Object.values(proposals).map(p => {
+        p.forCount = p.forVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
+        p.againstCount = p.againstVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
         return true
       })
     }
-  }, [counts, govToken, proposals])
+  }, [govToken, proposals])
 
   return proposals
 }

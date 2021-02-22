@@ -79,14 +79,14 @@ export const PROPOSALS = gql`
       proposer {
         id
       }
-      forVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: true }) {
+      forVotes: votes(first: 1000, orderBy: votesRaw, orderDirection: desc, where: { support: true }) {
         support
         votes
         voter {
           id
         }
       }
-      againstVotes: votes(first: 5, orderBy: votesRaw, orderDirection: desc, where: { support: false }) {
+      againstVotes: votes(first: 1000, orderBy: votesRaw, orderDirection: desc, where: { support: false }) {
         support
         votes
         voter {
