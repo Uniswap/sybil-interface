@@ -109,33 +109,39 @@ export default function VoterList({
           <Progress status={support} percentageString={percentage} />
         </ProgressWrapper>
         <TopVoterWrapper>
-          <AutoColumn gap="1rem">
-            <RowBetween>
-              <TYPE.main fontWeight={400} fontSize="14px">
-                Top Voters
-              </TYPE.main>
-              <div />
-            </RowBetween>
-            {voters.map((p, i) => {
-              return (
-                <RowBetween key={'vote-for-' + i}>
-                  <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
+          {voters.length > 0 ? (
+            <AutoColumn gap="1rem">
+              <RowBetween>
+                <TYPE.main fontWeight={400} fontSize="14px">
+                  Top Voters
+                </TYPE.main>
+                <div />
+              </RowBetween>
+              {voters.map((p, i) => {
+                return (
+                  <RowBetween key={'vote-for-' + i}>
+                    <StyledInternalLink to={'/delegates/' + activeProtocol?.id + '/' + p.voter.id}>
+                      <TYPE.black fontWeight={400} fontSize="14px">
+                        {nameOrAddress(p.voter.id, allIdentities, true)}
+                      </TYPE.black>
+                    </StyledInternalLink>
                     <TYPE.black fontWeight={400} fontSize="14px">
-                      {nameOrAddress(p.voter.id, allIdentities, true)}
+                      {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </TYPE.black>
-                  </StyledInternalLink>
-                  <TYPE.black fontWeight={400} fontSize="14px">
-                    {parseFloat(p.votes).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </TYPE.black>
-                </RowBetween>
-              )
-            })}
-            <ButtonEmpty onClick={() => setShowAll(true)}>
-              <TYPE.black fontWeight={600} fontSize="14px" textAlign="center">
-                View All
-              </TYPE.black>
-            </ButtonEmpty>
-          </AutoColumn>
+                  </RowBetween>
+                )
+              })}
+              <ButtonEmpty onClick={() => setShowAll(true)}>
+                <TYPE.black fontWeight={600} fontSize="14px" textAlign="center">
+                  View All
+                </TYPE.black>
+              </ButtonEmpty>
+            </AutoColumn>
+          ) : (
+            <TYPE.main fontWeight={400} fontSize="14px">
+              No votes yet
+            </TYPE.main>
+          )}
         </TopVoterWrapper>
       </CardSection>
     </StyledDataCard>
