@@ -19,8 +19,8 @@ export default function Delegates({
 
   // if on testnet, show warning
   const { chainId } = useActiveWeb3React()
-
-  // filter out zerio votes, value from tabs
+  
+  // filter out zero votes, value from tabs
   const [hideZero, setHideZero] = useState<boolean>(true)
 
   return (

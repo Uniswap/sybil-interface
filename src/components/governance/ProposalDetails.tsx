@@ -210,7 +210,7 @@ function ProposalDetails({
             </AutoColumn>
             <AutoColumn gap="md">
               <MarkDownWrapper>
-                <ReactMarkdown source={proposalData?.description} />
+                <ReactMarkdown source={proposalData?.description} disallowedTypes={["code"]} />
               </MarkDownWrapper>
             </AutoColumn>
             <AutoColumn gap="md">
