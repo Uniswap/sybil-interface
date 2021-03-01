@@ -7,7 +7,7 @@ import styled, { ThemeContext } from 'styled-components'
 import { RowBetween } from '../Row'
 import { TYPE, CustomLightSpinner } from '../../theme'
 import { X, ArrowUpCircle } from 'react-feather'
-import { ButtonPrimary } from '../Button'
+import { ButtonError } from '../Button'
 import Circle from '../../assets/images/blue-loader.svg'
 import { useVoteCallback, useUserVotes } from '../../state/governance/hooks'
 import { getEtherscanLink } from '../../utils'
@@ -39,9 +39,10 @@ interface VoteModalProps {
   onDismiss: () => void
   support: boolean // if user is for or against proposal
   proposalId: string | undefined // id for the proposal to vote on
+  proposalTitle: string | undefined
 }
 
-export default function VoteModal({ isOpen, onDismiss, proposalId, support }: VoteModalProps) {
+export default function VoteModal({ isOpen, onDismiss, proposalId, proposalTitle, support }: VoteModalProps) {
   const { chainId } = useActiveWeb3React()
   const {
     voteCallback
@@ -57,6 +58,8 @@ export default function VoteModal({ isOpen, onDismiss, proposalId, support }: Vo
   // get theme for colors
   const theme = useContext(ThemeContext)
 
+  const fallbackTitle = `Vote ${support ? 'for ' : 'against'} proposal ${proposalId}`
+  const title = proposalTitle ? proposalTitle : fallbackTitle
   // wrapper to reset state on modal close
   function wrappedOndismiss() {
     setHash(undefined)
@@ -87,17 +90,15 @@ export default function VoteModal({ isOpen, onDismiss, proposalId, support }: Vo
         <ContentWrapper gap="lg">
           <AutoColumn gap="lg" justify="center">
             <RowBetween>
-              <TYPE.mediumHeader fontWeight={500}>{`Vote ${
-                support ? 'for ' : 'against'
-              } proposal ${proposalId}`}</TYPE.mediumHeader>
+              <TYPE.mediumHeader fontWeight={500}>{title}</TYPE.mediumHeader>
               <StyledClosed stroke="black" onClick={wrappedOndismiss} />
             </RowBetween>
             <TYPE.largeHeader>{availableVotes?.toSignificant(4)} Votes</TYPE.largeHeader>
-            <ButtonPrimary onClick={onVote}>
+            <ButtonError error={!support} onClick={onVote}>
               <TYPE.mediumHeader color="white">{`Vote ${
                 support ? 'for ' : 'against'
-              } proposal  ${proposalId}`}</TYPE.mediumHeader>
-            </ButtonPrimary>
+              } proposal #${proposalId}`}</TYPE.mediumHeader>
+            </ButtonError>
           </AutoColumn>
         </ContentWrapper>
       )}

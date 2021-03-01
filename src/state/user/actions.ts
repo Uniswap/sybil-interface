@@ -15,5 +15,8 @@ export interface SerializedPair {
 
 export const updateMatchesDarkMode = createAction<{ matchesDarkMode: boolean }>('user/updateMatchesDarkMode')
 export const updateUserDarkMode = createAction<{ userDarkMode: boolean }>('user/updateUserDarkMode')
-export const updateTwitterAccount = createAction<{ twitterAccount: string | undefined }>('user/updateTwitterAccount¸')
+export const updateTwitterAccount = createAction<{ twitterAccount: string | undefined }>('user/updateTwitterAccount')
+export const updateLastSelectedProtocolID = createAction<{ protocolID: string | undefined }>(
+  'user/updateLastSelectedProtocolID'
+)
 export const toggleURLWarning = createAction<void>('app/toggleURLWarning')

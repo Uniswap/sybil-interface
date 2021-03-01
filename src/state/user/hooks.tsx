@@ -3,7 +3,13 @@ import { useCallback } from 'react'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 
 import { AppDispatch, AppState } from '../index'
-import { SerializedToken, updateUserDarkMode, toggleURLWarning, updateTwitterAccount } from './actions'
+import {
+  SerializedToken,
+  updateUserDarkMode,
+  toggleURLWarning,
+  updateTwitterAccount,
+  updateLastSelectedProtocolID
+} from './actions'
 
 export function serializeToken(token: Token): SerializedToken {
   return {
@@ -64,6 +70,23 @@ export function useTwitterAccount(): [string | undefined, (newAccount: string | 
     [dispatch]
   )
   return [twitterAccount, setTwitterAccount]
+}
+
+// use for twitter login passed through query param
+export function useLastSelectedProtocolID(): [string | undefined, (protocolID: string | undefined) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const lastSelectedProtocolID = useSelector<AppState, AppState['user']['lastSelectedProtocolID']>(
+    state => state.user.lastSelectedProtocolID
+  )
+
+  // set new or reset account
+  const setLastSelectedProtocolID = useCallback(
+    (protocolID: string | undefined) => {
+      dispatch(updateLastSelectedProtocolID({ protocolID: protocolID }))
+    },
+    [dispatch]
+  )
+  return [lastSelectedProtocolID, setLastSelectedProtocolID]
 }
 
 export function useURLWarningVisible(): boolean {

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
-import { EmptyProposals, ProposalStatus, ProposalStatusSmall } from './styled'
+import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
 import { TYPE, OnlyAboveSmall, OnlyBelowSmall } from '../../theme'
 import { GreyCard } from '../Card'
 import Row, { RowBetween, RowFixed } from '../Row'
@@ -39,12 +39,12 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
     <Wrapper>
       <GreyCard>
         {allProposals && Object.keys(allProposals)?.length === 0 && (
-          <EmptyProposals>
+          <EmptyWrapper>
             <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
             <TYPE.subHeader>
               <i>Proposals submitted by community members will appear here.</i>
             </TYPE.subHeader>
-          </EmptyProposals>
+          </EmptyWrapper>
         )}
         <AutoColumn gap="1rem">
           {allStatuses && allProposals ? (
@@ -53,35 +53,41 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                 const status = allStatuses[i]
                   ? enumerateProposalState(allStatuses[i])
                   : enumerateProposalState(0)
-                return (
-                  <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                    <RowBetween>
-                      <RowFixed>
+                  return (
+                    <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
+                      <RowBetween>
+                        <RowFixed>
+                          <OnlyAboveSmall>
+                            <TYPE.black mr="8px">{p.id}</TYPE.black>
+                          </OnlyAboveSmall>
+                          <TYPE.black mr="10px">{p.title}</TYPE.black>
+                        </RowFixed>
+                        <OnlyBelowSmall>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                          ) : (
+                            <Loader />
+                          )}
+                        </OnlyBelowSmall>
                         <OnlyAboveSmall>
-                          <TYPE.black mr="8px">{p.id}</TYPE.black>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatus status={status}>{status}</ProposalStatus>
+                          ) : (
+                            <Loader />
+                          )}
                         </OnlyAboveSmall>
-                        <TYPE.black mr="10px">{p.title}</TYPE.black>
-                      </RowFixed>
-                      <OnlyBelowSmall>
-                        {allStatuses?.[i] ? (
-                          <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                        ) : (
-                          <Loader />
-                        )}
-                      </OnlyBelowSmall>
-                      <OnlyAboveSmall>
-                        {allStatuses?.[i] ? <ProposalStatus status={status}>{status}</ProposalStatus> : <Loader />}
-                      </OnlyAboveSmall>
-                    </RowBetween>
-                  </ProposalItem>
-                )
-              })
-            .reverse()
-          ) : (
-            <Row justify="center">
-              <Loader />
-            </Row>
-          )}
+                      </RowBetween>
+                    </ProposalItem>
+                  )
+                })
+              .reverse()
+          )
+            : !allProposals &&
+              !(allProposals && Object.keys(allProposals)?.length === 0) && (
+                <Row justify="center">
+                  <Loader />
+                </Row>
+              )}
         </AutoColumn>
       </GreyCard>
     </Wrapper>

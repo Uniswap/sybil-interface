@@ -16,7 +16,7 @@ import {
   DelegateData,
   useMaxFetched
 } from '../../state/governance/hooks'
-import { WrappedListLogo, RoundedProfileImage, DelegateButton } from './styled'
+import { WrappedListLogo, RoundedProfileImage, DelegateButton, EmptyWrapper } from './styled'
 import { GreyCard } from '../Card'
 import { useActiveWeb3React } from '../../hooks'
 import { useToggleModal, useModalDelegatee } from '../../state/application/hooks'
@@ -149,19 +149,21 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       : []
   }, [allIdentities, filteredDelegates])
 
-  const formattedManualDelegates: DelegateData[] = manualEntries.map(entry => {
-    return {
-      id: entry.address,
-      delegatedVotes: 0,
-      delegatedVotesRaw: 0,
-      votePercent: new Percent(BIG_INT_ZERO),
-      votes: [],
-      EOA: true,
-      autonomous: undefined,
-      handle: entry.handle,
-      imageURL: undefined
-    }
-  })
+  const formattedManualDelegates: DelegateData[] = useMemo(() => {
+    return manualEntries.map(entry => {
+      return {
+        id: entry.address,
+        delegatedVotes: 0,
+        delegatedVotesRaw: 0,
+        votePercent: new Percent(BIG_INT_ZERO),
+        votes: [],
+        EOA: true,
+        autonomous: undefined,
+        handle: entry.handle,
+        imageURL: undefined
+      }
+    })
+  }, [manualEntries])
 
   const [page, setPage] = useState(1)
   const [maxFetched, setMaxFetched] = useMaxFetched()
@@ -181,9 +183,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
     const name = nameOrAddress(d.id, allIdentities, true, d.autonomous)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
-
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
-
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
     const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
 
@@ -256,6 +256,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     return chainId && combinedDelegates && activeProtocol
       ? combinedDelegates
           // filter for non zero votes
+          // eslint-disable-next-line react/prop-types
           .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
           .map((d, i) => {
@@ -264,7 +265,16 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       : null
   }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
 
-  return (
+  return delegateList && delegateList.length === 0 ? (
+    <GreyCard padding="20px">
+      <EmptyWrapper>
+        <TYPE.body style={{ marginBottom: '8px' }}>No delegates yet.</TYPE.body>
+        <TYPE.subHeader>
+          <i>Community members with delegated votes will appear here.</i>
+        </TYPE.subHeader>
+      </EmptyWrapper>
+    </GreyCard>
+  ) : (
     <GreyCard padding="1rem 0">
       <AutoColumn gap="lg">
         <DataRow>
@@ -277,6 +287,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
           </OnlyAboveLarge>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
+
         {delegateList ?? (
           <Row justify="center">
             <Loader />

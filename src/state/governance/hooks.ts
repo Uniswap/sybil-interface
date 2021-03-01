@@ -1,3 +1,4 @@
+import { updateLastSelectedProtocolID } from './../user/actions'
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
 import {
@@ -49,6 +50,7 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
   const setActiveProtocol = useCallback(
     (activeProtocol: GovernanceInfo) => {
       dispatch(updateActiveProtocol({ activeProtocol }))
+      dispatch(updateLastSelectedProtocolID({ protocolID: activeProtocol.id }))
     },
     [dispatch]
   )
@@ -96,18 +98,14 @@ export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | unde
 
 export function useMaxFetched(): [number | undefined, (maxFetched: number | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
-
   const [activeProtocol] = useActiveProtocol()
-
   const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>(state => state.governance.maxFetched)
-
   const setMaxFetched = useCallback(
     (maxFetched: number | undefined) => {
       activeProtocol && dispatch(updateMaxFetched({ protocolID: activeProtocol.id, maxFetched }))
     },
     [activeProtocol, dispatch]
   )
-
   return [activeProtocol ? maxFetched[activeProtocol.id] : undefined, setMaxFetched]
 }
 
@@ -245,18 +243,6 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     setProposals(undefined)
   }, [activeProtocol])
 
-  // get number of proposals
-  const amount = useProposalCount()
-
-  // need to manually fetch counts and states as not in subgraph
-  const govContract = useGovernanceContract()
-  const isAaveGov = useIsAave()
-  const ids = amount ? Array.from({ length: amount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(
-    amount ? govContract : undefined,
-    isAaveGov ? 'getProposalById' : 'proposals',
-    ids
-  )
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
@@ -284,18 +270,14 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   }, [activeProtocol, govClient, govToken, proposals, states])
 
   useEffect(() => {
-    if (counts && proposals && govToken) {
-      Object.values(proposals).map((p, i) => {
-        const forCount = isAaveGov ? counts?.[i]?.result?.[0]?.forVotes : counts?.[i]?.result?.forVotes
-        const againstCount = isAaveGov
-          ? counts?.[i]?.result?.[0]?.againstVotes
-          : counts?.[i]?.result?.againstVotes
-        p.forCount = forCount ? parseFloat(new TokenAmount(govToken, forCount).toExact()) : undefined
-        p.againstCount = againstCount ? parseFloat(new TokenAmount(govToken, againstCount).toExact()) : undefined
+    if (proposals && govToken) {
+      Object.values(proposals).map(p => {
+        p.forCount = p.forVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
+        p.againstCount = p.againstVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
         return true
       })
     }
-  }, [counts, govContract, govToken, proposals, isAaveGov])
+  }, [govToken, proposals])
 
   return proposals
 }

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { shortenAddress } from '.'
+import { shortenAddress, isAddress } from '.'
 import { Identity } from '../state/social/reducer'
 import LogoText from '../components/governance/LogoText'
 
@@ -9,11 +9,14 @@ export function nameOrAddress(
   shortern?: boolean | undefined,
   autonomous?: boolean | undefined
 ): string | ReactNode {
+  const formattedAddress = isAddress(address)
+
   if (!address) {
     return ''
   }
 
-  const identity: Identity | undefined = identities?.[address]
+  // checksum name, as they are checksummed in identity mapping
+  const identity: Identity | undefined = formattedAddress ? identities?.[formattedAddress] : undefined
 
   if (identity?.twitter) {
     return <LogoText type="twitter">{'@' + identity.twitter.handle}</LogoText>

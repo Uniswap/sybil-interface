@@ -50,7 +50,7 @@ const handleColorType = (status?: any, theme?: any) => {
   }
 }
 
-export const EmptyProposals = styled.div`
+export const EmptyWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.text4};
   padding: 16px 12px;
   border-radius: 12px;
