@@ -97,7 +97,7 @@ export function useSubgraphClient() {
   if (activeProtocol?.id === AAVE_GOVERNANCE.id) {
     return aaveClient
   }
-  
+
   if (activeProtocol?.id === POOL_TOGETHER_GOVERNANCE.id) {
     return poolClient
   }

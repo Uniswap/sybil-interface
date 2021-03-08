@@ -85,15 +85,17 @@ export function useMulticallContract(): Contract | null {
 
 export function useGovernanceContract(): Contract | null {
   const [activeProtocol] = useActiveProtocol()
-  return useContract(activeProtocol ? activeProtocol.governanceAddress : undefined, 
-    activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI, true)
+  return useContract(
+    activeProtocol ? activeProtocol.governanceAddress : undefined,
+    activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,
+    true
+  )
 }
 
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
   const isAave = useIsAave()
-  return useContract(govToken ? govToken.address : undefined, 
-    isAave ? AAVE_ABI : UNI_ABI, true)
+  return useContract(govToken ? govToken.address : undefined, isAave ? AAVE_ABI : UNI_ABI, true)
 }
 
 export function useAutonomousContract(tokenAddress?: string): Contract | null {

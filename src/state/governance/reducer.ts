@@ -125,7 +125,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   compound: COMPOUND_GOVERNANCE,
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
-  radicle: RADICLE_GOVERNANCE,
+  radicle: RADICLE_GOVERNANCE
 }
 
 export const FETCHING_INTERVAL = 50
