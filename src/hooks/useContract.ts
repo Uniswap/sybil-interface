@@ -3,6 +3,8 @@ import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.j
 import { abi as UNI_ABI } from '@uniswap/governance/build/Uni.json'
 import { ChainId, WETH } from '@uniswap/sdk'
 import { useMemo } from 'react'
+import GOVERNANCE_AAVE_ABI from '../constants/abis/aave-governance.json'
+import AAVE_ABI from '../constants/abis/aave-token.json'
 import {
   ARGENT_WALLET_DETECTOR_ABI,
   ARGENT_WALLET_DETECTOR_MAINNET_ADDRESS
@@ -17,6 +19,7 @@ import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
 import { useActiveProtocol, useGovernanceToken } from '../state/governance/hooks'
+import { AAVE_GOVERNANCE } from '../state/governance/reducer'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -82,14 +85,22 @@ export function useMulticallContract(): Contract | null {
 
 export function useGovernanceContract(): Contract | null {
   const [activeProtocol] = useActiveProtocol()
-  return useContract(activeProtocol ? activeProtocol.governanceAddress : undefined, GOVERNANCE_ABI, true)
+  return useContract(activeProtocol ? activeProtocol.governanceAddress : undefined, 
+    activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI, true)
 }
 
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
-  return useContract(govToken ? govToken.address : undefined, UNI_ABI, true)
+  const isAave = useIsAave()
+  return useContract(govToken ? govToken.address : undefined, 
+    isAave ? AAVE_ABI : UNI_ABI, true)
 }
 
 export function useAutonomousContract(tokenAddress?: string): Contract | null {
   return useContract(tokenAddress ?? undefined, AUTONOMOUS_ABI, true)
+}
+
+export function useIsAave(): boolean {
+  const [activeProtocol] = useActiveProtocol()
+  return activeProtocol?.id === AAVE_GOVERNANCE.id
 }

@@ -75,8 +75,16 @@ const DetailText = styled.div`
 `
 
 const MarkDownWrapper = styled.div`
+  overflow: scroll;
+
   ${({ theme }) => theme.mediaWidth.upToSmall`
     max-width: 400px;
+  `};
+`
+
+const AddressWrapper = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    max-width: 300px;
   `};
 `
 
@@ -260,18 +268,23 @@ function ProposalDetails({
             </AutoColumn>
             <AutoColumn gap="md">
               <MarkDownWrapper>
-                <ReactMarkdown source={proposalData?.description} />
+                <ReactMarkdown source={proposalData?.description} disallowedTypes={['code']} />
               </MarkDownWrapper>
             </AutoColumn>
             <AutoColumn gap="md">
               <TYPE.mediumHeader fontWeight={600}>Proposer</TYPE.mediumHeader>
-              <ExternalLink
-                href={
-                  proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
-                }
-              >
-                <TYPE.blue fontWeight={500}>{nameOrAddress(proposalData?.proposer, allIdentities)}</TYPE.blue>
-              </ExternalLink>
+              <AddressWrapper>
+                <ExternalLink
+                  href={
+                    proposalData?.proposer && chainId
+                      ? getEtherscanLink(chainId, proposalData?.proposer, 'address')
+                      : ''
+                  }
+                  style={{ wordWrap: 'break-word' }}
+                >
+                  <TYPE.blue fontWeight={500}>{nameOrAddress(proposalData?.proposer, allIdentities)}</TYPE.blue>
+                </ExternalLink>
+              </AddressWrapper>
             </AutoColumn>
           </ProposalInfo>
         </GreyCard>

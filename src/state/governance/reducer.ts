@@ -12,6 +12,7 @@ import {
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
+import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import { serializeToken } from '../user/hooks'
@@ -70,6 +71,22 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   emoji: '🏦'
 }
 
+export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
+export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
+const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
+
+export const AAVE_GOVERNANCE: GovernanceInfo = {
+  id: 'aave',
+  name: 'Aave Governance',
+  logo: AaveLogo,
+  primaryColor: '#B6509E',
+  secondaryColor: '#ebfeff',
+  token: serializeToken(AAVE),
+  governanceAddress: AAVE_GOVERNANCE_ADDRESS,
+  social: '@AaveAave',
+  emoji: '👻'
+}
+
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
 export const POOL_ADDRESS = '0x0cEC1A9154Ff802e7934Fc916Ed7Ca50bDE6844e'
 const POOL = new Token(ChainId.MAINNET, POOL_ADDRESS, 18, 'POOL', 'PoolTogether')
@@ -106,8 +123,9 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
   compound: COMPOUND_GOVERNANCE,
+  aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
-  radicle: RADICLE_GOVERNANCE
+  radicle: RADICLE_GOVERNANCE,
 }
 
 export const FETCHING_INTERVAL = 50

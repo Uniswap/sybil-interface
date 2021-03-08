@@ -11,6 +11,7 @@ import {
   useGovernanceToken,
   useFilterActive,
   useTopDelegates,
+  useUserDelegatee,
   useVerifiedDelegates,
   DelegateData,
   useMaxFetched
@@ -128,6 +129,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const govTokenBalance = useTokenBalance(account ?? undefined, govToken)
   const showDelegateButton = Boolean(govTokenBalance && JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO))
 
+  // user gov data
+  const userDelegatee: string | undefined = useUserDelegatee()
+
   // show indentity if it exists instead of address
   const [allIdentities] = useAllIdentities()
 
@@ -181,6 +185,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
+    const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
+
     return (
       <DataRow>
         <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
@@ -229,13 +235,13 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             <DelegateButton
               width="fit-content"
               mr="10px"
-              disabled={!showDelegateButton}
+              disabled={!showDelegateButton || isDelegatee}
               onClick={() => {
                 setPrefilledDelegate(d.id)
                 toggelDelegateModal()
               }}
             >
-              Delegate
+              {isDelegatee ? 'Delegated' : 'Delegate'}
             </DelegateButton>
           </OnlyAboveSmall>
           <VoteText textAlign="end">
@@ -259,7 +265,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       : null
   }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
 
-  return delegateList && delegateList.length === 0 ? (
+  return combinedDelegates && combinedDelegates.length === 0 ? (
     <GreyCard padding="20px">
       <EmptyWrapper>
         <TYPE.body style={{ marginBottom: '8px' }}>No delegates yet.</TYPE.body>
@@ -282,7 +288,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
 
-        {delegateList ?? (
+        {combinedDelegates && combinedDelegates?.length > 0 ? (
+          delegateList
+        ) : (
           <Row justify="center">
             <Loader />
           </Row>

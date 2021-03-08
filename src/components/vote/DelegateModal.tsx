@@ -114,7 +114,7 @@ export default function DelegateModal({ isOpen, onDismiss, title }: VoteModalPro
               <StyledClosed stroke="black" onClick={wrappedOndismiss} />
             </RowBetween>
             <TYPE.body>
-              {activeProtocol?.token?.symbol} tokens represent voting shares in {activeProtocol?.name} governance.
+              {activeProtocol?.token?.symbol} tokens represent voting shares in {activeProtocol?.name}.
             </TYPE.body>
             <TYPE.body>
               You can either vote on each proposal yourself or delegate your votes to a third party.

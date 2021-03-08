@@ -23,7 +23,7 @@ A clear and concise description of the protocol to be added.
 **Other steps you'll need to take**
 1. Deploy a working subgraph that tracks governance data. For Compound governance forks you can fork the Compound subgraph found here and deploy easily: https://github.com/ianlapham/compound-governance-subgraph
 
-2. Add a logo to the assers folder 
+2. Add a logo to the assets folder 
 
 **Additional context**
 Add any other context for the protocol add.

@@ -107,8 +107,7 @@ async function fetchDelegatesFromClient(
         })
       })
       .catch((e: any) => {
-        console.log(e)
-        return Promise.reject('Error fetching delegates from subgraph')
+        return Promise.reject(`Error fetching delegates from subgraph: ${e.message}`)
       })
   } catch (e) {
     return Promise.reject('Unable to fetch delegates')
