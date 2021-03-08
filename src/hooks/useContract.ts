@@ -1,7 +1,7 @@
 import { Contract } from '@ethersproject/contracts'
 import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.json'
 import { abi as UNI_ABI } from '@uniswap/governance/build/Uni.json'
-import { ChainId, Token, WETH } from '@uniswap/sdk'
+import { ChainId, WETH } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import GOVERNANCE_AAVE_ABI from '../constants/abis/aave-governance.json'
 import AAVE_ABI from '../constants/abis/aave-token.json'
@@ -19,7 +19,7 @@ import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
 import { useActiveProtocol, useGovernanceToken } from '../state/governance/hooks'
-import { AAVE_GOVERNANCE, AAVE_ADDRESS, AAVE_GOVERNANCE_ADDRESS } from '../state/governance/reducer'
+import { AAVE_GOVERNANCE } from '../state/governance/reducer'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -91,22 +91,16 @@ export function useGovernanceContract(): Contract | null {
 
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
+  const isAave = useIsAave()
   return useContract(govToken ? govToken.address : undefined, 
-    isAaveToken(govToken) ? AAVE_ABI : UNI_ABI, true)
+    isAave ? AAVE_ABI : UNI_ABI, true)
 }
 
 export function useAutonomousContract(tokenAddress?: string): Contract | null {
   return useContract(tokenAddress ?? undefined, AUTONOMOUS_ABI, true)
 }
 
-export function isAaveGov(gov: Contract | null): boolean {
-  return gov?.address.toLowerCase() === AAVE_GOVERNANCE_ADDRESS.toLowerCase()
-}
-
-export function isAaveToken(token: Token | undefined): boolean {
-  return token?.address.toLowerCase() === AAVE_ADDRESS.toLowerCase()
-}
-
-export function isAaveTokenContract(token: Contract | null): boolean {
-  return token?.address.toLowerCase() === AAVE_ADDRESS.toLowerCase()
+export function useIsAave(): boolean {
+  const [activeProtocol] = useActiveProtocol()
+  return activeProtocol?.id === AAVE_GOVERNANCE.id
 }

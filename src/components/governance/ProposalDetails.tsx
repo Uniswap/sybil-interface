@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useProposalData, useActiveProtocol, useProposalStatus } from '../../state/governance/hooks'
+import { useProposalData, useActiveProtocol, useProposalStatus, useUserVotes } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
 import { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
@@ -8,10 +8,11 @@ import { TYPE, ExternalLink } from '../../theme'
 import { ArrowLeft } from 'react-feather'
 import { ProposalStatus } from './styled'
 import { DateTime } from 'luxon'
-import { AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants'
+import { AVERAGE_BLOCK_TIME_IN_SECS, BIG_INT_ZERO } from '../../constants'
 import { isAddress, getEtherscanLink } from '../../utils'
 import { useActiveWeb3React } from '../../hooks'
 import VoterList from './VoterList'
+import VoteModal from '../vote/VoteModal'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BodyWrapper } from '../../pages/AppBody'
 import { useDispatch } from 'react-redux'
@@ -19,10 +20,12 @@ import { AppDispatch } from '../../state'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import { GreyCard } from '../Card'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
-import { useBlockNumber } from '../../state/application/hooks'
+import { ApplicationModal } from '../../state/application/actions'
+import { useBlockNumber, useModalOpen, useToggleModal } from '../../state/application/hooks'
 import { BigNumber } from 'ethers'
 import { nameOrAddress } from '../../utils/getName'
 import { useAllIdentities } from '../../state/social/hooks'
+import { ButtonError } from '../../components/Button'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>``
 
@@ -72,8 +75,16 @@ const DetailText = styled.div`
 `
 
 const MarkDownWrapper = styled.div`
+  overflow: scroll;
+
   ${({ theme }) => theme.mediaWidth.upToSmall`
     max-width: 400px;
+  `};
+`
+
+const AddressWrapper = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    max-width: 300px;
   `};
 `
 
@@ -139,9 +150,28 @@ function ProposalDetails({
     }
     return <span>{nameOrAddress(content, allIdentities)}</span>
   }
+  const [support, setSupport] = useState(false)
+  const toggleVoteModal = useToggleModal(ApplicationModal.VOTE)
+  const voteModalOpen = useModalOpen(ApplicationModal.VOTE)
+  const voteModelToggle = useToggleModal(ApplicationModal.VOTE)
+
+  const userAvailableVotes = useUserVotes()
+  // only show voting if user has > 0 votes at proposal start block and proposal is active,
+  const showVotingButtons =
+    userAvailableVotes &&
+    userAvailableVotes.greaterThan(BIG_INT_ZERO) &&
+    proposalData &&
+    proposalData.status === 'active'
 
   return (
     <BodyWrapper>
+      <VoteModal
+        isOpen={voteModalOpen}
+        onDismiss={voteModelToggle}
+        support={support}
+        proposalId={proposalID}
+        proposalTitle={proposalData?.title}
+      />
       <Wrapper>
         <GreyCard padding="0">
           <ProposalInfo gap="lg" justify="start">
@@ -156,7 +186,9 @@ function ProposalDetails({
               {proposalData && <ProposalStatus status={status ?? ''}>{status}</ProposalStatus>}
             </RowBetween>
             <AutoColumn gap="10px" style={{ width: '100%' }}>
-              <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>{proposalData?.title}</TYPE.largeHeader>
+              <TYPE.largeHeader style={{ marginBottom: '.5rem' }}>
+                #{proposalID} - {proposalData?.title}
+              </TYPE.largeHeader>
               <RowBetween>
                 <TYPE.main>
                   {endDate && endDate < now
@@ -174,7 +206,7 @@ function ProposalDetails({
                     title="For"
                     amount={proposalData?.forCount}
                     percentage={forPercentage}
-                    voters={proposalData?.forVotes}
+                    voters={proposalData?.forVotes.slice(0, Math.min(10, Object.keys(proposalData?.forVotes)?.length))}
                     support="for"
                     id={proposalData?.id}
                   />
@@ -182,10 +214,36 @@ function ProposalDetails({
                     title="Against"
                     amount={proposalData?.againstCount}
                     percentage={againstPercentage}
-                    voters={proposalData?.againstVotes}
+                    voters={proposalData?.againstVotes.slice(
+                      0,
+                      Math.min(10, Object.keys(proposalData?.againstVotes)?.length)
+                    )}
                     support={'against'}
                     id={proposalData?.id}
                   />
+                </>
+              )}
+              {showVotingButtons && (
+                <>
+                  <ButtonError
+                    style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                    onClick={() => {
+                      setSupport(true)
+                      toggleVoteModal()
+                    }}
+                  >
+                    Support Proposal
+                  </ButtonError>
+                  <ButtonError
+                    error
+                    style={{ flexGrow: 1, fontSize: 16, padding: '8px 12px', width: 'unset' }}
+                    onClick={() => {
+                      setSupport(false)
+                      toggleVoteModal()
+                    }}
+                  >
+                    Reject Proposal
+                  </ButtonError>
                 </>
               )}
             </CardWrapper>
@@ -210,18 +268,23 @@ function ProposalDetails({
             </AutoColumn>
             <AutoColumn gap="md">
               <MarkDownWrapper>
-                <ReactMarkdown source={proposalData?.description} />
+                <ReactMarkdown source={proposalData?.description} disallowedTypes={['code']} />
               </MarkDownWrapper>
             </AutoColumn>
             <AutoColumn gap="md">
               <TYPE.mediumHeader fontWeight={600}>Proposer</TYPE.mediumHeader>
-              <ExternalLink
-                href={
-                  proposalData?.proposer && chainId ? getEtherscanLink(chainId, proposalData?.proposer, 'address') : ''
-                }
-              >
-                <TYPE.blue fontWeight={500}>{nameOrAddress(proposalData?.proposer, allIdentities)}</TYPE.blue>
-              </ExternalLink>
+              <AddressWrapper>
+                <ExternalLink
+                  href={
+                    proposalData?.proposer && chainId
+                      ? getEtherscanLink(chainId, proposalData?.proposer, 'address')
+                      : ''
+                  }
+                  style={{ wordWrap: 'break-word' }}
+                >
+                  <TYPE.blue fontWeight={500}>{nameOrAddress(proposalData?.proposer, allIdentities)}</TYPE.blue>
+                </ExternalLink>
+              </AddressWrapper>
             </AutoColumn>
           </ProposalInfo>
         </GreyCard>

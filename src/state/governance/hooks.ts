@@ -1,3 +1,4 @@
+import { updateLastSelectedProtocolID } from './../user/actions'
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
 import {
@@ -12,7 +13,7 @@ import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import { useGovernanceContract, useGovTokenContract, isAaveGov, isAaveTokenContract } from '../../hooks/useContract'
+import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
@@ -49,6 +50,7 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
   const setActiveProtocol = useCallback(
     (activeProtocol: GovernanceInfo) => {
       dispatch(updateActiveProtocol({ activeProtocol }))
+      dispatch(updateLastSelectedProtocolID({ protocolID: activeProtocol.id }))
     },
     [dispatch]
   )
@@ -96,18 +98,14 @@ export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | unde
 
 export function useMaxFetched(): [number | undefined, (maxFetched: number | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
-
   const [activeProtocol] = useActiveProtocol()
-
   const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>(state => state.governance.maxFetched)
-
   const setMaxFetched = useCallback(
     (maxFetched: number | undefined) => {
       activeProtocol && dispatch(updateMaxFetched({ protocolID: activeProtocol.id, maxFetched }))
     },
     [activeProtocol, dispatch]
   )
-
   return [activeProtocol ? maxFetched[activeProtocol.id] : undefined, setMaxFetched]
 }
 
@@ -182,7 +180,7 @@ export interface ProposalData {
 // get count of all proposals made
 export function useProposalCount(): number | undefined {
   const gov = useGovernanceContract()
-  const res = useSingleCallResult(gov, isAaveGov(gov) ? 'getProposalsCount' : 'proposalCount')
+  const res = useSingleCallResult(gov, useIsAave() ? 'getProposalsCount' : 'proposalCount')
   if (res.result && !res.loading) {
     return parseInt(res.result[0])
   }
@@ -196,15 +194,15 @@ export function useAllProposalStates(): number[] | undefined {
   const govContract = useGovernanceContract()
 
   const [statuses, setStatuses] = useState<number[] | undefined>()
-  const isAaveGovCheck = isAaveGov(govContract)
+  const isAaveGov = useIsAave()
 
   // get total amount
   const proposalCount = useProposalCount()
-  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGovCheck ? k : k + 1]) : [['']]
+  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
 
   const statusRes = useSingleContractMultipleData(
     proposalCount ? govContract : undefined,
-    isAaveGovCheck ? 'getProposalState' : 'state',
+    isAaveGov ? 'getProposalState' : 'state',
     ids,
     NEVER_RELOAD
   )
@@ -227,7 +225,8 @@ export function useAllProposalStates(): number[] | undefined {
 
 export function useProposalStatus(id: string): string | undefined {
   const allStatuses = useAllProposalStates()
-  return allStatuses ? enumerateProposalState(allStatuses[parseInt(id) - 1]) : undefined
+  const isAaave = useIsAave()
+  return allStatuses ? enumerateProposalState(allStatuses[isAaave ? parseInt(id) : parseInt(id) - 1]) : undefined
 }
 
 export function useAllProposals(): { [id: string]: ProposalData } | undefined {
@@ -244,17 +243,6 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     setProposals(undefined)
   }, [activeProtocol])
 
-  // get number of proposals
-  const amount = useProposalCount()
-
-  // need to manually fetch counts and states as not in subgraph
-  const govContract = useGovernanceContract()
-  const ids = amount ? Array.from({ length: amount }, (v, k) => [k + 1]) : [['']]
-  const counts = useSingleContractMultipleData(
-    amount ? govContract : undefined,
-    isAaveGov(govContract) ? 'getProposalById' : 'proposals',
-    ids
-  )
   const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
@@ -282,18 +270,14 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
   }, [activeProtocol, govClient, govToken, proposals, states])
 
   useEffect(() => {
-    if (counts && proposals && govToken) {
-      Object.values(proposals).map((p, i) => {
-        p.forCount = counts?.[i]?.result?.forVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.forVotes).toExact())
-          : undefined
-        p.againstCount = counts?.[i]?.result?.againstVotes
-          ? parseFloat(new TokenAmount(govToken, counts?.[i]?.result?.againstVotes).toExact())
-          : undefined
+    if (proposals && govToken) {
+      Object.values(proposals).map(p => {
+        p.forCount = p.forVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
+        p.againstCount = p.againstVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
         return true
       })
     }
-  }, [counts, govToken, proposals])
+  }, [govToken, proposals])
 
   return proposals
 }
@@ -304,15 +288,19 @@ export function useProposalData(id: string): ProposalData | undefined {
 }
 
 // get the users delegatee if it exists
-export function useUserDelegatee(): string {
+export function useUserDelegatee(): string | undefined {
   const { account } = useActiveWeb3React()
   const tokenContract = useGovTokenContract()
+  const isAave = useIsAave()
   const { result } = useSingleCallResult(
     tokenContract,
-    isAaveTokenContract(tokenContract) ? 'getDelegateeByType' : 'delegates',
-    isAaveTokenContract(tokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+    isAave ? 'getDelegateeByType' : 'delegates',
+    isAave ? [account ?? undefined, 0] : [account ?? undefined]
   )
-  return result?.[0] ?? undefined
+
+  const formattedAddress = isAddress(result?.[0])
+
+  return formattedAddress !== false ? formattedAddress : undefined
 }
 
 // gets the users current votes
@@ -321,12 +309,13 @@ export function useUserVotes(): TokenAmount | undefined {
   const govTokenContract = useGovTokenContract()
 
   const govToken = useGovernanceToken()
+  const isAaave = useIsAave()
 
   // check for available votes
   const votes = useSingleCallResult(
     govTokenContract,
-    isAaveTokenContract(govTokenContract) ? 'getPowerCurrent' : 'getCurrentVotes',
-    isAaveTokenContract(govTokenContract) ? [account ?? undefined, 0] : [account ?? undefined]
+    isAaave ? 'getPowerCurrent' : 'getCurrentVotes',
+    isAaave ? [account ?? undefined, 0] : [account ?? undefined]
   )?.result?.[0]
   return votes && govToken ? new TokenAmount(govToken, votes) : undefined
 }
@@ -337,14 +326,13 @@ export function useUserVotesAsOfBlock(block: number | undefined): TokenAmount | 
   const govTokenContract = useGovTokenContract()
 
   const govToken = useGovernanceToken()
+  const isAave = useIsAave()
 
   // check for available votes
   const votes = useSingleCallResult(
     govTokenContract,
-    isAaveTokenContract(govTokenContract) ? 'getPowerAtBlock' : 'getPriorVotes',
-    isAaveTokenContract(govTokenContract)
-      ? [account ?? undefined, block ?? undefined, 0]
-      : [account ?? undefined, block ?? undefined]
+    isAave ? 'getPowerAtBlock' : 'getPriorVotes',
+    isAave ? [account ?? undefined, block ?? undefined, 0] : [account ?? undefined, block ?? undefined]
   )?.result?.[0]
   return votes && govToken ? new TokenAmount(govToken, votes) : undefined
 }
@@ -382,13 +370,13 @@ export function useVoteCallback(): {
 
   const govContract = useGovernanceContract()
   const addTransaction = useTransactionAdder()
-  const isAaveGovCheck = isAaveGov(govContract)
+  const isAaveGov = useIsAave()
 
   const voteCallback = useCallback(
     (proposalId: string | undefined, support: boolean) => {
       if (!account || !govContract || !proposalId) return
       const args = [proposalId, support]
-      if (isAaveGovCheck) {
+      if (isAaveGov) {
         return govContract.estimateGas.submitVote(...args, {}).then(estimatedGasLimit => {
           return govContract
             .submitVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
@@ -412,7 +400,7 @@ export function useVoteCallback(): {
         })
       }
     },
-    [account, addTransaction, govContract, isAaveGovCheck]
+    [account, addTransaction, govContract, isAaveGov]
   )
   return { voteCallback }
 }

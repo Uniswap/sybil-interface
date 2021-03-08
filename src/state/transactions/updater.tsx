@@ -34,13 +34,13 @@ export default function Updater(): null {
   const dispatch = useDispatch<AppDispatch>()
   const state = useSelector<AppState, AppState['transactions']>(state => state.transactions)
 
-  const transactions = chainId ? state[chainId] ?? {} : {}
-
   // show popup on confirm
   const addPopup = useAddPopup()
 
   useEffect(() => {
     if (!chainId || !library || !lastBlockNumber) return
+
+    const transactions = chainId ? state[chainId] ?? {} : {}
 
     Object.keys(transactions)
       .filter(hash => shouldCheck(lastBlockNumber, transactions[hash]))
@@ -84,7 +84,7 @@ export default function Updater(): null {
             console.error(`failed to check transaction hash: ${hash}`, error)
           })
       })
-  }, [chainId, library, transactions, lastBlockNumber, dispatch, addPopup])
+  }, [chainId, library, lastBlockNumber, dispatch, addPopup, state])
 
   return null
 }

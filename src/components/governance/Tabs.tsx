@@ -31,13 +31,13 @@ const AboveSmall = styled.div`
   `};
 `
 
-const StyledCheckbox = styled.input`
-  border: 1px solid ${({ theme }) => theme.bg1};
-  height: 20px;
-  color: ${({ theme }) => theme.text1};
-`
+// const StyledCheckbox = styled.input`
+//   border: 1px solid ${({ theme }) => theme.bg1};
+//   height: 20px;
+//   color: ${({ theme }) => theme.text1};
+// `
 
-function Tabs({ hideZero, setHideZero }: { hideZero?: boolean; setHideZero?: (val: boolean) => void }) {
+function Tabs() {
   const [activeProtocol] = useActiveProtocol()
   const [filter, setFilter] = useFilterActive()
 
@@ -65,14 +65,14 @@ function Tabs({ hideZero, setHideZero }: { hideZero?: boolean; setHideZero?: (va
         {location.pathname.includes('delegates') && (
           <AboveSmall>
             <RowFixed>
-              <StyledCheckbox
+              {/* <StyledCheckbox
                 type="checkbox"
                 checked={hideZero}
                 onChange={() => setHideZero && setHideZero(!hideZero)}
               />
               <TYPE.main mr="10px" onClick={() => setHideZero && setHideZero(!hideZero)} style={{ cursor: 'pointer' }}>
                 Hide 0 votes
-              </TYPE.main>
+              </TYPE.main> */}
               <Toggle isActive={filter} toggle={() => setFilter(!filter)} />
             </RowFixed>
           </AboveSmall>

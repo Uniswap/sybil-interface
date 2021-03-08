@@ -1,6 +1,12 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { updateVersion } from '../global/actions'
-import { updateMatchesDarkMode, updateUserDarkMode, toggleURLWarning, updateTwitterAccount } from './actions'
+import {
+  updateMatchesDarkMode,
+  updateUserDarkMode,
+  toggleURLWarning,
+  updateTwitterAccount,
+  updateLastSelectedProtocolID
+} from './actions'
 
 const currentTimestamp = () => new Date().getTime()
 
@@ -15,13 +21,16 @@ export interface UserState {
 
   timestamp: number
   URLWarningVisible: boolean
+
+  lastSelectedProtocolID: string | undefined
 }
 
 export const initialState: UserState = {
   userDarkMode: null,
   matchesDarkMode: false,
   timestamp: currentTimestamp(),
-  URLWarningVisible: true
+  URLWarningVisible: true,
+  lastSelectedProtocolID: undefined
 }
 
 export default createReducer(initialState, builder =>
@@ -42,5 +51,8 @@ export default createReducer(initialState, builder =>
     })
     .addCase(updateTwitterAccount, (state, { payload: { twitterAccount } }) => {
       state.twitterAccount = twitterAccount
+    })
+    .addCase(updateLastSelectedProtocolID, (state, { payload: { protocolID } }) => {
+      state.lastSelectedProtocolID = protocolID
     })
 )
