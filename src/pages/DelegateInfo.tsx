@@ -287,10 +287,12 @@ function DelegateInfo({
                 {delegateInfo && proposalStatuses && delegateInfo.votes ? (
                   delegateInfo.votes
                     ?.map((vote, i) => {
-                      const proposal = proposalData?.[vote.proposal] // proposals start at 1
-                      const status = proposalStatuses[i]
-                        ? enumerateProposalState(proposalStatuses[i])
-                        : enumerateProposalState(0)
+                      const proposal = proposalData?.[vote.proposal]
+                      // need to offset by one because proposal ids start at 1
+                      const index = proposal ? parseFloat(proposal?.id) - 1 : 0
+                      const status = proposalStatuses[index]
+                        ? enumerateProposalState(proposalStatuses[index])
+                        : 'loading'
                       return (
                         proposal && (
                           <div key={i}>
