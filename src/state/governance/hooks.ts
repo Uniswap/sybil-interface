@@ -199,8 +199,6 @@ export function useProposalCount(): number | undefined {
 export function useAllProposalStates(): number[] | undefined {
   const govContract = useGovernanceContract()
   const [activeProtocol] = useActiveProtocol()
-
-  // Got migration id and retired gov contract
   const migrationProposal = activeProtocol?.migrationProposalId
   const govContractBravo = useGovernanceContractBravo()
 
