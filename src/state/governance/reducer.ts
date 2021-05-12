@@ -24,9 +24,9 @@ export interface GovernanceInfo {
   primaryColor: string
   secondaryColor: string
   token: SerializedToken
-  governanceAddress: string,
-  governanceAddressBravo?: string,
-  migrationProposalId?: number,
+  governanceAddress: string
+  governanceAddressBravo?: string
+  migrationProposalId?: number
   social: string
   emoji?: string
 }

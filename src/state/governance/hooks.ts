@@ -13,7 +13,12 @@ import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
 import { GovernanceInfo, GlobaData } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import { useGovernanceContract, useGovernanceContractBravo, useGovTokenContract, useIsAave } from '../../hooks/useContract'
+import {
+  useGovernanceContract,
+  useGovernanceContractBravo,
+  useGovTokenContract,
+  useIsAave
+} from '../../hooks/useContract'
 import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
@@ -179,10 +184,9 @@ export interface ProposalData {
 
 // get count of all proposals made
 export function useProposalCount(): number | undefined {
-  const [activeProtocol] = useActiveProtocol();
-  const gov = useGovernanceContract();
-  const govBravo = useGovernanceContractBravo();
-  const res = useSingleCallResult(govBravo? govBravo:gov, useIsAave() ? 'getProposalsCount' : 'proposalCount')
+  const gov = useGovernanceContract()
+  const govBravo = useGovernanceContractBravo()
+  const res = useSingleCallResult(govBravo ? govBravo : gov, useIsAave() ? 'getProposalsCount' : 'proposalCount')
   if (res.result && !res.loading) {
     return parseInt(res.result[0])
   }
@@ -194,11 +198,11 @@ export function useProposalCount(): number | undefined {
  */
 export function useAllProposalStates(): number[] | undefined {
   const govContract = useGovernanceContract()
-  const [activeProtocol] = useActiveProtocol();
+  const [activeProtocol] = useActiveProtocol()
 
   // Got migration id and retired gov contract
-  const migrationProposal = activeProtocol?.migrationProposalId;
-  const govContractBravo = useGovernanceContractBravo();
+  const migrationProposal = activeProtocol?.migrationProposalId
+  const govContractBravo = useGovernanceContractBravo()
 
   const [statuses, setStatuses] = useState<number[] | undefined>()
   const isAaveGov = useIsAave()
@@ -207,23 +211,23 @@ export function useAllProposalStates(): number[] | undefined {
   const proposalCount = useProposalCount()
   const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
 
-  const cutoffProposal = migrationProposal ? migrationProposal:proposalCount;
+  const cutoffProposal = migrationProposal ? migrationProposal : proposalCount
 
   let statusRes = useSingleContractMultipleData(
-      proposalCount ? govContract : undefined,
-      isAaveGov ? 'getProposalState' : 'state',
-      ids.slice(0,cutoffProposal),
-      NEVER_RELOAD
-   )
+    proposalCount ? govContract : undefined,
+    isAaveGov ? 'getProposalState' : 'state',
+    ids.slice(0, cutoffProposal),
+    NEVER_RELOAD
+  )
 
   statusRes = statusRes.concat(
-      useSingleContractMultipleData(
+    useSingleContractMultipleData(
       proposalCount ? govContractBravo : undefined,
       isAaveGov ? 'getProposalState' : 'state',
       ids.slice(cutoffProposal),
       NEVER_RELOAD
     )
-   )
+  )
 
   useEffect(() => {
     if (!statuses) {
