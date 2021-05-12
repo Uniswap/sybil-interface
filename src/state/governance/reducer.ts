@@ -24,7 +24,9 @@ export interface GovernanceInfo {
   primaryColor: string
   secondaryColor: string
   token: SerializedToken
-  governanceAddress: string
+  governanceAddress: string,
+  governanceAddressBravo?: string,
+  migrationProposalId?: number,
   social: string
   emoji?: string
 }
@@ -55,6 +57,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   emoji: '🦄'
 }
 
+export const COMP_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb17b66529'
 export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
 const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
@@ -66,7 +69,9 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#00D395',
   secondaryColor: '#f0fffa',
   token: serializeToken(COMP),
+  governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   governanceAddress: COMP_GOVERNANCE_ADDRESS,
+  migrationProposalId: 42,
   social: '@compoundfinance',
   emoji: '🏦'
 }

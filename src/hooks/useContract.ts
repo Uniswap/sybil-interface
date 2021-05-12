@@ -92,6 +92,15 @@ export function useGovernanceContract(): Contract | null {
   )
 }
 
+export function useGovernanceContractBravo(): Contract | null {
+  const [activeProtocol] = useActiveProtocol()
+  return useContract(
+    activeProtocol ? activeProtocol.governanceAddressBravo : undefined,
+    activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,
+    true
+  )
+}
+
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
   const isAave = useIsAave()
