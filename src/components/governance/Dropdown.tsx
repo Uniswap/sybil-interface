@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import { RowBetween, RowFixed } from '../Row'
 import { WrappedListLogo } from './styled'
-import { TYPE } from '../../theme'
+import { TYPE, ExternalLink } from '../../theme'
 import { ChevronDown, ChevronUp } from 'react-feather'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
 import useOnClickOutside from '../../hooks/useClickOutside'
+import { GreyCard } from '../../components/Card'
+import { getEtherscanLink } from '../../utils'
 
 const Wrapper = styled.div<{ backgroundColor?: string; open: boolean }>`
   width: 100%;
@@ -50,6 +52,28 @@ const Option = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
   }
 `
 
+const Votes = styled(GreyCard)`
+  padding-top: 56px;
+  margin-top: -60px;
+  background-color: ${({ theme }) => theme.bg3};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+
+    gap: 12px;
+  `};
+`
+
+const SectionWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1.5em;
+  margin-bottom: 1rem;
+`
+
 export default function Dropdown() {
   const [activeProtocol] = useActiveProtocol()
 
@@ -82,19 +106,31 @@ export default function Dropdown() {
   }, [activeProtocol])
 
   return (
-    <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open} ref={ref}>
-      <RowBetween>
-        <RowFixed style={{ gap: '16px' }}>
-          <WrappedListLogo src={activeProtocol?.logo} />
-          <TYPE.mediumHeader color={activeProtocol?.primaryColor}>{activeProtocol?.name}</TYPE.mediumHeader>
-        </RowFixed>
-        {open ? (
-          <ChevronUp stroke={activeProtocol?.primaryColor} />
-        ) : (
-          <ChevronDown stroke={activeProtocol?.primaryColor} />
-        )}
-      </RowBetween>
-      {open && activeProtocol && <Flyout options={options.length}>{options}</Flyout>}
-    </Wrapper>
+    <SectionWrapper>
+      <Wrapper backgroundColor={activeProtocol?.secondaryColor} onClick={() => setOpen(!open)} open={open} ref={ref}>
+        <RowBetween>
+          <RowFixed style={{ gap: '16px' }}>
+            <WrappedListLogo src={activeProtocol?.logo} />
+            <TYPE.mediumHeader color={activeProtocol?.primaryColor}>{activeProtocol?.name}</TYPE.mediumHeader>
+          </RowFixed>
+          {open ? (
+            <ChevronUp stroke={activeProtocol?.primaryColor} />
+          ) : (
+            <ChevronDown stroke={activeProtocol?.primaryColor} />
+          )}
+        </RowBetween>
+        {open && activeProtocol && <Flyout options={options.length}>{options}</Flyout>}
+      </Wrapper>
+      {activeProtocol?.governanceAddress ? (
+        <Votes>
+          <TYPE.black fontSize="12px">
+            Contract address:&nbsp;
+            <ExternalLink href={getEtherscanLink(1, activeProtocol.governanceAddress, 'address')}>
+              {activeProtocol.governanceAddress}
+            </ExternalLink>
+          </TYPE.black>
+        </Votes>
+      ) : null}
+    </SectionWrapper>
   )
 }
