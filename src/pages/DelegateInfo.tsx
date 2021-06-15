@@ -26,7 +26,7 @@ import {
   DelegateButton
 } from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
-import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
+import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall } from '../theme'
 import { useIdentity, useTwitterProfileData, useAllIdentities } from '../state/social/hooks'
 import { useTokenBalance } from '../state/wallet/hooks'
 import Loader from '../components/Loader'
@@ -68,7 +68,7 @@ const DataRow = styled.div`
 
 export const Break = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.bg3};
+  background-color: ${({ theme }) => theme.bg4};
   height: 1px;
 `
 
@@ -150,12 +150,6 @@ function DelegateInfo({
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
 
   const [allIdentities] = useAllIdentities()
-  const name = nameOrAddress(
-    formattedAddress ? formattedAddress : undefined,
-    allIdentities,
-    false,
-    delegateInfo?.autonomous
-  )
 
   const nameShortened = nameOrAddress(
     formattedAddress ? formattedAddress : undefined,
@@ -163,8 +157,6 @@ function DelegateInfo({
     true,
     delegateInfo?.autonomous
   )
-
-  const formattedName = name === formattedAddress ? ensName ?? name : name
 
   // toggle for showing delegation modal with prefilled delegate
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
@@ -207,7 +199,7 @@ function DelegateInfo({
                   ) : (
                     <WrappedListLogo src={EmptyProfile} />
                   )}
-                  <AutoColumn gap="sm">
+                  <AutoColumn gap="2px">
                     <RowFixed>
                       <ExternalLink
                         href={
@@ -216,12 +208,9 @@ function DelegateInfo({
                             : getEtherscanLink(chainId, formattedAddress, 'address')
                         }
                       >
-                        <OnlyAboveSmall>
-                          <TYPE.black>{formattedName}</TYPE.black>
-                        </OnlyAboveSmall>
-                        <OnlyBelowSmall>
-                          <TYPE.black>{nameShortened}</TYPE.black>
-                        </OnlyBelowSmall>
+                        <TYPE.black>
+                          {nameShortened === formattedAddress ? ensName ?? formattedAddress : nameShortened}
+                        </TYPE.black>
                       </ExternalLink>
                       {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
                     </RowFixed>
@@ -296,10 +285,12 @@ function DelegateInfo({
                       return (
                         proposal && (
                           <div key={i}>
-                            <RowBetween key={i + proposal.id}>
+                            <RowBetween key={i + proposal.id} style={{ alignItems: 'flex-start' }}>
                               <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
                                 <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
-                                  <ResponsiveBodyText>{proposal.title}</ResponsiveBodyText>
+                                  <ResponsiveBodyText style={{ maxWidth: '240px' }}>
+                                    {proposal.title}
+                                  </ResponsiveBodyText>
                                 </StyledInternalLink>
                                 {status && (
                                   <RowFixed>
@@ -322,7 +313,6 @@ function DelegateInfo({
                                     </RedIcon>
                                   )}
                                 </RowFixed>
-                                <div> </div>
                               </AutoColumn>
                             </RowBetween>
                             {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}

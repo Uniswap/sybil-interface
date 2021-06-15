@@ -29,6 +29,7 @@ import { ALL_VOTERS, DELEGATE_INFO } from '../../apollo/queries'
 import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
+import usePrevious from '../../hooks/usePrevious'
 
 export interface DelegateData {
   id: string
@@ -488,6 +489,7 @@ export function useAllVotersForProposal(
 export interface DelegateInfo {
   // amount of votes delegated to them
   delegatedVotes: number
+  delegatedVotesRaw: number
 
   // amount of delegates they represent
   tokenHoldersRepresentedAmount: number
@@ -509,6 +511,7 @@ interface DelegateInfoRes {
         delegates: {
           id: string
           delegatedVotes: string
+          delegatedVotesRaw: string
           tokenHoldersRepresentedAmount: number
           votes: {
             proposal: {
@@ -531,6 +534,14 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
 
   const isEOA = useIsEOA(address)
 
+  // reset data on account switch
+  const prevAddress = usePrevious(address)
+  useEffect(() => {
+    if (prevAddress !== address && !!prevAddress && !!address) {
+      setData(undefined)
+    }
+  }, [address, prevAddress])
+
   useEffect(() => {
     async function fetchData() {
       client
@@ -548,6 +559,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
             if (!resData) {
               setData({
                 delegatedVotes: 0,
+                delegatedVotesRaw: 0,
                 tokenHoldersRepresentedAmount: 0,
                 votes: [],
                 EOA: isEOA,
@@ -567,6 +579,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
               : []
             setData({
               delegatedVotes: parseFloat(resData?.delegatedVotes ?? '0'),
+              delegatedVotesRaw: parseInt(resData?.delegatedVotesRaw ?? '0'),
               tokenHoldersRepresentedAmount: resData?.tokenHoldersRepresentedAmount ?? 0,
               votes,
               EOA: isEOA,

@@ -5,25 +5,57 @@ import styled, { keyframes } from 'styled-components'
 import { darken } from 'polished'
 import { ArrowLeft, X } from 'react-feather'
 
+export const Above1080Only = styled.span`
+  display: initial;
+  @media (max-width: 1080px) {
+    display: none;
+  }
+`
+
+export const Below1080Only = styled.span`
+  display: none;
+  @media (max-width: 1080px) {
+    display: initial;
+  }
+`
+
+export const OnlyAboveExtraLarge = styled.div`
+  display: initial;
+  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
+    display: none;
+  `};
+`
+
 export const OnlyAboveLarge = styled.div`
   display: initial;
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    display: none;
+  `};
+`
 
-  ${({ theme }) => theme.mediaWidth.upToExtraLarge`
-  display: none;
+export const OnlyAboveMedium = styled.div`
+  display: initial;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    display: none;
   `};
 `
 
 export const OnlyAboveSmall = styled.div`
   display: initial;
-
   ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `};
+`
+
+export const OnlyAboveExtraSmall = styled.div`
+  display: initial;
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     display: none;
   `};
 `
 
 export const OnlyBelowSmall = styled.div`
   display: none;
-
   ${({ theme }) => theme.mediaWidth.upToSmall`
     display: initial;
   `};
@@ -117,6 +149,11 @@ export const BlankInternalLink = styled(Link)`
   cursor: pointer;
   color: ${({ theme }) => theme.black};
   font-weight: 500;
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.6;
+  }
 
   :focus {
     outline: none;
@@ -295,7 +332,7 @@ export const LoadingFlag = styled.div`
   color: ${({ theme }) => theme.blue1};
   padding: 4px 8px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 11px;
 
   :hover {
     cursor: pointer;

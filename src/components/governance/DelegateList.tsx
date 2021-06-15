@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
+import { TYPE, BlankInternalLink, OnlyAboveExtraSmall } from '../../theme'
 import Row, { AutoRow } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
@@ -17,7 +17,7 @@ import {
   useMaxFetched
 } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton, EmptyWrapper } from './styled'
-import { GreyCard } from '../Card'
+import Card from '../Card'
 import { useActiveWeb3React } from '../../hooks'
 import { useToggleModal, useModalDelegatee } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/actions'
@@ -36,6 +36,9 @@ const ColumnLabel = styled(TYPE.darkGray)`
 
 const NoWrap = styled(TYPE.black)`
   white-space: nowrap;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `
 
 const DataRow = styled.div`
@@ -58,13 +61,28 @@ const DataRow = styled.div`
   }
 
   ${({ theme }) => theme.mediaWidth.upToExtraLarge`
+    grid-template-columns: 1fr 100px 1fr;
+     > *:nth-child(2){
+      display: none;
+    }
+  `};
+
+  @media (max-width: 1370px) {
+    grid-template-columns: 1fr 1fr;
+    padding: 0 0.5rem;
+    > *:nth-child(3) {
+      display: none;
+    }
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToLarge`
     grid-template-columns: 1fr 1fr;
   `};
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     margin: 0;
-    padding: 0 1.5rem;
+    padding: 0 0.5rem;
   `};
 `
 
@@ -78,16 +96,16 @@ const AccountLinkGroup = styled(AutoRow)`
 `
 
 const VoteText = styled(NoWrap)`
-  width: 140px;
+  width: 120px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 12px;
+    font-size: 14px;
   `};
 `
 
 const FixedRankWidth = styled.div`
-  width: 20px;
+  width: 12px;
   text-align: right;
-  margin-right: 12px;
+  margin-right: 0px;
 `
 
 const PageButtons = styled.div`
@@ -105,6 +123,18 @@ const Arrow = styled.div<{ faded?: boolean }>`
   :hover {
     cursor: pointer;
   }
+`
+
+const HiddenBelow1080 = styled.span`
+  @media (max-width: 1080px) {
+    display: none;
+  }
+`
+
+const ResponsiveText = styled(TYPE.black)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 14px;
+  `};
 `
 
 export default function DelegateList({ hideZero }: { hideZero: boolean }) {
@@ -190,14 +220,14 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     return (
       <DataRow>
         <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
-          <OnlyAboveSmall>
+          <HiddenBelow1080>
             <FixedRankWidth>
               <NoWrap>{(page - 1) * FETCHING_INTERVAL + (index + 1)}</NoWrap>
             </FixedRankWidth>
-          </OnlyAboveSmall>
+          </HiddenBelow1080>
           <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
             <AccountLinkGroup gap="10px" width="initial">
-              <OnlyAboveSmall>
+              <HiddenBelow1080>
                 {imageURL ? (
                   <RoundedProfileImage>
                     <img src={imageURL} alt="profile" />
@@ -205,9 +235,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
                 ) : (
                   <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
                 )}
-              </OnlyAboveSmall>
+              </HiddenBelow1080>
               <AutoColumn gap="6px">
-                <TYPE.black style={{ fontWeight: imageURL ? 500 : 400 }}>{name}</TYPE.black>
+                <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
                 {d.handle || d.autonomous ? (
                   <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                 ) : (
@@ -219,22 +249,17 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             </AccountLinkGroup>
           </BlankInternalLink>
         </AutoRow>
-        <OnlyAboveLarge>
-          <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-        </OnlyAboveLarge>
-        <OnlyAboveLarge>
-          <NoWrap textAlign="end">
-            {globalData
-              ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
-                '%'
-              : '-'}
-          </NoWrap>
-        </OnlyAboveLarge>
+        <NoWrap textAlign="end">{d.votes.length}</NoWrap>
+        <NoWrap textAlign="end">
+          {globalData
+            ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) + '%'
+            : '-'}
+        </NoWrap>
         <Row style={{ justifyContent: 'flex-end' }}>
-          <OnlyAboveSmall>
+          <OnlyAboveExtraSmall>
             <DelegateButton
               width="fit-content"
-              mr="10px"
+              mr="24px"
               disabled={!showDelegateButton || isDelegatee}
               onClick={() => {
                 setPrefilledDelegate(d.id)
@@ -243,7 +268,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             >
               {isDelegatee ? 'Delegated' : 'Delegate'}
             </DelegateButton>
-          </OnlyAboveSmall>
+          </OnlyAboveExtraSmall>
           <VoteText textAlign="end">
             {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
           </VoteText>
@@ -266,25 +291,21 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
 
   return combinedDelegates && combinedDelegates.length === 0 ? (
-    <GreyCard padding="20px">
+    <Card padding="20px">
       <EmptyWrapper>
         <TYPE.body style={{ marginBottom: '8px' }}>No delegates yet.</TYPE.body>
         <TYPE.subHeader>
           <i>Community members with delegated votes will appear here.</i>
         </TYPE.subHeader>
       </EmptyWrapper>
-    </GreyCard>
+    </Card>
   ) : (
-    <GreyCard padding="1rem 0">
+    <Card padding="0">
       <AutoColumn gap="lg">
         <DataRow>
           <ColumnLabel>Rank</ColumnLabel>
-          <OnlyAboveLarge>
-            <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
-          </OnlyAboveLarge>
-          <OnlyAboveLarge>
-            <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
-          </OnlyAboveLarge>
+          <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
+          <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
 
@@ -314,6 +335,6 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>
-    </GreyCard>
+    </Card>
   )
 }

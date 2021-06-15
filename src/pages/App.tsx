@@ -6,7 +6,7 @@ import Polling from '../components/Header/Polling'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
-import Overview from './Governance'
+import Profile from '../components/governance/Profile'
 import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 import SideMenu from '../components/Menu/SideMenu'
 import TwitterAccountQueryParamReader from '../state/social/TwitterAccountQueryParamReader'
@@ -18,14 +18,22 @@ import DelegateInfo from './DelegateInfo'
 import DelegateModal from '../components/vote/DelegateModal'
 import { useModalOpen, useToggleModal } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
+import OverviewColumn from '../components/governance/OverviewColumn'
 
 const SiteWrapper = styled.div`
   height: 100vh;
   width: 100%;
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-gap: 1.5em;
+  grid-template-columns: 320px 1fr 376px;
   overflow: auto;
+
+  @media (max-width: 1370px) {
+    grid-template-columns: 320px 1fr 306px;
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    grid-template-columns: 1fr 376px;
+  `};
 
   @media (max-width: 1080px) {
     display: flex;
@@ -40,6 +48,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding: 1rem;
   padding-top: 64px;
   align-items: center;
   flex: 1;
@@ -47,17 +56,10 @@ const ContentWrapper = styled.div`
   overflow-x: hidden;
   z-index: 1;
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    padding: 2rem 0 0 0;
-  `};
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    padding: 1rem 0 0 0;
-  `};
-`
-
-const Marginer = styled.div`
-  margin-top: 5rem;
+  @media (max-width: 1080px) {
+    padding-top: 1rem;
+    padding-bottom: 120px;
+  }
 `
 
 function TopLevelModals() {
@@ -74,11 +76,11 @@ export default function App() {
       <Route component={TwitterAccountQueryParamReader} />
       <SiteWrapper>
         <SideMenu />
+        <OverviewColumn />
         <ContentWrapper>
           <Web3Status />
           <Popups />
           <Polling />
-          <Overview />
           <TopLevelModals />
           <Web3ReactManager>
             <Switch>
@@ -89,8 +91,8 @@ export default function App() {
               <Route path="/" component={RedirectWithUpdatedGovernance} />
             </Switch>
           </Web3ReactManager>
-          <Marginer />
         </ContentWrapper>
+        <Profile />
       </SiteWrapper>
     </Suspense>
   )

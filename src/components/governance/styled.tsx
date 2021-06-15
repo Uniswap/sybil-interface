@@ -85,10 +85,10 @@ export const ProposalStatusSmall = styled.span<{ status: string }>`
 `
 
 export const DelegateButton = styled(ButtonBlue)<{ disabled: boolean }>`
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  @media (max-width: 1080px) {
     font-size: 12px;
     margin-top: 0px !important;
-  `};
+  }
 
   background-color: ${({ disabled, theme }) => disabled && theme.bg3};
   color: ${({ disabled, theme }) => disabled && theme.text2};

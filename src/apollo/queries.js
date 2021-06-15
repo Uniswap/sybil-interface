@@ -118,6 +118,7 @@ export const DELEGATE_INFO = gql`
     delegates(where: { id: $address }) {
       id
       delegatedVotes
+      delegatedVotesRaw
       tokenHoldersRepresentedAmount
       votes {
         proposal {
