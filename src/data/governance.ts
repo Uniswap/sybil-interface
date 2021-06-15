@@ -239,7 +239,7 @@ export async function fetchProposals(client: any, key: string, govId: string): P
                 }
 
                 const calldata = p.calldatas[i]
-                if (calldata) {
+                if (calldata && types) {
                   const decoded = ethers.utils.defaultAbiCoder.decode(types.split(','), calldata)
                   callData = decoded.toString()
                 }

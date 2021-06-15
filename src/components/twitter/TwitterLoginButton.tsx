@@ -9,7 +9,6 @@ export const VerifyButton = styled.a`
   padding: 8px;
   outline: none;
   border: 1px solid transparent;
-  width: 100%;
   border-radius: 12px;
   white-space: nowrap;
   text-decoration: none;

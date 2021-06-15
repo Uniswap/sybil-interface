@@ -215,9 +215,11 @@ export default function Profile() {
           <RowBetween>
             <BlankInternalLink to={`/delegates/${activeProtocol?.id}/${account}`}>
               <RowFixed>
-                <RoundedProfileImage>
-                  <img src={!profileData?.profileURL ? EmptyProfile : profileData?.profileURL} />
-                </RoundedProfileImage>
+                {account && (
+                  <RoundedProfileImage>
+                    <img src={!profileData?.profileURL ? EmptyProfile : profileData?.profileURL} />
+                  </RoundedProfileImage>
+                )}
                 {!account ? (
                   <TYPE.main>Your Address</TYPE.main>
                 ) : (
@@ -251,7 +253,7 @@ export default function Profile() {
             )}
           </RowBetween>
         </WhiteCard>
-        {!verifiedHandleEntry ? (
+        {!verifiedHandleEntry && account ? (
           !twitterAccount ? (
             <TwitterLoginButton text="Announce yourself as a delegate" />
           ) : (
@@ -281,7 +283,7 @@ export default function Profile() {
           <RowBetween>
             <TYPE.black>Wallet voting power</TYPE.black>
             <TYPE.main color={activeProtocol?.primaryColor}>
-              {walletVotes ? walletVotes.toFixed(0) : <Loader />}
+              {walletVotes ? walletVotes.toFixed(0) : account ? <Loader /> : '-'}
             </TYPE.main>
           </RowBetween>
         </WhiteCard>
@@ -330,7 +332,7 @@ export default function Profile() {
           <RowBetween>
             <TYPE.black>Received voting power</TYPE.black>
             <TYPE.main color={activeProtocol?.primaryColor}>
-              {receivedVotes ? receivedVotes.toFixed(0) : <Loader />}
+              {receivedVotes ? receivedVotes.toFixed(0) : account ? <Loader /> : '-'}
             </TYPE.main>
           </RowBetween>
         </WhiteCard>
@@ -351,7 +353,7 @@ export default function Profile() {
           ) : (
             <RowBetween style={{ color: activeProtocol?.primaryColor, fontWeight: 500 }}>
               <span>Total voting power</span>
-              <span>{totalVotes ? totalVotes.toFixed(0) : <Loader />}</span>
+              <span>{totalVotes ? totalVotes.toFixed(0) : account ? <Loader /> : '-'}</span>
             </RowBetween>
           )}
         </Card>
