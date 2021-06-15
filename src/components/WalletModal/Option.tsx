@@ -109,7 +109,7 @@ export default function Option({
   icon: string
   active?: boolean
   id: string
-}) {
+}): JSX.Element {
   const content = (
     <OptionCardClickable id={id} onClick={onClick} clickable={clickable && !active} active={active}>
       <OptionCardLeft>

@@ -89,7 +89,7 @@ export default function Modal({
   maxHeight = 90,
   initialFocusRef,
   children
-}: ModalProps) {
+}: ModalProps): JSX.Element {
   const fadeTransition = useTransition(isOpen, null, {
     config: { duration: 200 },
     from: { opacity: 0 },

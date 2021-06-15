@@ -73,7 +73,7 @@ export default function PendingView({
   error?: boolean
   setPendingError: (error: boolean) => void
   tryActivation: (connector: AbstractConnector) => void
-}) {
+}): JSX.Element {
   const isMetamask = window?.ethereum?.isMetaMask
 
   return (

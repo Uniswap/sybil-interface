@@ -75,7 +75,7 @@ export default function AddressInputPanel({
   value: string
   // triggers whenever the typed value changes
   onChange: (value: string) => void
-}) {
+}): JSX.Element {
   const { chainId } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
 

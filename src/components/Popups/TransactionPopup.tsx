@@ -20,7 +20,7 @@ export default function TransactionPopup({
   hash: string
   success?: boolean
   summary?: string
-}) {
+}): JSX.Element {
   const { chainId } = useActiveWeb3React()
 
   const theme = useContext(ThemeContext)

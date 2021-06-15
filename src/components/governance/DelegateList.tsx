@@ -288,7 +288,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             return <DelegateRow d={d} index={i} key={i} />
           })
       : null
-  }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainId, combinedDelegates, activeProtocol, page, hideZero])
 
   return combinedDelegates && combinedDelegates.length === 0 ? (
     <Card padding="20px">

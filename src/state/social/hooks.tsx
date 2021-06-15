@@ -170,7 +170,7 @@ export function useMultipleTwitterProfileDatas(
     async function fetchData() {
       // for each handle attestation - verify which ones are legit,
       Promise.all(
-        handles.map(async (handle: string) => {
+        handles.map(async (handle: string | undefined) => {
           if (handle) {
             return fetchProfileData(handle)
               .then(profileData => {
@@ -207,7 +207,7 @@ export function useTweetWatcher(
   sig: string | undefined, // used to check regex
   twitterHandle: string | undefined, // handle to fetch tweet from
   watch: boolean, // wether to actively look or not
-  setWatch: React.Dispatch<React.SetStateAction<boolean | undefined>>,
+  setWatch: React.Dispatch<React.SetStateAction<boolean>>,
   setTweetID: React.Dispatch<React.SetStateAction<string | undefined>>,
   setTweetError: React.Dispatch<React.SetStateAction<string | undefined>>
 ) {

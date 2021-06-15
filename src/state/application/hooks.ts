@@ -33,7 +33,10 @@ export function useToggleModal(modal: ApplicationModal): () => void {
 export function useModalDelegatee(): [string | null | undefined, (delegatee: string | null | undefined) => void] {
   const delegatee = useSelector((state: AppState) => state.application.modalDelegatee)
   const dispatch = useDispatch<AppDispatch>()
-  return [delegatee, useCallback((delegatee: string | null) => dispatch(setModalDelegatee({ delegatee })), [dispatch])]
+  return [
+    delegatee,
+    useCallback((delegatee: string | null | undefined) => dispatch(setModalDelegatee({ delegatee })), [dispatch])
+  ]
 }
 
 export function useOpenModal(modal: ApplicationModal): () => void {

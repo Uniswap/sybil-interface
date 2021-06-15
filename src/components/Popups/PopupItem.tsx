@@ -50,7 +50,7 @@ export default function PopupItem({
   removeAfterMs: number | null
   content: PopupContent
   popKey: string
-}) {
+}): JSX.Element {
   const removePopup = useRemovePopup()
   const removeThisPopup = useCallback(() => removePopup(popKey), [popKey, removePopup])
   useEffect(() => {

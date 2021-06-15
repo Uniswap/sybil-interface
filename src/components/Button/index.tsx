@@ -214,7 +214,7 @@ const ButtonErrorStyle = styled(Base)`
   }
 `
 
-export function ButtonError({ error, ...rest }: { error?: boolean } & ButtonProps) {
+export function ButtonError({ error, ...rest }: { error?: boolean } & ButtonProps): JSX.Element {
   if (error) {
     return <ButtonErrorStyle {...rest} />
   } else {

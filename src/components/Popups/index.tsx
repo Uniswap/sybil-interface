@@ -43,7 +43,7 @@ const FixedPopupColumn = styled(AutoColumn)<{ extraPadding: boolean }>`
   `};
 `
 
-export default function Popups() {
+export default function Popups(): JSX.Element {
   // get all popups
   const activePopups = useActivePopups()
 

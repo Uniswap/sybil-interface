@@ -70,7 +70,7 @@ export function TransactionSubmittedContent({
   hash?: string | undefined
   chainId?: ChainId
   confirmationText?: string
-}) {
+}): JSX.Element {
   const theme = useContext(ThemeContext)
 
   return (
@@ -115,7 +115,7 @@ export function ConfirmationModalContent({
   onDismiss: () => void
   topContent: () => React.ReactNode
   bottomContent: () => React.ReactNode
-}) {
+}): JSX.Element {
   return (
     <Wrapper>
       <Section>
@@ -132,7 +132,13 @@ export function ConfirmationModalContent({
   )
 }
 
-export function TransactionErrorContent({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+export function TransactionErrorContent({
+  message,
+  onDismiss
+}: {
+  message: string
+  onDismiss: () => void
+}): JSX.Element {
   const theme = useContext(ThemeContext)
   return (
     <Wrapper>
@@ -173,7 +179,7 @@ export default function TransactionConfirmationModal({
   hash,
   pendingText,
   content
-}: ConfirmationModalProps) {
+}: ConfirmationModalProps): JSX.Element | null {
   const { chainId } = useActiveWeb3React()
 
   if (!chainId) return null
@@ -192,7 +198,7 @@ export default function TransactionConfirmationModal({
   )
 }
 
-export function OffChainRequestModal({ success, onDismiss }: { success: boolean; onDismiss: () => void }) {
+export function OffChainRequestModal({ success, onDismiss }: { success: boolean; onDismiss: () => void }): JSX.Element {
   const theme = useTheme()
 
   return success ? (

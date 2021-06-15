@@ -7,7 +7,7 @@ import { ButtonBasic } from '../Button'
 import { GitHub, HelpCircle, ChevronLeft, X } from 'react-feather'
 import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
-import Logo from '../../assets/images/sybil_logo.png'
+import Logo from '../../assets/svg/sybil-logo.svg'
 import { Break } from '../../pages/DelegateInfo'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
@@ -82,7 +82,7 @@ export const HoverRow = styled(RowFixed)`
   }
 `
 
-export default function SideMenu() {
+export default function SideMenu(): JSX.Element {
   const [open, setOpen] = useState(false)
   const [faqOpen, setfaqOpen] = useState(false)
   const [activeProtocol, setActiveProtocol] = useActiveProtocol()
