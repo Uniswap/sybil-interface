@@ -82,7 +82,7 @@ const DataRow = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 1fr 1fr;
     margin: 0;
-    padding: 0 0.5rem;
+    padding: 0 1rem;
   `};
 `
 

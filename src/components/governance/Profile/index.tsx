@@ -93,10 +93,6 @@ const RoundedProfileImage = styled.div`
   border-radius: 50%;
   margin-right: 16px;
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    display: none;
-  `};
-
   & > img {
     height: 100%;
     width: 100%;
@@ -115,12 +111,12 @@ const MobileWrapper = styled.div`
   display: none;
   @media (max-width: 1080px) {
     display: initial;
-    position: absolute;
+    position: fixed;
     width: 100%;
     bottom: 0;
-    background-color: ${({ theme }) => theme.bg3};
+    background-color: ${({ theme }) => theme.bg2};
     z-index: 2;
-    padding: 1rem;
+    padding: 0.5rem;
     border-top-right-radius: 25px;
     border-top-left-radius: 25px;
   }
@@ -274,7 +270,7 @@ export default function Profile() {
             </TwitterButton>
           )
         ) : null}
-        {!verifiedHandleEntry ? (
+        {!verifiedHandleEntry && account ? (
           <TYPE.blue fontSize="12px">
             Connecting your Twitter to your address can help people find you and delegate votes to you.
           </TYPE.blue>

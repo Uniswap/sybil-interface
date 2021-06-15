@@ -36,6 +36,10 @@ const Flyout = styled.div<{ options: number }>`
   position: absolute;
   width: 100%;
   z-index: 3;
+
+  @media (max-width: 720px) {
+    bottom: -${({ options }) => options * 64}px;
+  }
 `
 
 // dont pass style props to DOM link element

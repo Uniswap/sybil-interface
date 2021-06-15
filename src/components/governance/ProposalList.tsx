@@ -26,6 +26,12 @@ const ProposalItem = styled.div`
   }
 `
 
+const ResponsiveText = styled(TYPE.black)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 14px;
+  `};
+`
+
 export default function ProposalList({ allProposals }: { allProposals: { [id: string]: ProposalData } | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
@@ -58,7 +64,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                           <OnlyAboveSmall>
                             <TYPE.black mr="8px">{p.id}</TYPE.black>
                           </OnlyAboveSmall>
-                          <TYPE.black mr="10px">{p.title}</TYPE.black>
+                          <ResponsiveText mr="10px">{p.title}</ResponsiveText>
                         </RowFixed>
                         <OnlyBelowSmall>
                           {allStatuses && allStatuses?.[i] ? (
