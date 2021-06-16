@@ -9,7 +9,6 @@ import { Link, useLocation } from 'react-router-dom'
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   margin-left: 70px;
   padding: 2rem;
-  padding-top: 64px;
   border-right: 1px solid ${({ backgroundColor }) => backgroundColor};
 
   ${({ theme }) => theme.mediaWidth.upToLarge`
@@ -23,8 +22,13 @@ export default function OverviewColumn() {
 
   return (
     <Wrapper backgroundColor={activeProtocol?.secondaryColor}>
-      <AutoColumn gap="lg">
-        <TYPE.main fontSize="24px" fontWeight="700" color={activeProtocol?.primaryColor}>
+      <AutoColumn gap="md">
+        <TYPE.main
+          fontSize="24px"
+          fontWeight="700"
+          color={activeProtocol?.primaryColor}
+          style={{ marginBottom: '1rem' }}
+        >
           {activeProtocol?.name}
         </TYPE.main>
         <TabOption

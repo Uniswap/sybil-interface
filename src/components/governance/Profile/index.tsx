@@ -42,8 +42,8 @@ import LogoText from '../LogoText'
 const SectionWrapper = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.bg2};
-  padding: 1rem;
-  padding-top: 64px;
+  padding: 2rem;
+  /* padding-top: calc(2rem + 6px); */
   height: 100%;
 
   @media (max-width: 1080px) {
@@ -205,7 +205,7 @@ export default function Profile() {
       </Modal>
       <AutoColumn gap="16px">
         <TYPE.main>
-          Your <span style={{ color: activeProtocol?.primaryColor }}> {activeProtocol?.name}</span> governance profile
+          Your <span style={{ color: activeProtocol?.primaryColor }}> {activeProtocol?.name}</span> profile
         </TYPE.main>
         <WhiteCard padding="10px">
           <RowBetween>

@@ -152,7 +152,6 @@ export const BlankInternalLink = styled(Link)`
 
   :hover {
     cursor: pointer;
-    opacity: 0.6;
   }
 
   :focus {

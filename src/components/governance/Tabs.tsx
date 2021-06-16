@@ -12,7 +12,7 @@ export const TabOption = styled.button<{ selected?: boolean; color?: string; col
   border-radius: 12px;
   outline: none;
   border: none;
-  color: ${({ color, theme }) => color ?? theme.text1}
+  color: ${({ color, theme }) => color ?? theme.text1};
   background-color: ${({ selected, theme, color2 }) => (selected ? color2 ?? theme.bg3 : 'transparent')};
   text-decoration: none;
   font-weight: 500;

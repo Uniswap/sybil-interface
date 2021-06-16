@@ -22,7 +22,7 @@ const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
 const StyledDataCard = styled(DataCard)`
   width: 100%;
   background: none;
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.bg2};
   height: fit-content;
   z-index: 2;
 `

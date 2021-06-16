@@ -48,8 +48,8 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 1rem;
-  padding-top: 64px;
+  padding: 2rem;
+  /* padding-top: 64px; */
   align-items: center;
   flex: 1;
   overflow-y: auto;

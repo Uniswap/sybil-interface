@@ -45,13 +45,21 @@ const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 132px 100px 1fr;
   grid-column-gap: 1rem;
-  padding: 0 1.5rem;
+  /* padding: 0 1.5rem; */
 
+  position: relative;
   margin: 6px 0;
   border-left: 3px solid transparent;
 
-  :hover {
+  :hover::after {
+    content: '';
     border-left: 3px solid ${({ theme }) => theme.primary1};
+    position: absolute;
+    margin-left: calc(-2rem - 4px);
+    height: 100%;
+    width: 1px;
+    /* margin-top: auto; */
+    /* left: -16px; */
   }
 
   &:first-child {
@@ -88,8 +96,8 @@ const DataRow = styled.div`
 
 const AccountLinkGroup = styled(AutoRow)`
   :hover {
-    opacity: 0.5;
-    border-radius: 8px;
+    /* opacity: 0.5; */
+    /* border-radius: 8px; */
   }
 
   flex-wrap: nowrap;
@@ -135,6 +143,12 @@ const ResponsiveText = styled(TYPE.black)`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: 14px;
   `};
+`
+
+export const Break = styled.div`
+  width: 100%;
+  background-color: ${({ theme }) => theme.bg4};
+  height: 1px;
 `
 
 export default function DelegateList({ hideZero }: { hideZero: boolean }) {
@@ -302,6 +316,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     </Card>
   ) : (
     <Card padding="0">
+      <TYPE.body fontSize="16px" fontWeight="600" style={{ marginBottom: '16px' }}>
+        Top Delegates
+      </TYPE.body>
       <AutoColumn gap="lg">
         <DataRow>
           <ColumnLabel>Rank</ColumnLabel>
