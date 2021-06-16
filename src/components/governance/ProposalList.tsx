@@ -9,6 +9,7 @@ import { AutoColumn } from '../Column'
 import { Link } from 'react-router-dom'
 import Loader from '../Loader'
 import { enumerateProposalState } from '../../data/governance'
+import { HIDDEN_PROPOSALS } from 'constants/proposals'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -56,6 +57,14 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
           {allStatuses && allProposals
             ? Object.values(allProposals)
                 .map((p: ProposalData, i) => {
+                  // block hidden proposals
+                  if (
+                    activeProtocol &&
+                    HIDDEN_PROPOSALS[activeProtocol.id] &&
+                    HIDDEN_PROPOSALS[activeProtocol.id].includes(i)
+                  ) {
+                    return null
+                  }
                   const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
                   return (
                     <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>

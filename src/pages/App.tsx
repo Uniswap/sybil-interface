@@ -28,7 +28,7 @@ const SiteWrapper = styled.div`
   overflow: auto;
 
   @media (max-width: 1370px) {
-    grid-template-columns: 320px 1fr 306px;
+    // grid-template-columns: 320px 1fr 306px;
   }
 
   ${({ theme }) => theme.mediaWidth.upToLarge`

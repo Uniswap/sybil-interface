@@ -10,7 +10,7 @@ export const VerifyButton = styled.a`
   outline: none;
   border: 1px solid transparent;
   border-radius: 12px;
-  white-space: nowrap;
+  // white-space: nowrap;
   text-decoration: none;
   :hover {
     cursor: pointer;
