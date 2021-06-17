@@ -324,22 +324,37 @@ export default function Profile() {
             </WhiteCard>
             {userDelegatee && userDelegatee !== ZERO_ADDRESS && (
               <OffsetCard bgColor={theme.bg3}>
-                <RowBetween>
-                  <RowFixed>
-                    <CornerDownRight size="14px" stroke={theme.text2} />{' '}
-                    <TYPE.main ml="2px" fontSize="14px" color={theme.text2}>
-                      Delegating to
-                    </TYPE.main>
-                  </RowFixed>
-                  <RowFixed style={{ backgroundColor: theme.bg1, borderRadius: '20px', padding: '0.25rem 0.5rem' }}>
-                    <StyledInternalLink to={`/delegates/${activeProtocol?.id}/${userDelegatee}`}>
-                      <TYPE.main fontSize="14px" mr="2px" color={activeProtocol?.primaryColor}>
-                        {userDelegatee !== account ? nameOrAddress(userDelegatee, allIdentities, true) : 'self'}
+                {userDelegatee === account ? (
+                  <RowBetween>
+                    <TYPE.body fontSize="14px" fontWeight={500} color={theme.text2}>
+                      Selft delegated
+                    </TYPE.body>
+                    <ButtonCustom
+                      bgColor={theme.bg4}
+                      color={theme.text1}
+                      style={{ fontSize: '14px', width: 'fit-content' }}
+                    >
+                      Add Delegate
+                    </ButtonCustom>
+                  </RowBetween>
+                ) : (
+                  <RowBetween>
+                    <RowFixed>
+                      <CornerDownRight size="14px" stroke={theme.text2} />{' '}
+                      <TYPE.main ml="2px" fontSize="14px" color={theme.text2}>
+                        Delegating to
                       </TYPE.main>
-                    </StyledInternalLink>
-                    <CloseIcon stroke={theme.text2} size="16px" onClick={() => toggelDelegateModal()} />
-                  </RowFixed>
-                </RowBetween>
+                    </RowFixed>
+                    <RowFixed style={{ backgroundColor: theme.bg1, borderRadius: '20px', padding: '0.25rem 0.5rem' }}>
+                      <StyledInternalLink to={`/delegates/${activeProtocol?.id}/${userDelegatee}`}>
+                        <TYPE.main fontSize="14px" mr="2px" color={activeProtocol?.primaryColor}>
+                          {userDelegatee !== account ? nameOrAddress(userDelegatee, allIdentities, true) : 'self'}
+                        </TYPE.main>
+                      </StyledInternalLink>
+                      <CloseIcon stroke={theme.text2} size="16px" onClick={() => toggelDelegateModal()} />
+                    </RowFixed>
+                  </RowBetween>
+                )}
               </OffsetCard>
             )}
             {userDelegatee &&
