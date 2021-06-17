@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-import { TYPE, BlankInternalLink, OnlyAboveExtraSmall } from '../../theme'
-import Row, { AutoRow } from '../Row'
+import { TYPE, BlankInternalLink, OnlyAboveExtraSmall, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
+import Row, { AutoRow, RowBetween, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
 import {
@@ -28,6 +28,7 @@ import { useTokenBalance } from '../../state/wallet/hooks'
 import { useAllIdentities, useTwitterProfileData } from '../../state/social/hooks'
 import { nameOrAddress } from '../../utils/getName'
 import { FETCHING_INTERVAL } from '../../state/governance/reducer'
+import Toggle from 'components/Toggle'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -45,7 +46,6 @@ const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 132px 100px 1fr;
   grid-column-gap: 1rem;
-  /* padding: 0 1.5rem; */
 
   position: relative;
   margin: 6px 0;
@@ -58,8 +58,6 @@ const DataRow = styled.div`
     margin-left: calc(-2rem - 4px);
     height: 100%;
     width: 1px;
-    /* margin-top: auto; */
-    /* left: -16px; */
   }
 
   &:first-child {
@@ -147,8 +145,9 @@ const ResponsiveText = styled(TYPE.black)`
 
 export const Break = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.bg4};
+  background-color: ${({ theme }) => theme.bg3};
   height: 1px;
+  margin: 12px 0;
 `
 
 export default function DelegateList({ hideZero }: { hideZero: boolean }) {
@@ -178,6 +177,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
   // show indentity if it exists instead of address
   const [allIdentities] = useAllIdentities()
+
+  // filter on verified or not
+  const [filter, setFilter] = useFilterActive()
 
   const manualEntries = useMemo(() => {
     return allIdentities && filteredDelegates
@@ -232,62 +234,66 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
 
     return (
-      <DataRow>
-        <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
-          <HiddenBelow1080>
-            <FixedRankWidth>
-              <NoWrap>{(page - 1) * FETCHING_INTERVAL + (index + 1)}</NoWrap>
-            </FixedRankWidth>
-          </HiddenBelow1080>
-          <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
-            <AccountLinkGroup gap="10px" width="initial">
-              <HiddenBelow1080>
-                {imageURL ? (
-                  <RoundedProfileImage>
-                    <img src={imageURL} alt="profile" />
-                  </RoundedProfileImage>
-                ) : (
-                  <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
-                )}
-              </HiddenBelow1080>
-              <AutoColumn gap="6px">
-                <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
-                {d.handle || d.autonomous ? (
-                  <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
-                ) : (
-                  <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
-                    {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
-                  </TYPE.black>
-                )}
-              </AutoColumn>
-            </AccountLinkGroup>
-          </BlankInternalLink>
-        </AutoRow>
-        <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-        <NoWrap textAlign="end">
-          {globalData
-            ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) + '%'
-            : '-'}
-        </NoWrap>
-        <Row style={{ justifyContent: 'flex-end' }}>
-          <OnlyAboveExtraSmall>
-            <DelegateButton
-              width="fit-content"
-              mr="24px"
-              disabled={!showDelegateButton || isDelegatee}
-              onClick={() => {
-                setPrefilledDelegate(d.id)
-                toggelDelegateModal()
-              }}
-            >
-              {isDelegatee ? 'Delegated' : 'Delegate'}
-            </DelegateButton>
-          </OnlyAboveExtraSmall>
-          <VoteText textAlign="end">
-            {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
-          </VoteText>
-        </Row>
-      </DataRow>
+      <AutoColumn>
+        <DataRow>
+          <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
+            <HiddenBelow1080>
+              <FixedRankWidth>
+                <NoWrap>{(page - 1) * FETCHING_INTERVAL + (index + 1)}</NoWrap>
+              </FixedRankWidth>
+            </HiddenBelow1080>
+            <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
+              <AccountLinkGroup gap="10px" width="initial">
+                <HiddenBelow1080>
+                  {imageURL ? (
+                    <RoundedProfileImage>
+                      <img src={imageURL} alt="profile" />
+                    </RoundedProfileImage>
+                  ) : (
+                    <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
+                  )}
+                </HiddenBelow1080>
+                <AutoColumn gap="6px">
+                  <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
+                  {d.handle || d.autonomous ? (
+                    <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                  ) : (
+                    <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
+                      {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
+                    </TYPE.black>
+                  )}
+                </AutoColumn>
+              </AccountLinkGroup>
+            </BlankInternalLink>
+          </AutoRow>
+          <NoWrap textAlign="end">{d.votes.length}</NoWrap>
+          <NoWrap textAlign="end">
+            {globalData
+              ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
+                '%'
+              : '-'}
+          </NoWrap>
+          <Row style={{ justifyContent: 'flex-end' }}>
+            <OnlyAboveExtraSmall>
+              <DelegateButton
+                width="fit-content"
+                mr="24px"
+                disabled={!showDelegateButton || isDelegatee}
+                onClick={() => {
+                  setPrefilledDelegate(d.id)
+                  toggelDelegateModal()
+                }}
+              >
+                {isDelegatee ? 'Delegated' : 'Delegate'}
+              </DelegateButton>
+            </OnlyAboveExtraSmall>
+            <VoteText textAlign="end">
+              {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
+            </VoteText>
+          </Row>
+        </DataRow>
+        <Break />
+      </AutoColumn>
     )
   }
 
@@ -316,17 +322,26 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     </Card>
   ) : (
     <Card padding="0">
-      <TYPE.body fontSize="16px" fontWeight="600" style={{ marginBottom: '16px' }}>
-        Top Delegates
-      </TYPE.body>
-      <AutoColumn gap="lg">
+      <OnlyAboveLarge>
+        <RowBetween style={{ marginBottom: '16px', alignItems: 'flex-start' }}>
+          <TYPE.body fontSize="16px" fontWeight="600">
+            Top Delegates
+          </TYPE.body>
+          <OnlyAboveSmall>
+            <RowFixed>
+              <Toggle isActive={filter} toggle={() => setFilter(!filter)} />
+            </RowFixed>
+          </OnlyAboveSmall>
+        </RowBetween>
+      </OnlyAboveLarge>
+      <AutoColumn gap="0">
         <DataRow>
           <ColumnLabel>Rank</ColumnLabel>
           <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
           <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
-
+        <Break />
         {combinedDelegates && combinedDelegates?.length > 0 ? (
           delegateList
         ) : (

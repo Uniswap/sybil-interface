@@ -534,13 +534,16 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
 
   const isEOA = useIsEOA(address)
 
+  const [activeProtocol] = useActiveProtocol()
+
   // reset data on account switch
   const prevAddress = usePrevious(address)
+  const prevProtocol = usePrevious(activeProtocol)
   useEffect(() => {
-    if (prevAddress !== address && !!prevAddress && !!address) {
+    if ((prevAddress !== address && !!prevAddress && !!address) || prevProtocol !== activeProtocol) {
       setData(undefined)
     }
-  }, [address, prevAddress])
+  }, [activeProtocol, address, prevAddress, prevProtocol])
 
   useEffect(() => {
     async function fetchData() {

@@ -21,7 +21,7 @@ import { ZERO_ADDRESS, BIG_INT_ZERO } from '../../../constants'
 import Card, { WhiteCard } from '../../../components/Card'
 import { RowFixed, RowBetween } from '../../../components/Row'
 import { TYPE, BlankInternalLink } from '../../../theme'
-import { ButtonBasic, ButtonEmpty } from '../../../components/Button'
+import { ButtonBasic, ButtonCustom, ButtonEmpty } from '../../../components/Button'
 import { shortenAddress } from '../../../utils'
 import { CornerDownRight, ChevronUp } from 'react-feather'
 import Loader from '../../../components/Loader'
@@ -38,18 +38,29 @@ import TwitterLoginButton from '../../twitter/TwitterLoginButton'
 import TwitterIcon from '../../../assets/images/Twitter_Logo_Blue.png'
 import { Break } from '../../../pages/DelegateInfo'
 import LogoText from '../LogoText'
+import { lighten } from 'polished'
 
 const SectionWrapper = styled.div`
   width: 100%;
-  background: ${({ theme }) => theme.bg2};
-  padding: 2rem;
-  /* padding-top: calc(2rem + 6px); */
+  padding: 1rem;
+  padding-top: 2rem;
   height: 100%;
 
   @media (max-width: 1080px) {
-    padding-top: 1rem;
-    padding: 2rem;
+    padding: 0;
   }
+`
+
+const BackgroundWrapper = styled.div<{ bgColor?: string; account: boolean }>`
+  background: ${({ theme, bgColor, account }) =>
+    !account ? theme.bg2 : `linear-gradient(180deg, ${bgColor} 0%, ${theme.bg1} 100%);`} 
+  padding: 1rem;
+  height: ${({ account }) => (account ? '100%' : 'initial')};
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+  border-bottom-right-radius: ${({ account }) => (!account ? '20px' : '0')};
+  border-bottom-left-radius: ${({ account }) => (!account ? '20px' : '0')};
+  
 `
 
 const ButtonText = styled(TYPE.white)`
@@ -199,161 +210,195 @@ export default function Profile() {
   const [showProfileModal, setShowProfileModal] = useState(false)
 
   const ProfileContent = () => (
-    <SectionWrapper style={{ borderLeft: `1px solid ${activeProtocol?.secondaryColor}` }}>
-      <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
-        <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
-      </Modal>
-      <AutoColumn gap="16px">
-        <TYPE.main>
+    <SectionWrapper>
+      <BackgroundWrapper
+        account={!!account}
+        bgColor={
+          account
+            ? lighten('0.01', activeProtocol?.secondaryColor ? activeProtocol.secondaryColor : theme.bg2)
+            : theme.bg2
+        }
+      >
+        <Modal isOpen={showTwitterFlow} onDismiss={() => setShowTwitterFlow(false)}>
+          <TwitterFlow onDismiss={() => setShowTwitterFlow(false)} />
+        </Modal>
+        <TYPE.main mb="16px">
           Your <span style={{ color: activeProtocol?.primaryColor }}> {activeProtocol?.name}</span> profile
         </TYPE.main>
-        <WhiteCard padding="10px">
-          <RowBetween>
-            <BlankInternalLink to={`/delegates/${activeProtocol?.id}/${account}`}>
-              <RowFixed>
-                {account && (
-                  <RoundedProfileImage>
-                    <img src={!profileData?.profileURL ? EmptyProfile : profileData?.profileURL} />
-                  </RoundedProfileImage>
-                )}
-                {!account ? (
-                  <TYPE.main>Your Address</TYPE.main>
-                ) : (
-                  chainId &&
-                  (verifiedHandleEntry?.handle ? (
-                    <AutoColumn gap="4px">
-                      <LogoText type="twitter">@{verifiedHandleEntry.handle}</LogoText>
-                      <TYPE.main fontSize="12px">{ensName ?? shortenAddress(account)}</TYPE.main>
-                    </AutoColumn>
-                  ) : (
-                    <TYPE.main mr="10px" color={theme.text1}>
-                      {ensName ?? shortenAddress(account)}
-                    </TYPE.main>
-                  ))
-                )}
-              </RowFixed>
-            </BlankInternalLink>
-            {!account ? (
-              <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
-                <ButtonText>Connect wallet</ButtonText>
-              </ButtonBasic>
-            ) : (
-              <RowFixed>
-                {hasPendingTransactions && (
-                  <LoadingFlag style={{ marginRight: '10px' }} onClick={toggleWalletModal}>
-                    {pending?.length} pending <Loader style={{ marginLeft: '4px', height: '12px' }} />
-                  </LoadingFlag>
-                )}
-                <StyledWalletIcon src={WalletIcon} onClick={toggleWalletModal} />
-              </RowFixed>
+        {!account ? (
+          <Above1080Only>
+            <TYPE.body fontWeight={500} fontSize="14px" color={activeProtocol?.primaryColor} mb="1rem">
+              Connect wallet to see voting power and link wallet address to Sybil identity.
+            </TYPE.body>
+            {activeProtocol && (
+              <ButtonCustom
+                color={activeProtocol?.primaryColor}
+                bgColor={activeProtocol?.secondaryColor}
+                style={{
+                  fontWeight: 500,
+                  fontSize: '16px'
+                }}
+                onClick={() => toggleWalletModal()}
+              >
+                Connect Wallet
+              </ButtonCustom>
             )}
-          </RowBetween>
-        </WhiteCard>
-        {!verifiedHandleEntry && account ? (
-          !twitterAccount ? (
-            <TwitterLoginButton text="Announce yourself as a delegate" />
-          ) : (
-            <TwitterButton
-              onClick={() => {
-                ReactGA.event({
-                  category: 'Social',
-                  action: 'Start Link',
-                  label: 'Not linked'
-                })
-                setShowTwitterFlow(true)
-              }}
+          </Above1080Only>
+        ) : (
+          <AutoColumn gap="16px">
+            <WhiteCard padding="10px">
+              <RowBetween>
+                <BlankInternalLink to={`/delegates/${activeProtocol?.id}/${account}`}>
+                  <RowFixed>
+                    {account && (
+                      <RoundedProfileImage>
+                        <img src={!profileData?.profileURL ? EmptyProfile : profileData?.profileURL} />
+                      </RoundedProfileImage>
+                    )}
+                    {!account ? (
+                      <TYPE.main>Your Address</TYPE.main>
+                    ) : (
+                      chainId &&
+                      (verifiedHandleEntry?.handle ? (
+                        <AutoColumn gap="4px">
+                          <LogoText type="twitter">@{verifiedHandleEntry.handle}</LogoText>
+                          <TYPE.main fontSize="12px">{ensName ?? shortenAddress(account)}</TYPE.main>
+                        </AutoColumn>
+                      ) : (
+                        <TYPE.main mr="10px" color={theme.text1}>
+                          {ensName ?? shortenAddress(account)}
+                        </TYPE.main>
+                      ))
+                    )}
+                  </RowFixed>
+                </BlankInternalLink>
+                {!account ? (
+                  <ButtonBasic width="fit-content" onClick={toggleWalletModal}>
+                    <ButtonText>Connect wallet</ButtonText>
+                  </ButtonBasic>
+                ) : (
+                  <RowFixed>
+                    {hasPendingTransactions && (
+                      <LoadingFlag style={{ marginRight: '10px' }} onClick={toggleWalletModal}>
+                        {pending?.length} pending <Loader style={{ marginLeft: '4px', height: '12px' }} />
+                      </LoadingFlag>
+                    )}
+                    <StyledWalletIcon src={WalletIcon} onClick={toggleWalletModal} />
+                  </RowFixed>
+                )}
+              </RowBetween>
+            </WhiteCard>
+            {!verifiedHandleEntry && account ? (
+              !twitterAccount ? (
+                <TwitterLoginButton text="Announce yourself as a delegate" />
+              ) : (
+                <TwitterButton
+                  onClick={() => {
+                    ReactGA.event({
+                      category: 'Social',
+                      action: 'Start Link',
+                      label: 'Not linked'
+                    })
+                    setShowTwitterFlow(true)
+                  }}
+                >
+                  <RowBetween>
+                    <TYPE.white fontSize="14px">Add a public identity</TYPE.white>
+                    <TwitterLogo src={TwitterIcon} />
+                  </RowBetween>
+                </TwitterButton>
+              )
+            ) : null}
+            {!verifiedHandleEntry && account ? (
+              <TYPE.blue fontSize="12px">
+                Connecting your Twitter to your address can help people find you and delegate votes to you.
+              </TYPE.blue>
+            ) : null}
+            <WhiteCard border={`1px solid ${theme.bg3}`} style={{ zIndex: 2 }}>
+              <RowBetween>
+                <TYPE.black color={theme.text2}>Wallet voting power</TYPE.black>
+                <TYPE.main color={theme.text1}>
+                  {walletVotes ? walletVotes.toFixed(0) : account ? <Loader /> : '-'}
+                </TYPE.main>
+              </RowBetween>
+            </WhiteCard>
+            {userDelegatee && userDelegatee !== ZERO_ADDRESS && (
+              <OffsetCard bgColor={theme.bg3}>
+                <RowBetween>
+                  <RowFixed>
+                    <CornerDownRight size="14px" stroke={theme.text2} />{' '}
+                    <TYPE.main ml="2px" fontSize="14px" color={theme.text2}>
+                      Delegating to
+                    </TYPE.main>
+                  </RowFixed>
+                  <RowFixed style={{ backgroundColor: theme.bg1, borderRadius: '20px', padding: '0.25rem 0.5rem' }}>
+                    <StyledInternalLink to={`/delegates/${activeProtocol?.id}/${userDelegatee}`}>
+                      <TYPE.main fontSize="14px" mr="2px" color={activeProtocol?.primaryColor}>
+                        {userDelegatee !== account ? nameOrAddress(userDelegatee, allIdentities, true) : 'self'}
+                      </TYPE.main>
+                    </StyledInternalLink>
+                    <CloseIcon stroke={theme.text2} size="16px" onClick={() => toggelDelegateModal()} />
+                  </RowFixed>
+                </RowBetween>
+              </OffsetCard>
+            )}
+            {userDelegatee &&
+              userDelegatee === ZERO_ADDRESS &&
+              govTokenBalance &&
+              govTokenBalance.greaterThan(BIG_INT_ZERO) && (
+                <OffsetCard bgColor={theme.blue3}>
+                  <RowBetween>
+                    <RowFixed>
+                      <TYPE.blue ml="4px" fontSize="14px">
+                        {govTokenBalance.toFixed(0)} inactive votes
+                      </TYPE.blue>
+                    </RowFixed>
+                    <ButtonBasic onClick={() => toggelDelegateModal()}>
+                      <TYPE.white fontSize="14px">Set up voting</TYPE.white>
+                    </ButtonBasic>
+                  </RowBetween>
+                </OffsetCard>
+              )}
+            <WhiteCard
+              border={`1px solid ${theme.bg3}`}
+              opacity={receivedVotes?.greaterThan(BIG_INT_ZERO) ? '1' : '0.5'}
+              style={{ zIndex: 3 }}
             >
               <RowBetween>
-                <TYPE.white fontSize="14px">Add a public identity</TYPE.white>
-                <TwitterLogo src={TwitterIcon} />
-              </RowBetween>
-            </TwitterButton>
-          )
-        ) : null}
-        {!verifiedHandleEntry && account ? (
-          <TYPE.blue fontSize="12px">
-            Connecting your Twitter to your address can help people find you and delegate votes to you.
-          </TYPE.blue>
-        ) : null}
-        <WhiteCard border={`1px solid ${theme.bg3}`} style={{ zIndex: 2 }}>
-          <RowBetween>
-            <TYPE.black>Wallet voting power</TYPE.black>
-            <TYPE.main color={activeProtocol?.primaryColor}>
-              {walletVotes ? walletVotes.toFixed(0) : account ? <Loader /> : '-'}
-            </TYPE.main>
-          </RowBetween>
-        </WhiteCard>
-        {userDelegatee && userDelegatee !== ZERO_ADDRESS && (
-          <OffsetCard bgColor={activeProtocol?.secondaryColor}>
-            <RowBetween>
-              <RowFixed>
-                <CornerDownRight size="16px" stroke={activeProtocol?.primaryColor} />{' '}
-                <TYPE.main ml="4px" fontSize="14px" color={activeProtocol?.primaryColor}>
-                  Delegating to
+                <TYPE.black color={theme.text2}>Received voting power</TYPE.black>
+                <TYPE.main color={theme.text1}>
+                  {receivedVotes ? receivedVotes.toFixed(0) : account ? <Loader /> : '-'}
                 </TYPE.main>
-              </RowFixed>
-              <RowFixed>
-                <StyledInternalLink to={`/delegates/${activeProtocol?.id}/${userDelegatee}`}>
-                  <TYPE.main fontSize="14px" mr="6px" color={activeProtocol?.primaryColor}>
-                    {userDelegatee !== account ? nameOrAddress(userDelegatee, allIdentities, true) : 'self'}
-                  </TYPE.main>
-                </StyledInternalLink>
-                <CloseIcon stroke={theme.text2} size="16px" onClick={() => toggelDelegateModal()} />
-              </RowFixed>
-            </RowBetween>
-          </OffsetCard>
-        )}
-        {userDelegatee &&
-          userDelegatee === ZERO_ADDRESS &&
-          govTokenBalance &&
-          govTokenBalance.greaterThan(BIG_INT_ZERO) && (
-            <OffsetCard bgColor={theme.blue3}>
-              <RowBetween>
-                <RowFixed>
-                  <TYPE.blue ml="4px" fontSize="14px">
-                    {govTokenBalance.toFixed(0)} inactive votes
-                  </TYPE.blue>
-                </RowFixed>
-                <ButtonBasic onClick={() => toggelDelegateModal()}>
-                  <TYPE.white fontSize="14px">Set up voting</TYPE.white>
-                </ButtonBasic>
               </RowBetween>
-            </OffsetCard>
-          )}
-        <WhiteCard
-          border={`1px solid ${theme.bg3}`}
-          opacity={receivedVotes?.greaterThan(BIG_INT_ZERO) ? '1' : '0.5'}
-          style={{ zIndex: 2 }}
-        >
-          <RowBetween>
-            <TYPE.black>Received voting power</TYPE.black>
-            <TYPE.main color={activeProtocol?.primaryColor}>
-              {receivedVotes ? receivedVotes.toFixed(0) : account ? <Loader /> : '-'}
-            </TYPE.main>
-          </RowBetween>
-        </WhiteCard>
-        {delegatorsCount > 0 && (
-          <OffsetCard bgColor={theme.green2}>
-            <TYPE.main fontWeight={500} color={theme.green1} fontSize="14px">
-              {delegatorsCount} {delegatorsCount > 1 ? 'addresses have' : 'address has'} delegated to you
-            </TYPE.main>
-          </OffsetCard>
+            </WhiteCard>
+            {delegatorsCount > 0 && (
+              <OffsetCard bgColor={theme.green2}>
+                <TYPE.main fontWeight={500} color={theme.green1} fontSize="14px">
+                  {delegatorsCount} {delegatorsCount > 1 ? 'addresses have' : 'address has'} delegated to you
+                </TYPE.main>
+              </OffsetCard>
+            )}
+            <Break />
+            <Card
+              backgroundColor={activeProtocol?.secondaryColor}
+              color={activeProtocol?.primaryColor}
+              fontWeight={500}
+            >
+              {userDelegatee &&
+              userDelegatee !== ZERO_ADDRESS &&
+              userDelegatee !== account &&
+              receivedVotes?.equalTo(BIG_INT_ZERO) ? (
+                'You are delegating all your voting power'
+              ) : (
+                <RowBetween style={{ color: activeProtocol?.primaryColor, fontWeight: 500 }}>
+                  <span>Total voting power</span>
+                  <span>{totalVotes ? totalVotes.toFixed(0) : account ? <Loader /> : '-'}</span>
+                </RowBetween>
+              )}
+            </Card>
+          </AutoColumn>
         )}
-        <Break />
-        <Card backgroundColor={activeProtocol?.secondaryColor}>
-          {userDelegatee &&
-          userDelegatee !== ZERO_ADDRESS &&
-          userDelegatee !== account &&
-          receivedVotes?.equalTo(BIG_INT_ZERO) ? (
-            'You are delegating all your voting power'
-          ) : (
-            <RowBetween style={{ color: activeProtocol?.primaryColor, fontWeight: 500 }}>
-              <span>Total voting power</span>
-              <span>{totalVotes ? totalVotes.toFixed(0) : account ? <Loader /> : '-'}</span>
-            </RowBetween>
-          )}
-        </Card>
-      </AutoColumn>
+      </BackgroundWrapper>
     </SectionWrapper>
   )
 

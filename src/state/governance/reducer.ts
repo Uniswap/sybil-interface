@@ -66,7 +66,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   name: 'Compound Governance',
   logo: CompLogo,
   primaryColor: '#00D395',
-  secondaryColor: '#f0fffa',
+  secondaryColor: '#E1F9F1',
   token: serializeToken(COMP),
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   governanceAddress: COMP_GOVERNANCE_ADDRESS,

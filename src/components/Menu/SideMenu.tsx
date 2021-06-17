@@ -85,7 +85,7 @@ export const HoverRow = styled(RowFixed)`
 export default function SideMenu(): JSX.Element {
   const [open, setOpen] = useState(false)
   const [faqOpen, setfaqOpen] = useState(false)
-  const [activeProtocol, setActiveProtocol] = useActiveProtocol()
+  const [activeProtocol] = useActiveProtocol()
 
   function closeBoth() {
     setOpen(!open)
@@ -131,33 +131,33 @@ export default function SideMenu(): JSX.Element {
             <Break />
           </div>
           {Object.values(SUPPORTED_PROTOCOLS).map(p => (
-            <HoverRow
-              key={p.governanceAddress + '-image-id'}
-              onClick={e => {
-                e.stopPropagation()
-                setActiveProtocol(p)
-                setOpen(false)
-              }}
-            >
-              <div
-                style={{
-                  height: '30px',
-                  backgroundColor: activeProtocol?.id === p.id ? activeProtocol?.primaryColor : 'transparent',
-                  width: '2px'
+            <BlankInternalLink key={p.governanceAddress + '-image-id'} to={'/delegates/' + p.id}>
+              <HoverRow
+                onClick={e => {
+                  e.stopPropagation()
+                  setOpen(false)
                 }}
-              />
+              >
+                <div
+                  style={{
+                    height: '30px',
+                    backgroundColor: activeProtocol?.id === p.id ? activeProtocol?.primaryColor : 'transparent',
+                    width: '2px'
+                  }}
+                />
 
-              <div style={{ padding: '0 1.25rem', marginLeft: '-2px' }}>
-                <RowFixed>
-                  <WrappedListLogo src={p.logo} color={p.primaryColor} />
-                  {open && (
-                    <TYPE.mediumHeader fontSize="16px" ml={'12px'} color={p.primaryColor}>
-                      {p.name}
-                    </TYPE.mediumHeader>
-                  )}
-                </RowFixed>
-              </div>
-            </HoverRow>
+                <div style={{ padding: '0 1.25rem', marginLeft: '-2px' }}>
+                  <RowFixed>
+                    <WrappedListLogo src={p.logo} color={p.primaryColor} />
+                    {open && (
+                      <TYPE.mediumHeader fontSize="16px" ml={'12px'} color={p.primaryColor}>
+                        {p.name}
+                      </TYPE.mediumHeader>
+                    )}
+                  </RowFixed>
+                </div>
+              </HoverRow>
+            </BlankInternalLink>
           ))}
         </AutoColumn>
 

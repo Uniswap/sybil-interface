@@ -27,10 +27,6 @@ const SiteWrapper = styled.div`
   grid-template-columns: 320px 1fr 376px;
   overflow: auto;
 
-  @media (max-width: 1370px) {
-    // grid-template-columns: 320px 1fr 306px;
-  }
-
   ${({ theme }) => theme.mediaWidth.upToLarge`
     grid-template-columns: 1fr 376px;
   `};
@@ -49,7 +45,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   padding: 2rem;
-  /* padding-top: 64px; */
   align-items: center;
   flex: 1;
   overflow-y: auto;

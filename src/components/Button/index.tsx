@@ -61,6 +61,22 @@ export const ButtonPrimary = styled(Base)`
   }
 `
 
+export const ButtonCustom = styled(ButtonPrimary)<{ bgColor?: string; color?: string }>`
+  color: ${({ color }) => color};
+  background-color: ${({ bgColor, theme }) => bgColor ?? theme.primary1};
+  &:focus {
+    box-shadow: 0 0 0 1pt ${({ bgColor, theme }) => darken(0.05, bgColor ?? theme.primary1)};
+    background-color: ${({ bgColor, theme }) => darken(0.05, bgColor ?? theme.primary1)};
+  }
+  &:hover {
+    background-color: ${({ bgColor, theme }) => darken(0.05, bgColor ?? theme.primary1)};
+  }
+  &:active {
+    box-shadow: 0 0 0 1pt ${({ bgColor, theme }) => darken(0.1, bgColor ?? theme.primary1)};
+    background-color: ${({ bgColor, theme }) => darken(0.1, bgColor ?? theme.primary1)};
+  }
+`
+
 export const ButtonBasic = styled(ButtonPrimary)`
   width: fit-content;
   font-size: 1rem;
