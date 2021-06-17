@@ -3,10 +3,10 @@ import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
 import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
 import { TYPE, OnlyAboveSmall, OnlyBelowSmall } from '../../theme'
-import Row, { RowBetween, RowFixed } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { Link } from 'react-router-dom'
-import Loader from '../Loader'
+import Loader, { LoadingRows } from '../Loader'
 import { enumerateProposalState } from '../../data/governance'
 import { HIDDEN_PROPOSALS } from 'constants/proposals'
 
@@ -32,6 +32,13 @@ const ResponsiveText = styled(TYPE.black)`
   `};
 `
 
+export const Break = styled.div`
+  width: 100%;
+  background-color: ${({ theme }) => theme.bg3};
+  height: 1px;
+  margin: 0;
+`
+
 export default function ProposalList({ allProposals }: { allProposals: { [id: string]: ProposalData } | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
@@ -55,6 +62,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
         <TYPE.body fontSize="16px" fontWeight="600" style={{ marginBottom: '16px' }}>
           Proposals
         </TYPE.body>
+        <Break />
         {allStatuses && allProposals
           ? Object.values(allProposals)
               .map((p: ProposalData, i) => {
@@ -68,38 +76,52 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                 }
                 const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
                 return (
-                  <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                    <RowBetween>
-                      <RowFixed>
+                  <>
+                    <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
+                      <RowBetween>
+                        <RowFixed>
+                          <OnlyAboveSmall>
+                            <TYPE.darkGray mr="8px">{p.id + '.'}</TYPE.darkGray>
+                          </OnlyAboveSmall>
+                          <ResponsiveText mr="10px">{p.title}</ResponsiveText>
+                        </RowFixed>
+                        <OnlyBelowSmall>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                          ) : (
+                            <Loader />
+                          )}
+                        </OnlyBelowSmall>
                         <OnlyAboveSmall>
-                          <TYPE.darkGray mr="8px">{p.id + '.'}</TYPE.darkGray>
+                          {allStatuses && allStatuses?.[i] ? (
+                            <ProposalStatus status={status}>{status}</ProposalStatus>
+                          ) : (
+                            <Loader />
+                          )}
                         </OnlyAboveSmall>
-                        <ResponsiveText mr="10px">{p.title}</ResponsiveText>
-                      </RowFixed>
-                      <OnlyBelowSmall>
-                        {allStatuses && allStatuses?.[i] ? (
-                          <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                        ) : (
-                          <Loader />
-                        )}
-                      </OnlyBelowSmall>
-                      <OnlyAboveSmall>
-                        {allStatuses && allStatuses?.[i] ? (
-                          <ProposalStatus status={status}>{status}</ProposalStatus>
-                        ) : (
-                          <Loader />
-                        )}
-                      </OnlyAboveSmall>
-                    </RowBetween>
-                  </ProposalItem>
+                      </RowBetween>
+                    </ProposalItem>
+                    <Break />
+                  </>
                 )
               })
               .reverse()
           : !allProposals &&
             !(allProposals && Object.keys(allProposals)?.length === 0) && (
-              <Row justify="center">
-                <Loader />
-              </Row>
+              <LoadingRows>
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+                <div />
+              </LoadingRows>
             )}
       </AutoColumn>
     </Wrapper>

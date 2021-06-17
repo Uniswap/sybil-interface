@@ -22,7 +22,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useToggleModal, useModalDelegatee } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import { Percent, JSBI } from '@uniswap/sdk'
-import Loader from '../Loader'
+import { LoadingRows } from '../Loader'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useAllIdentities, useTwitterProfileData } from '../../state/social/hooks'
@@ -323,7 +323,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   ) : (
     <Card padding="0">
       <OnlyAboveLarge>
-        <RowBetween style={{ marginBottom: '16px', alignItems: 'flex-start' }}>
+        <RowBetween style={{ marginBottom: '32px', alignItems: 'flex-start' }}>
           <TYPE.body fontSize="16px" fontWeight="600">
             Top Delegates
           </TYPE.body>
@@ -345,29 +345,42 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
         {combinedDelegates && combinedDelegates?.length > 0 ? (
           delegateList
         ) : (
-          <Row justify="center">
-            <Loader />
-          </Row>
+          <LoadingRows>
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+          </LoadingRows>
         )}
       </AutoColumn>
-      <PageButtons>
-        <div
-          onClick={() => {
-            setPage(page === 1 ? page : page - 1)
-          }}
-        >
-          <Arrow faded={page === 1 ? true : false}>←</Arrow>
-        </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
-        <div
-          onClick={() => {
-            setPage(page === maxPage ? page : page + 1)
-            page !== maxPage && maxFetched && setMaxFetched(maxFetched + FETCHING_INTERVAL)
-          }}
-        >
-          <Arrow faded={page === maxPage ? true : false}>→</Arrow>
-        </div>
-      </PageButtons>
+      {combinedDelegates && combinedDelegates?.length > 0 && (
+        <PageButtons>
+          <div
+            onClick={() => {
+              setPage(page === 1 ? page : page - 1)
+            }}
+          >
+            <Arrow faded={page === 1 ? true : false}>←</Arrow>
+          </div>
+          <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+          <div
+            onClick={() => {
+              setPage(page === maxPage ? page : page + 1)
+              page !== maxPage && maxFetched && setMaxFetched(maxFetched + FETCHING_INTERVAL)
+            }}
+          >
+            <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+          </div>
+        </PageButtons>
+      )}
     </Card>
   )
 }
