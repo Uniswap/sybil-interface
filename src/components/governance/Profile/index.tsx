@@ -333,8 +333,9 @@ export default function Profile() {
                       bgColor={theme.bg4}
                       color={theme.text1}
                       style={{ fontSize: '14px', width: 'fit-content' }}
+                      onClick={() => toggelDelegateModal()}
                     >
-                      Add Delegate
+                      Delegate Votes
                     </ButtonCustom>
                   </RowBetween>
                 ) : (
