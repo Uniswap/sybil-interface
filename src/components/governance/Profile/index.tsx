@@ -335,7 +335,7 @@ export default function Profile() {
                       style={{ fontSize: '14px', width: 'fit-content' }}
                       onClick={() => toggelDelegateModal()}
                     >
-                      Delegate Votes
+                      Change delegate
                     </ButtonCustom>
                   </RowBetween>
                 ) : (
