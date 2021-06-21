@@ -40,7 +40,7 @@ import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
 
-const ArrowWrapper = styled.div`
+const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -95,8 +95,7 @@ function localNumber(val: number) {
 function DelegateInfo({
   match: {
     params: { protocolID, delegateAddress }
-  },
-  history
+  }
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
@@ -180,11 +179,7 @@ function DelegateInfo({
       {formattedAddress && chainId ? (
         <AutoColumn gap="lg">
           <RowFixed style={{ width: '100%', height: '20px' }}>
-            <ArrowWrapper
-              onClick={() => {
-                history?.length === 1 ? history.push('/') : history.goBack()
-              }}
-            >
+            <ArrowWrapper to={'/delegates/' + activeProtocol?.id}>
               <TYPE.body fontSize="16px" fontWeight="600">
                 Top Delegates
               </TYPE.body>
