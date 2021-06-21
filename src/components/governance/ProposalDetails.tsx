@@ -30,7 +30,6 @@ const Wrapper = styled.div<{ backgroundColor?: string }>``
 
 const ProposalInfo = styled(AutoColumn)`
   border-radius: 12px;
-  /* padding: 1.5rem; */
   position: relative;
 `
 
@@ -38,7 +37,6 @@ const ArrowWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 24px;
   color: ${({ theme }) => theme.text1};
 
   a {
@@ -173,18 +171,16 @@ function ProposalDetails({
       />
       <Wrapper>
         <ProposalInfo gap="lg" justify="start">
-          <RowBetween style={{ width: '100%' }}>
+          <RowBetween style={{ width: '100%', alignItems: 'flex-start' }}>
             <RowFixed>
               <ArrowWrapper
                 onClick={() => {
                   history?.length === 1 ? history.push('/') : history.goBack()
                 }}
+                style={{ alignItems: 'flex-start' }}
               >
-                <TYPE.body fontSize="16px" fontWeight="600">
-                  Proposals
-                </TYPE.body>
+                <TYPE.body fontWeight="600">Proposals</TYPE.body>
               </ArrowWrapper>
-
               <ChevronRight size={16} />
               <TYPE.body>{'Proposal #' + proposalID}</TYPE.body>
             </RowFixed>

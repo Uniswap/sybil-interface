@@ -59,7 +59,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
         </EmptyWrapper>
       )}
       <AutoColumn gap="1rem">
-        <TYPE.body fontSize="16px" fontWeight="600" style={{ marginBottom: '16px' }}>
+        <TYPE.body fontSize="16px" fontWeight="600">
           Proposals
         </TYPE.body>
         <Break />
