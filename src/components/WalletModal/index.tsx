@@ -9,7 +9,7 @@ import MetamaskIcon from '../../assets/images/metamask.png'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { fortmatic, injected, portis } from '../../connectors'
 import { OVERLAY_READY } from '../../connectors/Fortmatic'
-import { SUPPORTED_WALLETS } from '../../constants'
+import { SUPPORTED_WALLETS } from '../../constants/wallet'
 import usePrevious from '../../hooks/usePrevious'
 import { ApplicationModal } from '../../state/application/actions'
 import { useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
@@ -124,7 +124,7 @@ export default function WalletModal({
   pendingTransactions: string[] // hashes of pending
   confirmedTransactions: string[] // hashes of confirmed
   ENSName?: string
-}) {
+}): JSX.Element {
   // important that these are destructed from the account-specific web3-react context
   const { active, account, connector, activate, error } = useWeb3React()
 
@@ -227,7 +227,7 @@ export default function WalletModal({
               link={option.href}
               header={option.name}
               subheader={null}
-              icon={require('../../assets/images/' + option.iconName)}
+              icon={option.iconURL}
             />
           )
         }
@@ -280,8 +280,8 @@ export default function WalletModal({
             color={option.color}
             link={option.href}
             header={option.name}
-            subheader={null} //use option.descriptio to bring back multi-line
-            icon={require('../../assets/images/' + option.iconName)}
+            subheader={null} //use option.description to bring back multi-line
+            icon={option.iconURL}
           />
         )
       )

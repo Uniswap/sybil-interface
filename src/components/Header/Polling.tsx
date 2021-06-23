@@ -62,7 +62,7 @@ const Spinner = styled.div`
   top: -3px;
 `
 
-export default function Polling() {
+export default function Polling(): JSX.Element {
   const { chainId } = useActiveWeb3React()
 
   const blockNumber = useBlockNumber()

@@ -77,6 +77,7 @@ export function colors(darkMode: boolean): Colors {
     red1: '#FF6871',
     red2: '#F82D3A',
     green1: '#27AE60',
+    green2: '#E4F1EB',
     yellow1: '#FFE270',
     yellow2: '#F3841E',
     blue1: '#2172E5',

@@ -12,7 +12,7 @@ const StyledIdenticonContainer = styled.div`
   background-color: ${({ theme }) => theme.bg4};
 `
 
-export default function Identicon() {
+export default function Identicon(): JSX.Element {
   const ref = useRef<HTMLDivElement>()
 
   const { account } = useActiveWeb3React()

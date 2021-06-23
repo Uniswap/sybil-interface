@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
-import { TYPE, BlankInternalLink, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
-import Row, { AutoRow } from '../Row'
+import { TYPE, BlankInternalLink, OnlyAboveExtraSmall, OnlyAboveSmall, OnlyAboveLarge } from '../../theme'
+import Row, { AutoRow, RowBetween, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
 import {
@@ -17,17 +17,18 @@ import {
   useMaxFetched
 } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton, EmptyWrapper } from './styled'
-import { GreyCard } from '../Card'
+import Card from '../Card'
 import { useActiveWeb3React } from '../../hooks'
 import { useToggleModal, useModalDelegatee } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/actions'
 import { Percent, JSBI } from '@uniswap/sdk'
-import Loader from '../Loader'
+import { LoadingRows } from '../Loader'
 import { BIG_INT_ZERO } from '../../constants'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { useAllIdentities, useTwitterProfileData } from '../../state/social/hooks'
 import { nameOrAddress } from '../../utils/getName'
 import { FETCHING_INTERVAL } from '../../state/governance/reducer'
+import Toggle from 'components/Toggle'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -36,19 +37,27 @@ const ColumnLabel = styled(TYPE.darkGray)`
 
 const NoWrap = styled(TYPE.black)`
   white-space: nowrap;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `
 
 const DataRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 132px 100px 1fr;
   grid-column-gap: 1rem;
-  padding: 0 1.5rem;
 
+  position: relative;
   margin: 6px 0;
   border-left: 3px solid transparent;
 
-  :hover {
+  :hover::after {
+    content: '';
     border-left: 3px solid ${({ theme }) => theme.primary1};
+    position: absolute;
+    margin-left: calc(-2rem - 4px);
+    height: 100%;
+    width: 1px;
   }
 
   &:first-child {
@@ -58,36 +67,51 @@ const DataRow = styled.div`
   }
 
   ${({ theme }) => theme.mediaWidth.upToExtraLarge`
+    grid-template-columns: 1fr 100px 1fr;
+     > *:nth-child(2){
+      display: none;
+    }
+  `};
+
+  @media (max-width: 1370px) {
+    grid-template-columns: 1fr 1fr;
+    padding: 0 0.5rem;
+    > *:nth-child(3) {
+      display: none;
+    }
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToLarge`
     grid-template-columns: 1fr 1fr;
   `};
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     margin: 0;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
   `};
 `
 
 const AccountLinkGroup = styled(AutoRow)`
   :hover {
-    opacity: 0.5;
-    border-radius: 8px;
+    /* opacity: 0.5; */
+    /* border-radius: 8px; */
   }
 
   flex-wrap: nowrap;
 `
 
 const VoteText = styled(NoWrap)`
-  width: 140px;
+  width: 120px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 12px;
+    font-size: 14px;
   `};
 `
 
 const FixedRankWidth = styled.div`
-  width: 20px;
+  width: 12px;
   text-align: right;
-  margin-right: 12px;
+  margin-right: 0px;
 `
 
 const PageButtons = styled.div`
@@ -105,6 +129,25 @@ const Arrow = styled.div<{ faded?: boolean }>`
   :hover {
     cursor: pointer;
   }
+`
+
+const HiddenBelow1080 = styled.span`
+  @media (max-width: 1080px) {
+    display: none;
+  }
+`
+
+const ResponsiveText = styled(TYPE.black)`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 14px;
+  `};
+`
+
+export const Break = styled.div`
+  width: 100%;
+  background-color: ${({ theme }) => theme.bg3};
+  height: 1px;
+  margin: 12px 0;
 `
 
 export default function DelegateList({ hideZero }: { hideZero: boolean }) {
@@ -134,6 +177,9 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
   // show indentity if it exists instead of address
   const [allIdentities] = useAllIdentities()
+
+  // filter on verified or not
+  const [filter, setFilter] = useFilterActive()
 
   const manualEntries = useMemo(() => {
     return allIdentities && filteredDelegates
@@ -188,67 +234,66 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
 
     return (
-      <DataRow>
-        <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
-          <OnlyAboveSmall>
-            <FixedRankWidth>
-              <NoWrap>{(page - 1) * FETCHING_INTERVAL + (index + 1)}</NoWrap>
-            </FixedRankWidth>
-          </OnlyAboveSmall>
-          <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
-            <AccountLinkGroup gap="10px" width="initial">
-              <OnlyAboveSmall>
-                {imageURL ? (
-                  <RoundedProfileImage>
-                    <img src={imageURL} alt="profile" />
-                  </RoundedProfileImage>
-                ) : (
-                  <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
-                )}
-              </OnlyAboveSmall>
-              <AutoColumn gap="6px">
-                <TYPE.black style={{ fontWeight: imageURL ? 500 : 400 }}>{name}</TYPE.black>
-                {d.handle || d.autonomous ? (
-                  <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
-                ) : (
-                  <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
-                    {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
-                  </TYPE.black>
-                )}
-              </AutoColumn>
-            </AccountLinkGroup>
-          </BlankInternalLink>
-        </AutoRow>
-        <OnlyAboveLarge>
+      <AutoColumn>
+        <DataRow>
+          <AutoRow gap="10px" style={{ flexWrap: 'nowrap' }}>
+            <HiddenBelow1080>
+              <FixedRankWidth>
+                <NoWrap>{(page - 1) * FETCHING_INTERVAL + (index + 1)}</NoWrap>
+              </FixedRankWidth>
+            </HiddenBelow1080>
+            <BlankInternalLink to={activeProtocol?.id + '/' + d.id}>
+              <AccountLinkGroup gap="10px" width="initial">
+                <HiddenBelow1080>
+                  {imageURL ? (
+                    <RoundedProfileImage>
+                      <img src={imageURL} alt="profile" />
+                    </RoundedProfileImage>
+                  ) : (
+                    <WrappedListLogo src={EmptyProfile} alt="profile" style={{ opacity: '0.2' }} />
+                  )}
+                </HiddenBelow1080>
+                <AutoColumn gap="6px">
+                  <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
+                  {d.handle || d.autonomous ? (
+                    <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
+                  ) : (
+                    <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
+                      {d.EOA ? '👤 EOA' : ' 📜 Smart Contract'}
+                    </TYPE.black>
+                  )}
+                </AutoColumn>
+              </AccountLinkGroup>
+            </BlankInternalLink>
+          </AutoRow>
           <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-        </OnlyAboveLarge>
-        <OnlyAboveLarge>
           <NoWrap textAlign="end">
             {globalData
               ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
                 '%'
               : '-'}
           </NoWrap>
-        </OnlyAboveLarge>
-        <Row style={{ justifyContent: 'flex-end' }}>
-          <OnlyAboveSmall>
-            <DelegateButton
-              width="fit-content"
-              mr="10px"
-              disabled={!showDelegateButton || isDelegatee}
-              onClick={() => {
-                setPrefilledDelegate(d.id)
-                toggelDelegateModal()
-              }}
-            >
-              {isDelegatee ? 'Delegated' : 'Delegate'}
-            </DelegateButton>
-          </OnlyAboveSmall>
-          <VoteText textAlign="end">
-            {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
-          </VoteText>
-        </Row>
-      </DataRow>
+          <Row style={{ justifyContent: 'flex-end' }}>
+            <OnlyAboveExtraSmall>
+              <DelegateButton
+                width="fit-content"
+                mr="24px"
+                disabled={!showDelegateButton || isDelegatee}
+                onClick={() => {
+                  setPrefilledDelegate(d.id)
+                  toggelDelegateModal()
+                }}
+              >
+                {isDelegatee ? 'Delegated' : 'Delegate'}
+              </DelegateButton>
+            </OnlyAboveExtraSmall>
+            <VoteText textAlign="end">
+              {votes === '0' ? '0 Votes' : votes + (votes === '1' ? ' Vote' : ' Votes')}
+            </VoteText>
+          </Row>
+        </DataRow>
+        <Break />
+      </AutoColumn>
     )
   }
 
@@ -263,57 +308,79 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             return <DelegateRow d={d} index={i} key={i} />
           })
       : null
-  }, [chainId, activeProtocol, combinedDelegates, page, hideZero])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainId, combinedDelegates, activeProtocol, page, hideZero])
 
   return combinedDelegates && combinedDelegates.length === 0 ? (
-    <GreyCard padding="20px">
+    <Card padding="20px">
       <EmptyWrapper>
         <TYPE.body style={{ marginBottom: '8px' }}>No delegates yet.</TYPE.body>
         <TYPE.subHeader>
           <i>Community members with delegated votes will appear here.</i>
         </TYPE.subHeader>
       </EmptyWrapper>
-    </GreyCard>
+    </Card>
   ) : (
-    <GreyCard padding="1rem 0">
-      <AutoColumn gap="lg">
+    <Card padding="0">
+      <OnlyAboveLarge>
+        <RowBetween style={{ marginBottom: '32px', alignItems: 'flex-start' }}>
+          <TYPE.body fontSize="16px" fontWeight="600">
+            Top Delegates
+          </TYPE.body>
+          <OnlyAboveSmall>
+            <RowFixed>
+              <Toggle isActive={filter} toggle={() => setFilter(!filter)} />
+            </RowFixed>
+          </OnlyAboveSmall>
+        </RowBetween>
+      </OnlyAboveLarge>
+      <AutoColumn gap="0">
         <DataRow>
           <ColumnLabel>Rank</ColumnLabel>
-          <OnlyAboveLarge>
-            <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
-          </OnlyAboveLarge>
-          <OnlyAboveLarge>
-            <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
-          </OnlyAboveLarge>
+          <ColumnLabel textAlign="end">Proposals Voted</ColumnLabel>
+          <ColumnLabel textAlign="end">Vote Weight</ColumnLabel>
           <ColumnLabel textAlign="end">Total Votes</ColumnLabel>
         </DataRow>
-
+        <Break />
         {combinedDelegates && combinedDelegates?.length > 0 ? (
           delegateList
         ) : (
-          <Row justify="center">
-            <Loader />
-          </Row>
+          <LoadingRows>
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+          </LoadingRows>
         )}
       </AutoColumn>
-      <PageButtons>
-        <div
-          onClick={() => {
-            setPage(page === 1 ? page : page - 1)
-          }}
-        >
-          <Arrow faded={page === 1 ? true : false}>←</Arrow>
-        </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
-        <div
-          onClick={() => {
-            setPage(page === maxPage ? page : page + 1)
-            page !== maxPage && maxFetched && setMaxFetched(maxFetched + FETCHING_INTERVAL)
-          }}
-        >
-          <Arrow faded={page === maxPage ? true : false}>→</Arrow>
-        </div>
-      </PageButtons>
-    </GreyCard>
+      {combinedDelegates && combinedDelegates?.length > 0 && (
+        <PageButtons>
+          <div
+            onClick={() => {
+              setPage(page === 1 ? page : page - 1)
+            }}
+          >
+            <Arrow faded={page === 1 ? true : false}>←</Arrow>
+          </div>
+          <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+          <div
+            onClick={() => {
+              setPage(page === maxPage ? page : page + 1)
+              page !== maxPage && maxFetched && setMaxFetched(maxFetched + FETCHING_INTERVAL)
+            }}
+          >
+            <Arrow faded={page === maxPage ? true : false}>→</Arrow>
+          </div>
+        </PageButtons>
+      )}
+    </Card>
   )
 }

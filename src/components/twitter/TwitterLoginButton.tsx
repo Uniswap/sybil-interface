@@ -9,11 +9,9 @@ export const VerifyButton = styled.a`
   padding: 8px;
   outline: none;
   border: 1px solid transparent;
-  width: fit-content;
   border-radius: 12px;
-  white-space: nowrap;
   text-decoration: none;
-  /* font-size: 14px; */
+  font-size: 14px;
   :hover {
     cursor: pointer;
     opacity: 0.8;

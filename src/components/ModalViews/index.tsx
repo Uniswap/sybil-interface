@@ -20,7 +20,7 @@ const ConfirmedIcon = styled(ColumnCenter)`
   padding: 1rem 0;
 `
 
-export function LoadingView({ children, onDismiss }: { children: any; onDismiss: () => void }) {
+export function LoadingView({ children, onDismiss }: { children: any; onDismiss: () => void }): JSX.Element {
   return (
     <ConfirmOrLoadingWrapper>
       <RowBetween>
@@ -46,7 +46,7 @@ export function SubmittedView({
   children: any
   onDismiss: () => void
   hash: string | undefined
-}) {
+}): JSX.Element {
   const theme = useContext(ThemeContext)
   const { chainId } = useActiveWeb3React()
 

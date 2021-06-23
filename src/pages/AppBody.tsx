@@ -1,18 +1,23 @@
-import React from 'react'
 import styled from 'styled-components'
 
 export const BodyWrapper = styled.div`
   position: relative;
-  width: 80%;
+  width: 100%;
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    width: 90%;
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    margin-left: 70px;
+    width: calc(100% - 102px);
   `};
+
+  @media (max-width: 1080px) {
+    width: 100%;
+    margin: 0;
+  }
 `
 
-/**
- * The styled container element that wraps the content of most pages and the tabs.
- */
-export default function AppBody({ children }: { children: React.ReactNode }) {
-  return <BodyWrapper>{children}</BodyWrapper>
-}
+export const MediumHeaderWrapper = styled.div`
+  display: none;
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    display: initial;
+  `};
+`

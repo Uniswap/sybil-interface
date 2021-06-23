@@ -32,7 +32,7 @@ const MobilePopupInner = styled.div`
 
 const FixedPopupColumn = styled(AutoColumn)<{ extraPadding: boolean }>`
   position: fixed;
-  top: ${({ extraPadding }) => (extraPadding ? '108px' : '88px')};
+  top: ${({ extraPadding }) => (extraPadding ? '108px' : '20px')};
   right: 1rem;
   max-width: 355px !important;
   width: 100%;
@@ -43,7 +43,7 @@ const FixedPopupColumn = styled(AutoColumn)<{ extraPadding: boolean }>`
   `};
 `
 
-export default function Popups() {
+export default function Popups(): JSX.Element {
   // get all popups
   const activePopups = useActivePopups()
 

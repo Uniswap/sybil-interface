@@ -41,7 +41,7 @@ export default function Loader({
   size?: string
   stroke?: string
   [k: string]: any
-}) {
+}): JSX.Element {
   return (
     <StyledSVG viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" size={size} stroke={stroke} {...rest}>
       <path
@@ -62,7 +62,7 @@ export function LoaderSecondary({
   size?: string
   stroke?: string
   [k: string]: any
-}) {
+}): JSX.Element {
   return (
     <StyledSVGSecondary
       viewBox="0 0 24 24"
@@ -81,3 +81,42 @@ export function LoaderSecondary({
     </StyledSVGSecondary>
   )
 }
+
+const loadingAnimation = keyframes`
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`
+
+export const LoadingRows = styled.div`
+  display: grid;
+  min-width: 75%;
+  max-width: 960px;
+  grid-column-gap: 0.5em;
+  grid-row-gap: 0.8em;
+  grid-template-columns: repeat(3, 1fr);
+  & > div {
+    animation: ${loadingAnimation} 1.5s infinite;
+    animation-fill-mode: both;
+    background: linear-gradient(
+      to left,
+      ${({ theme }) => theme.bg2} 25%,
+      ${({ theme }) => theme.bg3} 50%,
+      ${({ theme }) => theme.bg2} 75%
+    );
+    background-size: 400%;
+    border-radius: 12px;
+    height: 2.4em;
+    will-change: background-position;
+  }
+  & > div:nth-child(3n + 1) {
+    grid-column: 1 / 3;
+  }
+  & > div:nth-child(3n) {
+    grid-column: 3 / 4;
+    margin-bottom: 2em;
+  }
+`

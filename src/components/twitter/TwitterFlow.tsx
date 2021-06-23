@@ -103,7 +103,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
-  const [watch, setWatch] = useState(false)
+  const [watch, setWatch] = useState<boolean>(false)
 
   // use hook to handle polling
   useTweetWatcher(sig, twitterHandle, watch, setWatch, setTweetID, setTweetError)

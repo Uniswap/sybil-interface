@@ -12,11 +12,11 @@ import {
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
 import { ChainId, Token, JSBI } from '@uniswap/sdk'
-import { WhiteCard, OutlineCard, GreyCard } from '../components/Card'
+import { GreyCard, OutlineCard } from '../components/Card'
 import { useProtocolUpdate } from '../hooks/useProtocolUpdate'
 import styled from 'styled-components'
 import { RowBetween, AutoRow, RowFixed } from '../components/Row'
-import { ArrowLeft, CheckCircle, XCircle } from 'react-feather'
+import { CheckCircle, XCircle, ChevronRight } from 'react-feather'
 import { AutoColumn } from '../components/Column'
 import EmptyProfile from '../assets/images/emptyprofile.png'
 import {
@@ -26,7 +26,7 @@ import {
   DelegateButton
 } from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
-import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall, OnlyBelowSmall } from '../theme'
+import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall } from '../theme'
 import { useIdentity, useTwitterProfileData, useAllIdentities } from '../state/social/hooks'
 import { useTokenBalance } from '../state/wallet/hooks'
 import Loader from '../components/Loader'
@@ -40,7 +40,7 @@ import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
 
-const ArrowWrapper = styled.div`
+const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -68,7 +68,7 @@ const DataRow = styled.div`
 
 export const Break = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.bg3};
+  background-color: ${({ theme }) => theme.bg4};
   height: 1px;
 `
 
@@ -95,8 +95,7 @@ function localNumber(val: number) {
 function DelegateInfo({
   match: {
     params: { protocolID, delegateAddress }
-  },
-  history
+  }
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
@@ -150,12 +149,6 @@ function DelegateInfo({
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
 
   const [allIdentities] = useAllIdentities()
-  const name = nameOrAddress(
-    formattedAddress ? formattedAddress : undefined,
-    allIdentities,
-    false,
-    delegateInfo?.autonomous
-  )
 
   const nameShortened = nameOrAddress(
     formattedAddress ? formattedAddress : undefined,
@@ -163,8 +156,6 @@ function DelegateInfo({
     true,
     delegateInfo?.autonomous
   )
-
-  const formattedName = name === formattedAddress ? ensName ?? name : name
 
   // toggle for showing delegation modal with prefilled delegate
   const toggelDelegateModal = useToggleModal(ApplicationModal.DELEGATE)
@@ -185,165 +176,168 @@ function DelegateInfo({
 
   return (
     <BodyWrapper>
-      <GreyCard>
-        {formattedAddress && chainId ? (
-          <AutoColumn gap="md">
-            <RowBetween style={{ width: '100%' }}>
-              <ArrowWrapper
+      {formattedAddress && chainId ? (
+        <AutoColumn gap="lg">
+          <RowFixed style={{ width: '100%', height: '20px' }}>
+            <ArrowWrapper to={'/delegates/' + activeProtocol?.id}>
+              <TYPE.body fontSize="16px" fontWeight="600">
+                Top Delegates
+              </TYPE.body>
+            </ArrowWrapper>
+            <ChevronRight size={16} />
+
+            <ExternalLink
+              href={
+                twitterHandle
+                  ? getTwitterProfileLink(twitterHandle)
+                  : getEtherscanLink(chainId, formattedAddress, 'address')
+              }
+            >
+              <TYPE.black>
+                {nameShortened === formattedAddress ? ensName ?? formattedAddress : nameShortened}
+              </TYPE.black>
+            </ExternalLink>
+          </RowFixed>
+          <GreyCard>
+            <RowBetween>
+              <AutoRow gap="10px">
+                {twitterData?.profileURL ? (
+                  <RoundedProfileImage>
+                    <img src={twitterData.profileURL} alt="profile" />
+                  </RoundedProfileImage>
+                ) : (
+                  <WrappedListLogo src={EmptyProfile} />
+                )}
+                <AutoColumn gap="2px">
+                  <RowFixed>
+                    <ExternalLink
+                      href={
+                        twitterHandle
+                          ? getTwitterProfileLink(twitterHandle)
+                          : getEtherscanLink(chainId, formattedAddress, 'address')
+                      }
+                    >
+                      <TYPE.black>
+                        {nameShortened === formattedAddress ? ensName ?? formattedAddress : nameShortened}
+                      </TYPE.black>
+                    </ExternalLink>
+                    {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
+                  </RowFixed>
+                  {twitterHandle && delegateAddress ? (
+                    <RowFixed>
+                      <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
+                        <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
+                      </ExternalLink>
+                      <CopyHelper toCopy={formattedAddress} />
+                    </RowFixed>
+                  ) : delegateInfo && delegateInfo.autonomous && delegateAddress ? (
+                    <RowFixed>
+                      <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
+                        <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
+                      </ExternalLink>
+                      <CopyHelper toCopy={formattedAddress} />
+                    </RowFixed>
+                  ) : (
+                    <TYPE.black fontSize="12px">
+                      {isEOA === true ? '👤 EOA' : isEOA === false && '📜 Smart Contract'}
+                    </TYPE.black>
+                  )}
+                </AutoColumn>
+              </AutoRow>
+              <DelegateButton
+                width="fit-content"
+                disabled={!showDelegateButton || !account || isDelegatee}
                 onClick={() => {
-                  history?.length === 1 ? history.push('/') : history.goBack()
+                  setPrefilledDelegate(delegateAddress)
+                  toggelDelegateModal()
                 }}
               >
-                <ArrowLeft size={20} /> Back
-              </ArrowWrapper>
+                {isDelegatee ? 'Delegated' : 'Delegate'}
+              </DelegateButton>
             </RowBetween>
-            <WhiteCard>
-              <RowBetween>
-                <AutoRow gap="10px">
-                  {twitterData?.profileURL ? (
-                    <RoundedProfileImage>
-                      <img src={twitterData.profileURL} alt="profile" />
-                    </RoundedProfileImage>
-                  ) : (
-                    <WrappedListLogo src={EmptyProfile} />
-                  )}
-                  <AutoColumn gap="sm">
-                    <RowFixed>
-                      <ExternalLink
-                        href={
-                          twitterHandle
-                            ? getTwitterProfileLink(twitterHandle)
-                            : getEtherscanLink(chainId, formattedAddress, 'address')
-                        }
-                      >
-                        <OnlyAboveSmall>
-                          <TYPE.black>{formattedName}</TYPE.black>
-                        </OnlyAboveSmall>
-                        <OnlyBelowSmall>
-                          <TYPE.black>{nameShortened}</TYPE.black>
-                        </OnlyBelowSmall>
-                      </ExternalLink>
-                      {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
-                    </RowFixed>
-                    {twitterHandle && delegateAddress ? (
-                      <RowFixed>
-                        <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
-                          <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
-                        </ExternalLink>
-                        <CopyHelper toCopy={formattedAddress} />
-                      </RowFixed>
-                    ) : delegateInfo && delegateInfo.autonomous && delegateAddress ? (
-                      <RowFixed>
-                        <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
-                          <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
-                        </ExternalLink>
-                        <CopyHelper toCopy={formattedAddress} />
-                      </RowFixed>
-                    ) : (
-                      <TYPE.black fontSize="12px">
-                        {isEOA === true ? '👤 EOA' : isEOA === false && '📜 Smart Contract'}
-                      </TYPE.black>
-                    )}
-                  </AutoColumn>
-                </AutoRow>
-                <DelegateButton
-                  width="fit-content"
-                  disabled={!showDelegateButton || !account || isDelegatee}
-                  onClick={() => {
-                    setPrefilledDelegate(delegateAddress)
-                    toggelDelegateModal()
-                  }}
-                >
-                  {isDelegatee ? 'Delegated' : 'Delegate'}
-                </DelegateButton>
-              </RowBetween>
-            </WhiteCard>
-            <WhiteCard>
-              <DataRow>
-                {!isAave && (
-                  <AutoColumn gap="sm">
-                    <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
-                    <ResponsiveDataText>
-                      {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
-                    </ResponsiveDataText>
-                  </AutoColumn>
-                )}
+          </GreyCard>
+          <GreyCard>
+            <DataRow>
+              {!isAave && (
                 <AutoColumn gap="sm">
-                  <TYPE.main fontSize="14px">Votes</TYPE.main>
-                  <ResponsiveDataText>{delegatedVotes}</ResponsiveDataText>
+                  <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
+                  <ResponsiveDataText>
+                    {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
+                  </ResponsiveDataText>
                 </AutoColumn>
-                <OnlyAboveSmall>
-                  <AutoColumn gap="sm">
-                    <TYPE.main fontSize="14px">Token Holders Represented</TYPE.main>
-                    <ResponsiveDataText>{holdersRepresented}</ResponsiveDataText>
-                  </AutoColumn>
-                </OnlyAboveSmall>
-              </DataRow>
-            </WhiteCard>
-            <WhiteCard>
-              <AutoColumn gap="lg">
-                <TYPE.main fontSize="16px">Voting History</TYPE.main>
-                <Break />
-                {delegateInfo && proposalStatuses && delegateInfo.votes ? (
-                  delegateInfo.votes
-                    ?.map((vote, i) => {
-                      const proposal = proposalData?.[vote.proposal]
-                      // need to offset by one because proposal ids start at 1
-                      const index = proposal ? parseFloat(proposal?.id) - 1 : 0
-                      const status = proposalStatuses[index]
-                        ? enumerateProposalState(proposalStatuses[index])
-                        : 'loading'
-                      return (
-                        proposal && (
-                          <div key={i}>
-                            <RowBetween key={i + proposal.id}>
-                              <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
-                                <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
-                                  <ResponsiveBodyText>{proposal.title}</ResponsiveBodyText>
-                                </StyledInternalLink>
-                                {status && (
-                                  <RowFixed>
-                                    <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                                  </RowFixed>
-                                )}
-                              </AutoColumn>
-                              <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
-                                <RowFixed>
-                                  <ResponsiveBodyText mr="6px" ml="6px" textAlign="right">
-                                    {`${localNumber(vote.votes)} votes ${vote.support ? 'in favor' : 'against'}`}
-                                  </ResponsiveBodyText>
-                                  {vote.support ? (
-                                    <GreenIcon>
-                                      <CheckCircle />
-                                    </GreenIcon>
-                                  ) : (
-                                    <RedIcon>
-                                      <XCircle />
-                                    </RedIcon>
-                                  )}
-                                </RowFixed>
-                                <div> </div>
-                              </AutoColumn>
-                            </RowBetween>
-                            {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
-                          </div>
-                        )
-                      )
-                    })
-                    .reverse()
-                ) : delegateInfo === null ? (
-                  <TYPE.body>No past votes</TYPE.body>
-                ) : (
-                  <Loader />
-                )}
-                {delegateInfo && delegateInfo?.votes?.length === 0 && <TYPE.body>No past votes</TYPE.body>}
+              )}
+              <AutoColumn gap="sm">
+                <TYPE.main fontSize="14px">Votes</TYPE.main>
+                <ResponsiveDataText>{delegatedVotes}</ResponsiveDataText>
               </AutoColumn>
-            </WhiteCard>
-          </AutoColumn>
-        ) : (
-          <Loader />
-        )}
-      </GreyCard>
+              <OnlyAboveSmall>
+                <AutoColumn gap="sm">
+                  <TYPE.main fontSize="14px">Token Holders Represented</TYPE.main>
+                  <ResponsiveDataText>{holdersRepresented}</ResponsiveDataText>
+                </AutoColumn>
+              </OnlyAboveSmall>
+            </DataRow>
+          </GreyCard>
+          <GreyCard>
+            <AutoColumn gap="lg">
+              <TYPE.main fontSize="16px">Voting History</TYPE.main>
+              <Break />
+              {delegateInfo && proposalStatuses && delegateInfo.votes ? (
+                delegateInfo.votes
+                  ?.map((vote, i) => {
+                    const proposal = proposalData?.[vote.proposal]
+                    // need to offset by one because proposal ids start at 1
+                    const index = proposal ? parseFloat(proposal?.id) - 1 : 0
+                    const status = proposalStatuses[index] ? enumerateProposalState(proposalStatuses[index]) : 'loading'
+                    return (
+                      proposal && (
+                        <div key={i}>
+                          <RowBetween key={i + proposal.id} style={{ alignItems: 'flex-start' }}>
+                            <AutoColumn gap="sm" style={{ maxWidth: '500px' }} justify="flex-start">
+                              <StyledInternalLink to={'/proposals/' + activeProtocol?.id + '/' + proposal.id}>
+                                <ResponsiveBodyText style={{ maxWidth: '240px' }}>{proposal.title}</ResponsiveBodyText>
+                              </StyledInternalLink>
+                              {status && (
+                                <RowFixed>
+                                  <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                                </RowFixed>
+                              )}
+                            </AutoColumn>
+                            <AutoColumn gap="sm" justify="flex-start" style={{ height: '100%' }}>
+                              <RowFixed>
+                                <ResponsiveBodyText mr="6px" ml="6px" textAlign="right">
+                                  {`${localNumber(vote.votes)} votes ${vote.support ? 'in favor' : 'against'}`}
+                                </ResponsiveBodyText>
+                                {vote.support ? (
+                                  <GreenIcon>
+                                    <CheckCircle />
+                                  </GreenIcon>
+                                ) : (
+                                  <RedIcon>
+                                    <XCircle />
+                                  </RedIcon>
+                                )}
+                              </RowFixed>
+                            </AutoColumn>
+                          </RowBetween>
+                          {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
+                        </div>
+                      )
+                    )
+                  })
+                  .reverse()
+              ) : delegateInfo === null ? (
+                <TYPE.body>No past votes</TYPE.body>
+              ) : (
+                <Loader />
+              )}
+              {delegateInfo && delegateInfo?.votes?.length === 0 && <TYPE.body>No past votes</TYPE.body>}
+            </AutoColumn>
+          </GreyCard>
+        </AutoColumn>
+      ) : (
+        <Loader />
+      )}
     </BodyWrapper>
   )
 }

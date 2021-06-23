@@ -61,13 +61,12 @@ export const COMP_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb
 export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
 export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
 const COMP = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'COMP', 'Compound Governance Token')
-
 export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   id: 'compound',
   name: 'Compound Governance',
   logo: CompLogo,
   primaryColor: '#00D395',
-  secondaryColor: '#f0fffa',
+  secondaryColor: '#E1F9F1',
   token: serializeToken(COMP),
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   governanceAddress: COMP_GOVERNANCE_ADDRESS,
@@ -79,7 +78,6 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
 export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
 const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
-
 export const AAVE_GOVERNANCE: GovernanceInfo = {
   id: 'aave',
   name: 'Aave Governance',
@@ -95,7 +93,6 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
 export const POOL_ADDRESS = '0x0cEC1A9154Ff802e7934Fc916Ed7Ca50bDE6844e'
 const POOL = new Token(ChainId.MAINNET, POOL_ADDRESS, 18, 'POOL', 'PoolTogether')
-
 export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   id: 'pool',
   name: 'PoolTogether Governance',
@@ -111,7 +108,6 @@ export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
 export const RADICLE_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
 export const RADICLE_ADDRESS = '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3'
 const RADICLE = new Token(ChainId.MAINNET, RADICLE_ADDRESS, 18, 'RAD', 'Radicle')
-
 export const RADICLE_GOVERNANCE: GovernanceInfo = {
   id: 'radicle',
   name: 'Radicle Governance',

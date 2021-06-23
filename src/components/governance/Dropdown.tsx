@@ -36,6 +36,10 @@ const Flyout = styled.div<{ options: number }>`
   position: absolute;
   width: 100%;
   z-index: 3;
+
+  @media (max-width: 720px) {
+    bottom: -${({ options }) => options * 64}px;
+  }
 `
 
 // dont pass style props to DOM link element
@@ -47,6 +51,12 @@ const Option = styled(({ backgroundColor, ...props }) => <Link {...props} />)`
   text-decoration: none;
   :hover {
     font-weight: bold;
+  }
+`
+
+const ResponsiveText = styled(TYPE.mediumHeader)`
+  @media (max-width: 720px) {
+    font-size: 16px !important;
   }
 `
 
@@ -71,9 +81,9 @@ export default function Dropdown() {
               <RowBetween>
                 <RowFixed style={{ gap: '16px' }}>
                   <WrappedListLogo src={SUPPORTED_PROTOCOLS[k]?.logo} />
-                  <TYPE.mediumHeader color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
+                  <ResponsiveText color={SUPPORTED_PROTOCOLS[k]?.primaryColor}>
                     {SUPPORTED_PROTOCOLS[k].name}
-                  </TYPE.mediumHeader>
+                  </ResponsiveText>
                 </RowFixed>
               </RowBetween>
             </Option>
@@ -86,7 +96,7 @@ export default function Dropdown() {
       <RowBetween>
         <RowFixed style={{ gap: '16px' }}>
           <WrappedListLogo src={activeProtocol?.logo} />
-          <TYPE.mediumHeader color={activeProtocol?.primaryColor}>{activeProtocol?.name}</TYPE.mediumHeader>
+          <ResponsiveText color={activeProtocol?.primaryColor}>{activeProtocol?.name}</ResponsiveText>
         </RowFixed>
         {open ? (
           <ChevronUp stroke={activeProtocol?.primaryColor} />
