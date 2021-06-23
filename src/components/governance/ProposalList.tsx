@@ -17,7 +17,6 @@ const Wrapper = styled.div<{ backgroundColor?: string }>`
 const ProposalItem = styled.div`
   border-radius: 12px;
   padding: 1rem 0;
-  /* background-color: ${({ theme }) => theme.bg1}; */
   text-decoration: none;
 
   :hover {
@@ -48,6 +47,8 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
    */
   const allStatuses = useAllProposalStates()
 
+  console.log(allStatuses)
+
   return (
     <Wrapper>
       {allProposals && Object.keys(allProposals)?.length === 0 && (
@@ -74,7 +75,9 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                 ) {
                   return null
                 }
+
                 const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
+
                 return (
                   <>
                     <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
@@ -93,7 +96,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                           )}
                         </OnlyBelowSmall>
                         <OnlyAboveSmall>
-                          {allStatuses && allStatuses?.[i] ? (
+                          {allStatuses && allStatuses?.[i] !== undefined ? (
                             <ProposalStatus status={status}>{status}</ProposalStatus>
                           ) : (
                             <Loader />
