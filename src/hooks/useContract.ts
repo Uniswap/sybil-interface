@@ -85,11 +85,32 @@ export function useMulticallContract(): Contract | null {
 
 export function useGovernanceContract(): Contract | null {
   const [activeProtocol] = useActiveProtocol()
+  const latestAlphaGovernanceAddress =
+    activeProtocol?.governanceAlphaAddresses[activeProtocol?.governanceAlphaAddresses.length - 1]
   return useContract(
-    activeProtocol ? activeProtocol.governanceAddress : undefined,
+    activeProtocol ? latestAlphaGovernanceAddress : undefined,
     activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,
     true
   )
+}
+
+export function useAllGovernanceAlphaContracts(): Contract[] | null {
+  const { library, account, chainId } = useActiveWeb3React()
+  const [activeProtocol] = useActiveProtocol()
+
+  return useMemo(() => {
+    if (!library || !chainId || !activeProtocol) {
+      return null
+    }
+    try {
+      return activeProtocol.governanceAlphaAddresses
+        .filter(addressMap => Boolean(addressMap[chainId]))
+        .map(addressMap => getContract(addressMap[chainId], GOVERNANCE_ABI, library, account ? account : undefined))
+    } catch (error) {
+      console.error('Failed to get contract', error)
+      return null
+    }
+  }, [library, chainId, activeProtocol, account])
 }
 
 export function useGovernanceContractBravo(): Contract | null {

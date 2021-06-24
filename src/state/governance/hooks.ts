@@ -11,15 +11,10 @@ import {
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
-import {
-  useGovernanceContract,
-  useGovernanceContractBravo,
-  useGovTokenContract,
-  useIsAave
-} from '../../hooks/useContract'
-import { useSingleCallResult, useSingleContractMultipleData, NEVER_RELOAD } from '../multicall/hooks'
+import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
+import { useSingleCallResult } from '../multicall/hooks'
 import { useActiveWeb3React } from '../../hooks'
 import { useTransactionAdder } from '../transactions/hooks'
 import { isAddress, calculateGasMargin } from '../../utils'
@@ -30,6 +25,8 @@ import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
+import { useGenericBravoProposalCount, useGenericAlphaProposalCounts } from 'data/proposalCount.ts'
+import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
 
 export interface DelegateData {
   id: string
@@ -184,64 +181,30 @@ export interface ProposalData {
 }
 
 // get count of all proposals made
-export function useProposalCount(): number | undefined {
-  const gov = useGovernanceContract()
-  const govBravo = useGovernanceContractBravo()
-  const res = useSingleCallResult(govBravo ? govBravo : gov, useIsAave() ? 'getProposalsCount' : 'proposalCount')
-  if (res.result && !res.loading) {
-    return parseInt(res.result[0])
+export function useProposalCounts(): number[] | undefined {
+  const [activeProtocol] = useActiveProtocol()
+  const alphaCounts: number[] | undefined = useGenericAlphaProposalCounts()
+  const bravoCount = useGenericBravoProposalCount()
+  if (activeProtocol === COMPOUND_GOVERNANCE) {
+    return bravoCount ? [bravoCount] : undefined
   }
-  return undefined
+  return alphaCounts
 }
 
 /**
  * @TODO can this be used to speed up the loading?
  */
 export function useAllProposalStates(): number[] | undefined {
-  const govContract = useGovernanceContract()
   const [activeProtocol] = useActiveProtocol()
-  const migrationProposal = activeProtocol?.migrationProposalId
-  const govContractBravo = useGovernanceContractBravo()
 
-  const [statuses, setStatuses] = useState<number[] | undefined>()
-  const isAaveGov = useIsAave()
+  const alphaStates = useGenericAlphaProposalStates()
+  const bravoStates = useGenericBravoProposalStates()
 
-  // get total amount
-  const proposalCount = useProposalCount()
-  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
+  if (activeProtocol === COMPOUND_GOVERNANCE) {
+    return bravoStates
+  }
 
-  const cutoffProposal = migrationProposal ? migrationProposal : proposalCount
-
-  let statusRes = useSingleContractMultipleData(
-    proposalCount ? govContract : undefined,
-    isAaveGov ? 'getProposalState' : 'state',
-    ids.slice(0, cutoffProposal),
-    NEVER_RELOAD
-  )
-
-  statusRes = statusRes.concat(
-    useSingleContractMultipleData(
-      proposalCount ? govContractBravo : undefined,
-      isAaveGov ? 'getProposalState' : 'state',
-      ids.slice(cutoffProposal),
-      NEVER_RELOAD
-    )
-  )
-
-  useEffect(() => {
-    if (!statuses) {
-      const formattedRes = statusRes?.map(res => {
-        if (!res.loading && res.valid) {
-          return res.result?.[0]
-        }
-      })
-      if (formattedRes[0]) {
-        setStatuses(formattedRes)
-      }
-    }
-  }, [statuses, statusRes])
-
-  return statuses
+  return alphaStates
 }
 
 export function useProposalStatus(id: string): string | undefined {
@@ -260,6 +223,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
 
   // reset proposals on protocol change
   const [activeProtocol] = useActiveProtocol()
+
   useEffect(() => {
     setProposals(undefined)
   }, [activeProtocol])

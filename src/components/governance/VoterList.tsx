@@ -139,7 +139,7 @@ export default function VoterList({
             </AutoColumn>
           ) : (
             <TYPE.main fontWeight={400} fontSize="14px">
-              No votes yet
+              {activeProtocol && activeProtocol?.id !== 'uniswap' ? 'No votes yet' : ''}
             </TYPE.main>
           )}
         </TopVoterWrapper>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
 import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
@@ -8,7 +8,8 @@ import { AutoColumn } from '../Column'
 import { Link } from 'react-router-dom'
 import Loader, { LoadingRows } from '../Loader'
 import { enumerateProposalState } from '../../data/governance'
-import { HIDDEN_PROPOSALS } from 'constants/proposals'
+import { BLOCKED_PROPOSALS_BY_START_BLOCK } from 'constants/proposals'
+import { useTempProposalData } from 'hooks/tempProposalData'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -47,11 +48,23 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
    */
   const allStatuses = useAllProposalStates()
 
-  console.log(allStatuses)
+  const tempProposals = useTempProposalData()
+
+  const tempFixed = useMemo(() => {
+    if (activeProtocol?.id !== 'uniswap') {
+      return allProposals
+    } else {
+      if (allProposals && tempProposals?.[0]) {
+        allProposals['6'] = tempProposals?.[0]
+        return allProposals
+      }
+      return allProposals
+    }
+  }, [activeProtocol?.id, allProposals, tempProposals])
 
   return (
     <Wrapper>
-      {allProposals && Object.keys(allProposals)?.length === 0 && (
+      {tempFixed && Object.keys(tempFixed)?.length === 0 && (
         <EmptyWrapper>
           <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
           <TYPE.subHeader>
@@ -64,14 +77,14 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
           Proposals
         </TYPE.body>
         <Break />
-        {allStatuses && allProposals
-          ? Object.values(allProposals)
+        {allStatuses && tempFixed
+          ? Object.values(tempFixed)
               .map((p: ProposalData, i) => {
                 // block hidden proposals
                 if (
                   activeProtocol &&
-                  HIDDEN_PROPOSALS[activeProtocol.id] &&
-                  HIDDEN_PROPOSALS[activeProtocol.id].includes(i)
+                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
+                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
                 ) {
                   return null
                 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import styled from 'styled-components'
 import { useProposalData, useActiveProtocol, useProposalStatus, useUserVotes } from '../../state/governance/hooks'
 import ReactMarkdown from 'react-markdown'
@@ -25,6 +25,7 @@ import { BigNumber } from 'ethers'
 import { nameOrAddress } from '../../utils/getName'
 import { useAllIdentities } from '../../state/social/hooks'
 import { ButtonError } from '../../components/Button'
+import { useTempProposalData } from 'hooks/tempProposalData'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>``
 
@@ -95,15 +96,24 @@ function ProposalDetails({
 
   // if valid protocol id passed in, update global active protocol
   const dispatch = useDispatch<AppDispatch>()
-  const [, setActiveProtocol] = useActiveProtocol()
+  const [activeProtocol, setActiveProtocol] = useActiveProtocol()
   useEffect(() => {
     if (protocolID && Object.keys(SUPPORTED_PROTOCOLS).includes(protocolID)) {
       setActiveProtocol(SUPPORTED_PROTOCOLS[protocolID])
     }
   }, [dispatch, protocolID, setActiveProtocol])
 
-  const proposalData = useProposalData(proposalID)
+  const proposalDataFetched = useProposalData(proposalID)
+  const tempProposalData = useTempProposalData()
   const status = useProposalStatus(proposalID) // @TODO shoudlnt use spearate data for this
+
+  const proposalData = useMemo(() => {
+    if (tempProposalData?.[0] && activeProtocol && activeProtocol.id === 'uniswap') {
+      return tempProposalData?.[0]
+    } else {
+      return proposalDataFetched
+    }
+  }, [activeProtocol, proposalDataFetched, tempProposalData])
 
   // get and format data
   const currentTimestamp = useCurrentBlockTimestamp()

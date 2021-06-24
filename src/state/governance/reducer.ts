@@ -24,7 +24,7 @@ export interface GovernanceInfo {
   primaryColor: string
   secondaryColor: string
   token: SerializedToken
-  governanceAddress: string
+  governanceAlphaAddresses: string[]
   governanceAddressBravo?: string
   migrationProposalId?: number
   social: string
@@ -42,9 +42,9 @@ export interface GlobaData {
 
 // constant addresses for supported protocols
 export const UNI_GOVERNANCE_ADDRESS = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
+export const UNI_GOVERNANCE_ADDRESS_BRAVO = '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6'
 export const UNI_ADDRESS = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'
 const UNI = new Token(ChainId.MAINNET, UNI_ADDRESS, 18, 'UNI', 'Uniswap')
-
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   id: 'uniswap',
   name: 'Uniswap Governance',
@@ -52,7 +52,8 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#FF007A',
   secondaryColor: '#FDEEF5',
   token: serializeToken(UNI),
-  governanceAddress: UNI_GOVERNANCE_ADDRESS,
+  governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS, UNI_GOVERNANCE_ADDRESS_BRAVO],
+  migrationProposalId: 5,
   social: '@UniswapProtocol',
   emoji: '🦄'
 }
@@ -68,8 +69,8 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#00D395',
   secondaryColor: '#E1F9F1',
   token: serializeToken(COMP),
+  governanceAlphaAddresses: [COMP_GOVERNANCE_ADDRESS],
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
-  governanceAddress: COMP_GOVERNANCE_ADDRESS,
   migrationProposalId: 42,
   social: '@compoundfinance',
   emoji: '🏦'
@@ -85,7 +86,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#B6509E',
   secondaryColor: '#ebfeff',
   token: serializeToken(AAVE),
-  governanceAddress: AAVE_GOVERNANCE_ADDRESS,
+  governanceAlphaAddresses: [AAVE_GOVERNANCE_ADDRESS],
   social: '@AaveAave',
   emoji: '👻'
 }
@@ -100,7 +101,7 @@ export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#5c0ef3',
   secondaryColor: '#f2eeff',
   token: serializeToken(POOL),
-  governanceAddress: POOL_TOGETHER_GOVERNANCE_ADDRESS,
+  governanceAlphaAddresses: [POOL_TOGETHER_GOVERNANCE_ADDRESS],
   social: '@PoolTogether_',
   emoji: '🏆'
 }
@@ -115,7 +116,7 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#5555FF',
   secondaryColor: '#E3E3FF',
   token: serializeToken(RADICLE),
-  governanceAddress: RADICLE_GOVERNANCE_ADDRESS,
+  governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
   social: '@radicle',
   emoji: '🌱'
 }

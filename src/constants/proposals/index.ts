@@ -11,11 +11,13 @@ export const PRELOADED_PROPOSALS: {
   }
 }
 
+export const EDUCATION_FUND_1_START_BLOCK = 12620175
+
 // hidden proposals that may be broken
-export const HIDDEN_PROPOSALS: {
+export const BLOCKED_PROPOSALS_BY_START_BLOCK: {
   [protocol: string]: number[]
 } = {
-  uniswap: [4]
+  uniswap: [EDUCATION_FUND_1_START_BLOCK]
 }
 
 export const AUTONOMOUS_PROPOSAL_BYTECODE =
