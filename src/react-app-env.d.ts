@@ -12,6 +12,7 @@ interface Window {
     on?: (...args: any[]) => void
     removeListener?: (...args: any[]) => void
   }
+  // eslint-disable-next-line @typescript-eslint/ban-types
   web3?: {}
 }
 
