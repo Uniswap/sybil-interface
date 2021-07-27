@@ -15,6 +15,7 @@ import CompLogo from '../../assets/images/compLogo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
+import Cre8rLogo from '../../assets/images/cre8r.png'
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -121,13 +122,29 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱'
 }
 
+export const CRE8R_GOVERNANCE_ADDRESS = '0xa832ce1b31bfb0961e78350320ab4cb7f110e7e2'
+export const CRE8R_ADDRESS = '0x238d82a35e69d7c10fe69a649134171c63e57522'
+const RADICLE = new Token(ChainId.MAINNET, RADICLE_ADDRESS, 18, 'RAD', 'Radicle')
+export const RADICLE_GOVERNANCE: GovernanceInfo = {
+  id: 'CRE8R',
+  name: 'CRE8R Governance',
+  logo: cre8rLogo,
+  primaryColor: '#5555FF',
+  secondaryColor: '#E3E3FF',
+  token: serializeToken(CRE8R),
+  governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
+  social: '@CRE8RDAO',
+  emoji: '🧱'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
   compound: COMPOUND_GOVERNANCE,
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
-  radicle: RADICLE_GOVERNANCE
+  radicle: RADICLE_GOVERNANCE,
+  CRE8R: CRE8R_GOVERNANCE
 }
 
 export const FETCHING_INTERVAL = 50
