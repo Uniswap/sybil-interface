@@ -128,7 +128,7 @@ const CRE8R = new Token(ChainId.MAINNET, CRE8R_ADDRESS, 18, 'CRE8R', 'CRE8R Cash
 export const CRE8R_GOVERNANCE: GovernanceInfo = {
   id: 'CRE8R',
   name: 'CRE8R Governance',
-  logo: cre8rLogo,
+  logo: Cre8rLogo,
   primaryColor: '#5555FF',
   secondaryColor: '#E3E3FF',
   token: serializeToken(CRE8R),
