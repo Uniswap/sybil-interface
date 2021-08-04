@@ -218,10 +218,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
 
   // get subgraph client for active protocol
   const govClient = useSubgraphClient()
-
   const govToken = useGovernanceToken()
-
-  // reset proposals on protocol change
   const [activeProtocol] = useActiveProtocol()
 
   useEffect(() => {
