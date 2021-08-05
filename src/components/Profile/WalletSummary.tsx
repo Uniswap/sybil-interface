@@ -67,7 +67,7 @@ export default function WalletSummary() {
     const txs = Object.values(allTransactions)
     return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
   }, [allTransactions])
-  const pending = sortedRecentTransactions.filter((tx) => !tx.receipt).map((tx) => tx.hash)
+  const pending = sortedRecentTransactions.filter(tx => !tx.receipt).map(tx => tx.hash)
   const hasPendingTransactions = !!pending.length
 
   // get any verified handles for this user + timestamps they were created at

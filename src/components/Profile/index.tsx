@@ -156,7 +156,7 @@ export default function Profile() {
                 bgColor={activeProtocol?.secondaryColor}
                 style={{
                   fontWeight: 500,
-                  fontSize: '16px',
+                  fontSize: '16px'
                 }}
                 onClick={() => toggleWalletModal()}
               >
@@ -176,7 +176,7 @@ export default function Profile() {
                     ReactGA.event({
                       category: 'Social',
                       action: 'Start Link',
-                      label: 'Not linked',
+                      label: 'Not linked'
                     })
                     setShowTwitterFlow(true)
                   }}

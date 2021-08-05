@@ -8,7 +8,7 @@ import {
   updateUserDarkMode,
   toggleURLWarning,
   updateTwitterAccount,
-  updateLastSelectedProtocolID,
+  updateLastSelectedProtocolID
 } from './actions'
 
 export function serializeToken(token: Token): SerializedToken {
@@ -17,7 +17,7 @@ export function serializeToken(token: Token): SerializedToken {
     address: token.address,
     decimals: token.decimals,
     symbol: token.symbol,
-    name: token.name,
+    name: token.name
   }
 }
 
@@ -38,7 +38,7 @@ export function useIsDarkMode(): boolean {
   >(
     ({ user: { matchesDarkMode, userDarkMode } }) => ({
       userDarkMode,
-      matchesDarkMode,
+      matchesDarkMode
     }),
     shallowEqual
   )
@@ -60,7 +60,7 @@ export function useDarkModeManager(): [boolean, () => void] {
 // use for twitter login passed through query param
 export function useTwitterAccount(): [string | undefined, (newAccount: string | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const twitterAccount = useSelector<AppState, AppState['user']['twitterAccount']>((state) => state.user.twitterAccount)
+  const twitterAccount = useSelector<AppState, AppState['user']['twitterAccount']>(state => state.user.twitterAccount)
 
   // set new or reset account
   const setTwitterAccount = useCallback(
@@ -76,7 +76,7 @@ export function useTwitterAccount(): [string | undefined, (newAccount: string | 
 export function useLastSelectedProtocolID(): [string | undefined, (protocolID: string | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const lastSelectedProtocolID = useSelector<AppState, AppState['user']['lastSelectedProtocolID']>(
-    (state) => state.user.lastSelectedProtocolID
+    state => state.user.lastSelectedProtocolID
   )
 
   // set new or reset account

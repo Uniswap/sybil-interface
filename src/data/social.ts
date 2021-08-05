@@ -7,13 +7,13 @@ export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 export async function fetchAllIdentities(): Promise<Identities | undefined> {
   try {
     return fetch(VERIFIED_JSON)
-      .then(async (res) => {
+      .then(async res => {
         if (!res || res.status !== 200) {
           return Promise.reject('Unable to fetch verified handles')
         } else {
           return res
             .json()
-            .then((data) => {
+            .then(data => {
               const content = data.content
               const decodedContent = atob(content)
               const parsed = JSON.parse(decodedContent)
@@ -51,7 +51,7 @@ export function fetchProfileData(handle: string): Promise<ProfileDataResponse | 
     return (PROFILE_DATA_PROMISES[key] =
       PROFILE_DATA_PROMISES[key] ??
       fetch(url)
-        .then(async (res) => {
+        .then(async res => {
           if (res.status === 200) {
             return res.json()
           } else {
@@ -59,7 +59,7 @@ export function fetchProfileData(handle: string): Promise<ProfileDataResponse | 
             return null
           }
         })
-        .catch((error) => {
+        .catch(error => {
           return Promise.reject(error)
         }))
   } catch {
@@ -80,7 +80,7 @@ export interface LatestTweetResponse {
 export async function fetchLatestTweet(handle: string): Promise<LatestTweetResponse | null> {
   const url = `${TWITTER_WORKER_URL}/latest-tweet?handle=` + handle
   try {
-    return fetch(url).then(async (res) => {
+    return fetch(url).then(async res => {
       if (res.status === 200) {
         return res.json()
       } else {
