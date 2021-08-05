@@ -33,7 +33,7 @@ export default function useENSName(address?: string): { ENSName: string | null; 
   const changed = debouncedAddress !== address
   return {
     ENSName: changed ? null : name.result?.[0] ?? null,
-    loading: changed || resolverAddress.loading || name.loading
+    loading: changed || resolverAddress.loading || name.loading,
   }
 }
 
@@ -43,7 +43,7 @@ export function useBulkENS(addresses: string[]): { names: string[] | null; loadi
   useEffect(() => {
     async function fetchAllAddresses() {
       const answers = await Promise.all(
-        addresses.map(a => {
+        addresses.map((a) => {
           return library?.lookupAddress(a)
         })
       )
@@ -61,6 +61,6 @@ export function useBulkENS(addresses: string[]): { names: string[] | null; loadi
 
   return {
     names: [''],
-    loading: false
+    loading: false,
   }
 }

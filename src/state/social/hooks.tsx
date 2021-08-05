@@ -12,7 +12,7 @@ const VERIFICATION_WORKER_URL = 'https://sybil-verifier.uniswap.workers.dev'
 // get all identity info from github file
 export function useAllIdentities(): [Identities | undefined, (identities: Identities) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const identities = useSelector<AppState, AppState['social']['identities']>(state => state.social.identities)
+  const identities = useSelector<AppState, AppState['social']['identities']>((state) => state.social.identities)
   // set new or reset account
   const setIdentities = useCallback(
     (identities: Identities) => {
@@ -28,7 +28,7 @@ export function useAllVerifiedHandles(): { [address: string]: TwitterEntry | und
   const [allIdentities] = useAllIdentities()
   if (allIdentities) {
     const twitterOnly: { [address: string]: TwitterEntry | undefined } | undefined = {}
-    Object.keys(allIdentities).map(address => {
+    Object.keys(allIdentities).map((address) => {
       if (allIdentities[address].twitter !== undefined) {
         twitterOnly[address] = allIdentities[address].twitter
       }
@@ -83,39 +83,39 @@ export function useVerifyCallback(tweetID: string | undefined): { verifyCallback
     if (!tweetID)
       return Promise.reject({
         success: false,
-        error: 'Invalid tweet id'
+        error: 'Invalid tweet id',
       })
 
     return fetch(`${VERIFICATION_WORKER_URL}/api/verify?account=${account}&id=${tweetID}`)
-      .then(async res => {
+      .then(async (res) => {
         if (res.status === 200) {
           return {
-            success: true
+            success: true,
           }
         } else {
           const errorText = await res.text()
           if (res.status === 400 && errorText === 'Invalid tweet format.') {
             return {
               success: false,
-              error: 'Invalid tweet format'
+              error: 'Invalid tweet format',
             }
           }
           if (res.status === 400 && errorText === 'Invalid tweet id.') {
             return {
               success: false,
-              error: 'Invalid tweet id'
+              error: 'Invalid tweet id',
             }
           }
           return {
             success: false,
-            error: 'Unknown error, please try again.'
+            error: 'Unknown error, please try again.',
           }
         }
       })
       .catch(() => {
         return {
           success: false,
-          error: 'Error submitting verification'
+          error: 'Error submitting verification',
         }
       })
   }, [account, tweetID])
@@ -143,7 +143,7 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
             setFormattedData({
               name: profileData.data.name,
               handle: profileData.data.username,
-              profileURL: profileData.data.profile_image_url
+              profileURL: profileData.data.profile_image_url,
             })
           }
         })
@@ -174,11 +174,11 @@ export function useMultipleTwitterProfileDatas(
         handles.map(async (handle: string | undefined) => {
           if (handle) {
             return fetchProfileData(handle)
-              .then(profileData => {
+              .then((profileData) => {
                 return {
                   account: '',
                   handle,
-                  profileURL: profileData?.data?.profile_image_url
+                  profileURL: profileData?.data?.profile_image_url,
                 }
               })
               .catch(() => undefined)
@@ -187,8 +187,8 @@ export function useMultipleTwitterProfileDatas(
           }
         })
       )
-        .then(handlesData => {
-          setFormattedData(Object.assign({}, ...handlesData.map(key => key && { [key.handle]: key })))
+        .then((handlesData) => {
+          setFormattedData(Object.assign({}, ...handlesData.map((key) => key && { [key.handle]: key })))
         })
         .catch(() => undefined)
     }

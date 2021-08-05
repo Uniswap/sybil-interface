@@ -7,7 +7,7 @@ import GOVERNANCE_AAVE_ABI from '../constants/abis/aave-governance.json'
 import AAVE_ABI from '../constants/abis/aave-token.json'
 import {
   ARGENT_WALLET_DETECTOR_ABI,
-  ARGENT_WALLET_DETECTOR_MAINNET_ADDRESS
+  ARGENT_WALLET_DETECTOR_MAINNET_ADDRESS,
 } from '../constants/abis/argent-wallet-detector'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ENS_ABI from '../constants/abis/ens-registrar.json'
@@ -104,8 +104,8 @@ export function useAllGovernanceAlphaContracts(): Contract[] | null {
     }
     try {
       return activeProtocol.governanceAlphaAddresses
-        .filter(addressMap => Boolean(addressMap[chainId]))
-        .map(addressMap => getContract(addressMap[chainId], GOVERNANCE_ABI, library, account ? account : undefined))
+        .filter((addressMap) => Boolean(addressMap[chainId]))
+        .map((addressMap) => getContract(addressMap[chainId], GOVERNANCE_ABI, library, account ? account : undefined))
     } catch (error) {
       console.error('Failed to get contract', error)
       return null

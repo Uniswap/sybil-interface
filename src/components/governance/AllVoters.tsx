@@ -39,7 +39,7 @@ const TopVoterWrapper = styled.div`
 export default function AllVoters({
   title,
   amount,
-  allVoters
+  allVoters,
 }: {
   title: string
   amount: number | undefined

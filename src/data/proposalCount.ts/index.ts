@@ -29,14 +29,14 @@ export function useGenericAlphaProposalCounts(): number[] | undefined {
   )
 
   // sum up responses
-  const parsedAlphaCounts = alphaCountRes.map(res => {
+  const parsedAlphaCounts = alphaCountRes.map((res) => {
     if (res.result && !res.loading && !res.error) {
       return parseFloat(res.result[0])
     }
     return undefined
   })
 
-  const allLoaded = !parsedAlphaCounts.some(x => x === undefined)
+  const allLoaded = !parsedAlphaCounts.some((x) => x === undefined)
 
   if (!allLoaded) {
     return undefined

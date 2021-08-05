@@ -7,7 +7,7 @@ import {
   useGovernanceToken,
   useAllProposals,
   useAllProposalStates,
-  useUserDelegatee
+  useUserDelegatee,
 } from '../state/governance/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
@@ -23,7 +23,7 @@ import {
   RoundedProfileImage,
   WrappedListLogo,
   ProposalStatusSmall,
-  DelegateButton
+  DelegateButton,
 } from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall } from '../theme'
@@ -94,8 +94,8 @@ function localNumber(val: number) {
 
 function DelegateInfo({
   match: {
-    params: { protocolID, delegateAddress }
-  }
+    params: { protocolID, delegateAddress },
+  },
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)

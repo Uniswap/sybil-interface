@@ -14,7 +14,7 @@ import {
   useUserDelegatee,
   useVerifiedDelegates,
   DelegateData,
-  useMaxFetched
+  useMaxFetched,
 } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton, EmptyWrapper } from './styled'
 import Card from '../Card'
@@ -123,7 +123,7 @@ const PageButtons = styled.div`
 `
 const Arrow = styled.div<{ faded?: boolean }>`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -184,8 +184,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const manualEntries = useMemo(() => {
     return allIdentities && filteredDelegates
       ? Object.keys(allIdentities)
-          .filter(address => {
-            const found = filteredDelegates.find(d => d.id === address)
+          .filter((address) => {
+            const found = filteredDelegates.find((d) => d.id === address)
             return !found
           })
           .map((address: any) => {
@@ -196,7 +196,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   }, [allIdentities, filteredDelegates])
 
   const formattedManualDelegates: DelegateData[] = useMemo(() => {
-    return manualEntries.map(entry => {
+    return manualEntries.map((entry) => {
       return {
         id: entry.address,
         delegatedVotes: 0,
@@ -206,7 +206,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
         EOA: true,
         autonomous: undefined,
         handle: entry.handle,
-        imageURL: undefined
+        imageURL: undefined,
       }
     })
   }, [manualEntries])
@@ -218,7 +218,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
   const maxCount = filterActive
     ? combinedDelegates
-      ? combinedDelegates.filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
+      ? combinedDelegates.filter((d) => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
       : 0
     : globalData
     ? globalData.totalDelegates
@@ -302,7 +302,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       ? combinedDelegates
           // filter for non zero votes
           // eslint-disable-next-line react/prop-types
-          .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
+          .filter((d) => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
           .map((d, i) => {
             return <DelegateRow d={d} index={i} key={i} />

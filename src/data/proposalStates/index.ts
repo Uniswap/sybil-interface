@@ -20,7 +20,7 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
   const alphaCounts: number[] | undefined = useGenericAlphaProposalCounts()
 
   const ids = alphaCounts
-    ? alphaCounts.map(total => {
+    ? alphaCounts.map((total) => {
         return Array.from({ length: total }, (v, k) => [isAaveGov ? k : k + 1])
       })
     : undefined
@@ -33,7 +33,7 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
   )
 
   const combinedStatuses = statusRes.reduce((accum: number[], res) => {
-    const currentStatuses = res.map(x => {
+    const currentStatuses = res.map((x) => {
       if (x.result) {
         return x.result?.[0]
       } else {
@@ -45,7 +45,10 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
   }, [])
 
   const loadingOrError =
-    statusRes && alphaCounts && statusRes?.length !== alphaCounts?.length && combinedStatuses.some(x => x === undefined)
+    statusRes &&
+    alphaCounts &&
+    statusRes?.length !== alphaCounts?.length &&
+    combinedStatuses.some((x) => x === undefined)
 
   useEffect(() => {
     if (!statuses && !loadingOrError) {
@@ -91,7 +94,7 @@ export function useGenericBravoProposalStates(): number[] | undefined {
 
   useEffect(() => {
     if (!statuses && proposalCount) {
-      const formattedRes = statusRes?.map(res => {
+      const formattedRes = statusRes?.map((res) => {
         if (!res.loading && res.valid) {
           return res.result?.[0]
         }

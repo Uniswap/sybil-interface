@@ -6,7 +6,7 @@ import {
   useUserVotes,
   useDelegateInfo,
   useUserDelegatee,
-  useActiveProtocol
+  useActiveProtocol,
 } from '../../state/governance/hooks'
 import { useToggleModal } from '../../state/application/hooks'
 import { useActiveWeb3React, useTheme } from '../../hooks'

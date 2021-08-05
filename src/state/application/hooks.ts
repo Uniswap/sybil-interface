@@ -9,7 +9,7 @@ import {
   COMPOUND_GOVERNANCE,
   AAVE_GOVERNANCE,
   POOL_TOGETHER_GOVERNANCE,
-  RADICLE_GOVERNANCE
+  RADICLE_GOVERNANCE,
 } from '../governance/reducer'
 import { uniswapClient, compoundClient, aaveClient, poolClient, radicleClient } from '../../apollo/client'
 
@@ -35,7 +35,7 @@ export function useModalDelegatee(): [string | null | undefined, (delegatee: str
   const dispatch = useDispatch<AppDispatch>()
   return [
     delegatee,
-    useCallback((delegatee: string | null | undefined) => dispatch(setModalDelegatee({ delegatee })), [dispatch])
+    useCallback((delegatee: string | null | undefined) => dispatch(setModalDelegatee({ delegatee })), [dispatch]),
   ]
 }
 
@@ -83,7 +83,7 @@ export function useRemovePopup(): (key: string) => void {
 // get the list of active popups
 export function useActivePopups(): AppState['application']['popupList'] {
   const list = useSelector((state: AppState) => state.application.popupList)
-  return useMemo(() => list.filter(item => item.show), [list])
+  return useMemo(() => list.filter((item) => item.show), [list])
 }
 
 export function useSubgraphClient() {

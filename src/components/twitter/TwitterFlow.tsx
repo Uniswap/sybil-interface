@@ -70,7 +70,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       // new copy of verified list
       verifiedHandles &&
         allIndentities &&
-        Object.keys(verifiedHandles).map(address => {
+        Object.keys(verifiedHandles).map((address) => {
           newVerified[address] = allIndentities[address]
           return true
         })
@@ -80,8 +80,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           ...allIndentities[account],
           twitter: {
             handle: twitterHandle,
-            timestamp: Date.now()
-          }
+            timestamp: Date.now(),
+          },
         }
         setAllIdentities(newVerified)
       }

@@ -26,10 +26,10 @@ export interface SocialState {
 }
 
 export const initialState: SocialState = {
-  identities: undefined
+  identities: undefined,
 }
 
-export default createReducer(initialState, builder =>
+export default createReducer(initialState, (builder) =>
   builder.addCase(updateIdentities, (state, action) => {
     state.identities = action.payload.identities
   })

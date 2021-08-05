@@ -87,9 +87,9 @@ const AddressWrapper = styled.div`
 
 function ProposalDetails({
   match: {
-    params: { protocolID, proposalID }
+    params: { protocolID, proposalID },
   },
-  history
+  history,
 }: RouteComponentProps<{ protocolID: string; proposalID: string }>) {
   const { chainId } = useActiveWeb3React()
 

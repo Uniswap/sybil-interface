@@ -130,10 +130,10 @@ export default function SideMenu(): JSX.Element {
           <div style={{ padding: '0 1.25rem' }}>
             <Break />
           </div>
-          {Object.values(SUPPORTED_PROTOCOLS).map(p => (
+          {Object.values(SUPPORTED_PROTOCOLS).map((p) => (
             <BlankInternalLink key={p.id + '-image-id'} to={'/delegates/' + p.id}>
               <HoverRow
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation()
                   setOpen(false)
                 }}
@@ -142,7 +142,7 @@ export default function SideMenu(): JSX.Element {
                   style={{
                     height: '30px',
                     backgroundColor: activeProtocol?.id === p.id ? activeProtocol?.primaryColor : 'transparent',
-                    width: '2px'
+                    width: '2px',
                   }}
                 />
 

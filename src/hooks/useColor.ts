@@ -13,7 +13,7 @@ async function getColorFromToken(token: Token): Promise<string | null> {
 
   return Vibrant.from(path)
     .getPalette()
-    .then(palette => {
+    .then((palette) => {
       if (palette?.Vibrant) {
         let detectedHex = palette.Vibrant.hex
         let AAscore = hex(detectedHex, '#FFF')
@@ -35,7 +35,7 @@ export function useColor(token?: Token) {
     let stale = false
 
     if (token) {
-      getColorFromToken(token).then(tokenColor => {
+      getColorFromToken(token).then((tokenColor) => {
         if (!stale && tokenColor !== null) {
           setColor(tokenColor)
         }

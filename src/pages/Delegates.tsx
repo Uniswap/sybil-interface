@@ -18,8 +18,8 @@ import { Above1080Only, Below1080Only } from '../theme/components'
 
 export default function Delegates({
   match: {
-    params: { protocolID }
-  }
+    params: { protocolID },
+  },
 }: RouteComponentProps<{ protocolID?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)

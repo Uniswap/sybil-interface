@@ -6,7 +6,7 @@ import {
   fetchTopDelegates,
   fetchVerifiedDelegates,
   fetchGlobalData,
-  fetchTopDelegatesOffset
+  fetchTopDelegatesOffset,
 } from '../../data/governance'
 import { useTopDelegates, useVerifiedDelegates, useGlobalData, useMaxFetched, useActiveProtocol } from './hooks'
 import { GlobaData, FETCHING_INTERVAL } from './reducer'
@@ -52,7 +52,7 @@ export default function Updater(): null {
         library &&
           allIdentities &&
           client &&
-          fetchTopDelegates(client, library, allIdentities).then(async delegateData => {
+          fetchTopDelegates(client, library, allIdentities).then(async (delegateData) => {
             if (delegateData) {
               setTopDelegates(delegateData)
             }
@@ -78,7 +78,7 @@ export default function Updater(): null {
         maxFetched < globalData.totalDelegates // dont fetch if we'eve reach max amount of delegates
       ) {
         try {
-          fetchTopDelegatesOffset(client, library, allIdentities, maxFetched).then(async delegateData => {
+          fetchTopDelegatesOffset(client, library, allIdentities, maxFetched).then(async (delegateData) => {
             if (delegateData) {
               setTopDelegates(topDelegates.concat(delegateData))
             }
@@ -97,7 +97,7 @@ export default function Updater(): null {
         library &&
           allIdentities &&
           client &&
-          fetchVerifiedDelegates(client, library, allIdentities).then(async delegateData => {
+          fetchVerifiedDelegates(client, library, allIdentities).then(async (delegateData) => {
             if (delegateData) {
               setVerifiedDelegates(delegateData)
             }

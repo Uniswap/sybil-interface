@@ -7,7 +7,7 @@ import {
   updateTopDelegates,
   updateVerifiedDelegates,
   updateGlobalData,
-  updateMaxFetched
+  updateMaxFetched,
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
@@ -55,7 +55,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS, UNI_GOVERNANCE_ADDRESS_BRAVO],
   migrationProposalId: 5,
   social: '@UniswapProtocol',
-  emoji: '🦄'
+  emoji: '🦄',
 }
 
 export const COMP_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb17b66529'
@@ -73,7 +73,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   migrationProposalId: 42,
   social: '@compoundfinance',
-  emoji: '🏦'
+  emoji: '🏦',
 }
 
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
@@ -88,7 +88,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(AAVE),
   governanceAlphaAddresses: [AAVE_GOVERNANCE_ADDRESS],
   social: '@AaveAave',
-  emoji: '👻'
+  emoji: '👻',
 }
 
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
@@ -103,7 +103,7 @@ export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(POOL),
   governanceAlphaAddresses: [POOL_TOGETHER_GOVERNANCE_ADDRESS],
   social: '@PoolTogether_',
-  emoji: '🏆'
+  emoji: '🏆',
 }
 
 export const RADICLE_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
@@ -118,7 +118,7 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(RADICLE),
   governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
   social: '@radicle',
-  emoji: '🌱'
+  emoji: '🌱',
 }
 
 // mapping for routing
@@ -127,7 +127,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   compound: COMPOUND_GOVERNANCE,
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
-  radicle: RADICLE_GOVERNANCE
+  radicle: RADICLE_GOVERNANCE,
 }
 
 export const FETCHING_INTERVAL = 50
@@ -168,10 +168,10 @@ export const initialState: GovernanceState = {
   maxFetched: {},
 
   verifiedDelegates: {},
-  globalData: {}
+  globalData: {},
 }
 
-export default createReducer(initialState, builder =>
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(updateActiveProtocol, (state, action) => {
       state.activeProtocol = action.payload.activeProtocol

@@ -29,7 +29,7 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
   return client
     .query({
       query: GLOBAL_DATA,
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-first',
     })
     .then(async (res: GlobalResponse) => {
       if (res) {
@@ -61,7 +61,7 @@ async function fetchDelegatesFromClient(
       .then(async (res: DelegateResponse) => {
         // check if account is EOA or not
         const typed = await Promise.all(
-          res.data.delegates.map(d => {
+          res.data.delegates.map((d) => {
             return library?.getCode(d.id)
           })
         )
@@ -86,7 +86,7 @@ async function fetchDelegatesFromClient(
             return {
               account: a.id,
               handle,
-              imageURL: profileData?.data?.profile_image_url
+              imageURL: profileData?.data?.profile_image_url,
             }
           })
         )
@@ -101,8 +101,8 @@ async function fetchDelegatesFromClient(
             ...d,
             EOA: typed[i] === '0x',
             autonomous: typed[i] === AUTONOMOUS_PROPOSAL_BYTECODE,
-            handle: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
-            imageURL: handles.find(h => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL
+            handle: handles.find((h) => h.account.toLowerCase() === d.id.toLowerCase())?.handle,
+            imageURL: handles.find((h) => h.account.toLowerCase() === d.id.toLowerCase())?.imageURL,
           }
         })
       })
@@ -121,7 +121,7 @@ export async function fetchTopDelegates(
 ): Promise<DelegateData[] | null> {
   return fetchDelegatesFromClient(client, library, allIdentities, {
     query: TOP_DELEGATES,
-    fetchPolicy: 'cache-first'
+    fetchPolicy: 'cache-first',
   })
 }
 
@@ -134,9 +134,9 @@ export async function fetchTopDelegatesOffset(
   return fetchDelegatesFromClient(client, library, allIdentities, {
     query: TOP_DELEGATES_OFFSET,
     variables: {
-      skip: maxFetched
+      skip: maxFetched,
     },
-    fetchPolicy: 'cache-first'
+    fetchPolicy: 'cache-first',
   })
 }
 
@@ -152,9 +152,9 @@ export async function fetchVerifiedDelegates(
     query: DELEGATES_FROM_LIST,
     variables: {
       // filter on address - graph needs lowercase
-      list: allIdentities && Object.keys(allIdentities)?.map(a => a.toLocaleLowerCase())
+      list: allIdentities && Object.keys(allIdentities)?.map((a) => a.toLocaleLowerCase()),
     },
-    fetchPolicy: 'cache-first'
+    fetchPolicy: 'cache-first',
   })
 }
 
@@ -208,7 +208,7 @@ export async function fetchProposals(client: any, key: string, govId: string): P
     client
       .query({
         query: PROPOSALS,
-        fetchPolicy: 'cache-first'
+        fetchPolicy: 'cache-first',
       })
       .then(async (res: ProposalResponse) => {
         if (res) {
@@ -247,9 +247,9 @@ export async function fetchProposals(client: any, key: string, govId: string): P
                 return {
                   target: p.targets[i],
                   functionSig: name,
-                  callData
+                  callData,
                 }
-              })
+              }),
             }
           })
         }

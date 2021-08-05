@@ -71,7 +71,7 @@ export default function Dropdown() {
   const options = useMemo(() => {
     return activeProtocol
       ? Object.keys(SUPPORTED_PROTOCOLS)
-          .filter(k => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
+          .filter((k) => SUPPORTED_PROTOCOLS[k].name !== activeProtocol.name)
           .map((k, i) => (
             <Option
               key={i}
