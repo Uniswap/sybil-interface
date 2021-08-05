@@ -93,7 +93,6 @@ export function useVerifyCallback(tweetID: string | undefined): { verifyCallback
             success: true
           }
         } else {
-          console.log('here')
           const errorText = await res.text()
           if (res.status === 400 && errorText === 'Invalid tweet format.') {
             return {
@@ -132,11 +131,12 @@ interface TwitterProfileData {
 // get handle and profile image from twitter
 export function useTwitterProfileData(handle: string | undefined | null): TwitterProfileData | undefined {
   const [formattedData, setFormattedData] = useState<TwitterProfileData | undefined>()
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (!handle) {
       setFormattedData(undefined)
-    } else {
+    } else if (!error) {
       fetchProfileData(handle)
         .then((profileData: ProfileDataResponse | null) => {
           if (profileData?.data) {
@@ -148,10 +148,11 @@ export function useTwitterProfileData(handle: string | undefined | null): Twitte
           }
         })
         .catch(() => {
-          console.log('Error fetching profile data')
+          console.log('Error fetching profile data for user')
+          setError(true)
         })
     }
-  }, [handle])
+  }, [handle, error])
 
   return formattedData
 }

@@ -61,14 +61,13 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
         <Break />
         {allStatuses && allProposals && activeProtocol
           ? Object.values(allProposals)
-              .filter(
-                p =>
-                  !Boolean(
-                    BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
-                      BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
-                  )
-              )
               .map((p: ProposalData, i) => {
+                if (
+                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
+                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
+                ) {
+                  return null
+                }
                 const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
                 return (
                   <div key={i}>

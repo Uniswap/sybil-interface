@@ -24,10 +24,10 @@ const ModalContentWrapper = styled.div`
 `
 
 const TweetWrapper = styled.div`
-    padding: 1rem;
-    color: ${({ theme }) => theme.blue1}
-    background: #F2F2F2;
-    word-break: break-word;
+  padding: 1rem;
+  color: ${({ theme }) => theme.blue1};
+  background: #f2f2f2;
+  word-break: break-word;
 `
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {

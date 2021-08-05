@@ -63,7 +63,7 @@ export function fetchProfileData(handle: string): Promise<ProfileDataResponse | 
           return Promise.reject(error)
         }))
   } catch {
-    return Promise.reject('Error fetching profile data')
+    return Promise.reject('Error: fetching profile data')
   }
 }
 
