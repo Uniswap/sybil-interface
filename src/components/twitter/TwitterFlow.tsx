@@ -24,10 +24,10 @@ const ModalContentWrapper = styled.div`
 `
 
 const TweetWrapper = styled.div`
-    padding: 1rem;
-    color: ${({ theme }) => theme.blue1}
-    background: #F2F2F2;
-    word-break: break-word;
+  padding: 1rem;
+  color: ${({ theme }) => theme.blue1};
+  background: #f2f2f2;
+  word-break: break-word;
 `
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
@@ -70,7 +70,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       // new copy of verified list
       verifiedHandles &&
         allIndentities &&
-        Object.keys(verifiedHandles).map(address => {
+        Object.keys(verifiedHandles).map((address) => {
           newVerified[address] = allIndentities[address]
           return true
         })
@@ -80,8 +80,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           ...allIndentities[account],
           twitter: {
             handle: twitterHandle,
-            timestamp: Date.now()
-          }
+            timestamp: Date.now(),
+          },
         }
         setAllIdentities(newVerified)
       }
