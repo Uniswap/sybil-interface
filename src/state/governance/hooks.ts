@@ -270,14 +270,16 @@ export function useProposalData(id: string): ProposalData | undefined {
 }
 
 // get the users delegatee if it exists
-export function useUserDelegatee(): string | undefined {
+export function useUserDelegatee(address?: string | undefined | null | false): string | undefined {
   const { account } = useActiveWeb3React()
   const tokenContract = useGovTokenContract()
   const isAave = useIsAave()
+  const accountToUse = address ? address : account
+
   const { result } = useSingleCallResult(
     tokenContract,
     isAave ? 'getDelegateeByType' : 'delegates',
-    isAave ? [account ?? undefined, 0] : [account ?? undefined]
+    isAave ? [accountToUse ?? undefined, 0] : [accountToUse ?? undefined]
   )
 
   const formattedAddress = isAddress(result?.[0])

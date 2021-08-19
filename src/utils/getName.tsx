@@ -23,7 +23,7 @@ export function nameOrAddress(
   }
 
   if (identity?.other) {
-    return identity.other.name
+    return <LogoText type="other">{identity.other.name}</LogoText>
   }
 
   if (autonomous) {

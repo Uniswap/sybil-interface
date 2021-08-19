@@ -255,7 +255,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
                 </HiddenBelow1080>
                 <AutoColumn gap="6px">
                   <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
-                  {d.handle || d.autonomous ? (
+                  {d.handle || d.autonomous || shortenAddress(d.id) !== name ? (
                     <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                   ) : (
                     <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
