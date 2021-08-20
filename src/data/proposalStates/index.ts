@@ -74,7 +74,7 @@ export function useGenericBravoProposalStates(): number[] | undefined {
   const proposalCount = useGenericBravoProposalCount()
   const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
 
-  const cutoffProposal = migrationProposal ? migrationProposal : proposalCount
+  const cutoffProposal = migrationProposal !== undefined ? migrationProposal : proposalCount
 
   let statusRes = useSingleContractMultipleData(
     proposalCount ? govContract : undefined,
@@ -99,7 +99,7 @@ export function useGenericBravoProposalStates(): number[] | undefined {
           return res.result?.[0]
         }
       })
-      if (formattedRes[0]) {
+      if (formattedRes[0] !== undefined) {
         setStatuses(formattedRes)
       }
     }

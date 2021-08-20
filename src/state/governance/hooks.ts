@@ -11,7 +11,7 @@ import {
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -200,7 +200,7 @@ export function useAllProposalStates(): number[] | undefined {
   const alphaStates = useGenericAlphaProposalStates()
   const bravoStates = useGenericBravoProposalStates()
 
-  if (activeProtocol === COMPOUND_GOVERNANCE) {
+  if (activeProtocol === COMPOUND_GOVERNANCE || activeProtocol === NOUNS_GOVERNANCE) {
     return bravoStates
   }
 
