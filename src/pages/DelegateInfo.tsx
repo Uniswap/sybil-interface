@@ -157,7 +157,8 @@ function DelegateInfo({
     formattedAddress ? formattedAddress : undefined,
     allIdentities,
     true,
-    delegateInfo?.autonomous
+    delegateInfo?.autonomous,
+    ensName
   )
 
   // toggle for showing delegation modal with prefilled delegate
@@ -196,9 +197,7 @@ function DelegateInfo({
                   : getEtherscanLink(chainId, formattedAddress, 'address')
               }
             >
-              <TYPE.black>
-                {nameShortened === formattedAddress ? ensName ?? formattedAddress : nameShortened}
-              </TYPE.black>
+              <TYPE.black>{nameShortened}</TYPE.black>
             </ExternalLink>
           </RowFixed>
           <GreyCard>

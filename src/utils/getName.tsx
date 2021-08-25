@@ -7,7 +7,8 @@ export function nameOrAddress(
   address: string | undefined,
   identities: { [address: string]: Identity } | undefined,
   shortern?: boolean | undefined,
-  autonomous?: boolean | undefined
+  autonomous?: boolean | undefined,
+  ens?: string | null
 ): string | ReactNode {
   const formattedAddress = isAddress(address)
 
@@ -31,8 +32,8 @@ export function nameOrAddress(
   }
 
   if (shortern) {
-    return shortenAddress(address)
+    return ens ?? shortenAddress(address)
   }
 
-  return address
+  return ens ?? address
 }
