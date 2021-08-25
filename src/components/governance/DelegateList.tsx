@@ -5,6 +5,7 @@ import { TYPE, BlankInternalLink, OnlyAboveExtraSmall, OnlyAboveSmall, OnlyAbove
 import Row, { AutoRow, RowBetween, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
+import useENSName from '../../hooks/useENSName'
 import {
   useActiveProtocol,
   useGlobalData,
@@ -227,11 +228,13 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const maxPage = maxCount ? Math.floor(maxCount / FETCHING_INTERVAL) + 1 : 1
 
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
-    const name = nameOrAddress(d.id, allIdentities, true, d.autonomous)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
     const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
+
+    const { ENSName } = useENSName(d.id ?? undefined)
+    const name = nameOrAddress(d.id, allIdentities, true, d.autonomous, ENSName)
 
     return (
       <AutoColumn>
