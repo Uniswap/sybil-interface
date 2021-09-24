@@ -54,7 +54,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(UNI),
   governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS, UNI_GOVERNANCE_ADDRESS_BRAVO],
   migrationProposalId: 5,
-  social: '@UniswapProtocol',
+  social: '@Uniswap',
   emoji: '🦄',
 }
 
