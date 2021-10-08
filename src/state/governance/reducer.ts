@@ -15,6 +15,7 @@ import CompLogo from '../../assets/images/compLogo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
+import NounsLogo from '../../assets/images/nouns-logo.png'
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -121,6 +122,24 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱',
 }
 
+export const NOUNS_GOVERNANCE_ADDRESS_BRAVO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d'
+export const NOUNS_ADDRESS = '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03'
+const NOUN = new Token(ChainId.MAINNET, NOUNS_ADDRESS, 0, 'NOUN', 'Nouns')
+const EMOJIS = ['🍕', '🤖', '🐶', '🍤', '🚘', '💍', '🐟', '👑', '🐋', '🐸']
+export const NOUNS_GOVERNANCE: GovernanceInfo = {
+  id: 'nouns',
+  name: 'Nouns DAO Governance',
+  logo: NounsLogo,
+  primaryColor: '#D63C5E',
+  secondaryColor: '#E8ECEF',
+  token: serializeToken(NOUN),
+  governanceAlphaAddresses: [],
+  governanceAddressBravo: NOUNS_GOVERNANCE_ADDRESS_BRAVO,
+  migrationProposalId: 0,
+  social: '@nounsdao',
+  emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
@@ -128,6 +147,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
   radicle: RADICLE_GOVERNANCE,
+  nouns: NOUNS_GOVERNANCE,
 }
 
 export const FETCHING_INTERVAL = 50

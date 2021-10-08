@@ -41,3 +41,11 @@ export const radicleClient = new ApolloClient({
   cache: new InMemoryCache(),
   shouldBatch: true,
 })
+
+export const nounsClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/nounsdao/nouns-subgraph',
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true,
+})
