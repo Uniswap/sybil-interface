@@ -42,8 +42,10 @@ export interface GlobaData {
 }
 
 // constant addresses for supported protocols
-export const UNI_GOVERNANCE_ADDRESS = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
-export const UNI_GOVERNANCE_ADDRESS_BRAVO = '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6'
+export const UNI_GOVERNANCE_ADDRESS_ALPHA_V0 = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
+export const UNI_GOVERNANCE_ADDRESS_ALPHA_V1 = '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6'
+export const UNI_GOVERNANCE_ADDRESS_BRAVO = '0x408ED6354d4973f66138C91495F2f2FCbd8724C3'
+
 export const UNI_ADDRESS = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'
 const UNI = new Token(ChainId.MAINNET, UNI_ADDRESS, 18, 'UNI', 'Uniswap')
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
@@ -53,8 +55,9 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#FF007A',
   secondaryColor: '#FDEEF5',
   token: serializeToken(UNI),
-  governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS, UNI_GOVERNANCE_ADDRESS_BRAVO],
-  migrationProposalId: 5,
+  governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS_ALPHA_V0, UNI_GOVERNANCE_ADDRESS_ALPHA_V1],
+  governanceAddressBravo: UNI_GOVERNANCE_ADDRESS_BRAVO,
+  migrationProposalId: 8,
   social: '@Uniswap',
   emoji: '🦄',
 }
