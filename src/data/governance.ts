@@ -213,7 +213,11 @@ export async function fetchProposals(client: any, key: string, govId: string): P
       .then(async (res: ProposalResponse) => {
         if (res) {
           return res.data.proposals.map((p, i) => {
-            const description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
+            let description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
+            console.log(p.startBlock)
+            if (p.startBlock === '13551293') {
+              description = description.replace(/  /g, '\n').replace(/\d\. /g, '\n$&')
+            }
 
             return {
               id: p.id,
