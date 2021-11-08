@@ -1,5 +1,5 @@
-import { DelegateData } from './hooks'
 import { SerializedToken } from './../user/actions'
+import { DelegateData } from './hooks'
 import { ChainId, Token } from '@uniswap/sdk'
 import {
   updateActiveProtocol,
@@ -16,6 +16,8 @@ import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import NounsLogo from '../../assets/images/nouns-logo.png'
+import ENSLogo from '../../assets/images/ens.jpeg'
+
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -125,6 +127,21 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱',
 }
 
+export const ENS_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
+export const ENS_ADDRESS = '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3'
+const ENS = new Token(ChainId.MAINNET, RADICLE_ADDRESS, 18, 'ENS', 'Ethereum Name Service')
+export const ENS_GOVERNANCE: GovernanceInfo = {
+  id: 'ens',
+  name: 'ENS Governance',
+  logo: ENSLogo,
+  primaryColor: '#5284ff',
+  secondaryColor: '#cfddff',
+  token: serializeToken(ENS),
+  governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS],
+  social: '@ensdomains',
+  emoji: '🌱',
+}
+
 export const NOUNS_GOVERNANCE_ADDRESS_BRAVO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d'
 export const NOUNS_ADDRESS = '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03'
 const NOUN = new Token(ChainId.MAINNET, NOUNS_ADDRESS, 0, 'NOUN', 'Nouns')
@@ -151,6 +168,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   pool: POOL_TOGETHER_GOVERNANCE,
   radicle: RADICLE_GOVERNANCE,
   nouns: NOUNS_GOVERNANCE,
+  ens: ENS_GOVERNANCE,
 }
 
 export const FETCHING_INTERVAL = 50

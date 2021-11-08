@@ -236,6 +236,12 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
     const { ENSName } = useENSName(d.id ?? undefined)
     const name = nameOrAddress(d.id, allIdentities, true, d.autonomous, ENSName)
 
+    const percentOfVotes = globalData
+      ? globalData.delegatedVotesRaw === 0
+        ? 0
+        : new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) + '%'
+      : '-'
+
     return (
       <AutoColumn>
         <DataRow>
@@ -270,12 +276,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             </BlankInternalLink>
           </AutoRow>
           <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-          <NoWrap textAlign="end">
-            {globalData
-              ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
-                '%'
-              : '-'}
-          </NoWrap>
+          <NoWrap textAlign="end">{percentOfVotes}</NoWrap>
           <Row style={{ justifyContent: 'flex-end' }}>
             <OnlyAboveExtraSmall>
               <DelegateButton

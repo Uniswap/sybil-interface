@@ -49,3 +49,11 @@ export const nounsClient = new ApolloClient({
   cache: new InMemoryCache(),
   shouldBatch: true,
 })
+
+export const ensClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/ens-governance',
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true,
+})
