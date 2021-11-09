@@ -18,7 +18,13 @@ interface DelegateResponse {
 
 interface GlobalResponse {
   data: {
-    governances: GlobaData[]
+    governances: {
+      id: string
+      delegatedVotes: string
+      delegatedVotesRaw: string
+      totalTokenHolders: string
+      totalDelegates: string
+    }[]
   }
 }
 
@@ -33,7 +39,13 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
     })
     .then(async (res: GlobalResponse) => {
       if (res) {
-        return res.data.governances[0]
+        return {
+          id: res.data.governances[0].id,
+          delegatedVotes: parseInt(res.data.governances[0].delegatedVotes),
+          delegatedVotesRaw: parseInt(res.data.governances[0].delegatedVotesRaw),
+          totalTokenHolders: parseInt(res.data.governances[0].totalTokenHolders),
+          totalDelegates: parseInt(res.data.governances[0].totalDelegates),
+        }
       } else {
         return Promise.reject('Error fetching global data')
       }
