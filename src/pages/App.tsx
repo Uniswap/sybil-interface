@@ -66,23 +66,14 @@ function TopLevelModals() {
 export default function App() {
   return (
     <Suspense fallback={null}>
-      <Route component={GoogleAnalyticsReporter} />
-      <Route component={DarkModeQueryParamReader} />
-      <Route component={TwitterAccountQueryParamReader} />
       <SiteWrapper>
-        <SideMenu />
-        <OverviewColumn />
         <ContentWrapper>
           <Web3Status />
           <Popups />
           <Polling />
-          <TopLevelModals />
           <Web3ReactManager>
             <Switch>
               <Route exact strict path="/delegates/:protocolID" component={Delegates} />
-              <Route exact strict path="/proposals/:protocolID" component={Proposals} />
-              <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
-              <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
               <Route path="/" component={RedirectWithUpdatedGovernance} />
             </Switch>
           </Web3ReactManager>

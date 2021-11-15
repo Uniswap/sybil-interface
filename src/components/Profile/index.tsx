@@ -193,7 +193,6 @@ export default function Profile() {
                 Connecting your Twitter to your address can help people find you and delegate votes to you.
               </TYPE.blue>
             ) : null}
-            <VoteContent />
           </AutoColumn>
         )}
       </BackgroundWrapper>
