@@ -160,6 +160,16 @@ export const NOUNS_GOVERNANCE: GovernanceInfo = {
   emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
 }
 
+export const CONNECT_CONFIG = {
+  id: 'connect',
+}
+
+// #/connect or #/delegates/connect
+// show only identity flow e.g. link to twitter
+export function identityOnlyPath(pathname: string) {
+  return pathname.split('/', 2)[1] == 'connect' || pathname.split('/', 3)[2] == 'connect'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
