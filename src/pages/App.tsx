@@ -98,6 +98,7 @@ export default function App() {
       )}
       {identityOnlyFlow && (
         <div>
+          <SideMenu />
           <Web3Status />
           <Web3ReactManager>
             <Switch>
