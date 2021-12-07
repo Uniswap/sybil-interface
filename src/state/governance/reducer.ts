@@ -17,6 +17,7 @@ import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import NounsLogo from '../../assets/images/nouns-logo.png'
 import ENSLogo from '../../assets/images/ens.jpeg'
+import AddAccount from '../../assets/images/AddAccount.png'
 
 import { serializeToken } from '../user/hooks'
 
@@ -145,7 +146,7 @@ export const ENS_GOVERNANCE: GovernanceInfo = {
 export const CONNECT_CONFIG: GovernanceInfo = {
   id: 'connect',
   name: 'Connect Social Profile', // placeholder
-  logo: ENSLogo, // placeholder
+  logo: AddAccount, // placeholder
   primaryColor: '#5284ff', // placeholder
   secondaryColor: '#cfddff', // placeholder
   token: serializeToken(ENS), //placeholder

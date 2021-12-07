@@ -15,7 +15,6 @@ import Modal from '../Modal'
 import TwitterFlow from '../twitter/TwitterFlow'
 import TwitterLoginButton from '../twitter/TwitterLoginButton'
 import TwitterIcon from '../../assets/images/Twitter_Logo_Blue.png'
-import { lighten } from 'polished'
 import WalletSummary from '../Profile/WalletSummary'
 
 const SectionWrapper = styled.div`
@@ -29,15 +28,12 @@ const SectionWrapper = styled.div`
   }
 `
 
-const BackgroundWrapper = styled.div<{ bgColor?: string; account: boolean }>`
-  background: ${({ theme, bgColor, account }) =>
-    !account ? theme.bg2 : `linear-gradient(180deg, ${bgColor} 0%, ${theme.bg1} 100%);`};
+const BackgroundWrapper = styled.div<{ account: boolean }>`
+  background: ${({ theme }) => theme.bg2};
   padding: 1rem;
   height: ${({ account }) => (account ? '100%' : 'initial')};
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
-  border-bottom-right-radius: ${({ account }) => (!account ? '20px' : '0')};
-  border-bottom-left-radius: ${({ account }) => (!account ? '20px' : '0')};
+  border-radius: 20px;
+
   max-width: 500px;
   margin: auto;
 `
@@ -79,13 +75,15 @@ export default function ProfileGeneric() {
     }
   }, [loadingVerifiedHandles, twitterAccount, loaded, usernameQuery, verifiedHandleEntry])
 
-  const primaryColor = '#5555FF'
+  const primaryColor = '#f1f1f1'
   const secondaryColor = '#E3E3FF'
 
   const ProfileContent = () => (
     <SectionWrapper>
-      <BackgroundWrapper account={!!account} bgColor={account ? lighten('0.01', primaryColor) : primaryColor}>
-        <TYPE.main mb="16px">Your profile</TYPE.main>
+      <BackgroundWrapper account={!!account}>
+        <TYPE.main fontSize="20px" fontWeight="700" style={{ marginBottom: '1rem' }}>
+          Your Sybil identity
+        </TYPE.main>
         {!account ? (
           <TYPE.body fontWeight={500} fontSize="14px" color={primaryColor} mb="1rem">
             Connect wallet to link wallet address to Sybil identity.
@@ -127,7 +125,9 @@ export default function ProfileGeneric() {
               )
             ) : null}
             {!verifiedHandleEntry && account ? (
-              <TYPE.blue fontSize="12px">Connecting your Twitter to your address can help people find you.</TYPE.blue>
+              <TYPE.blue fontSize="14px">
+                {`If the governance program you're participating in is not listed here, you can still add an identity to your ethereum address. Connecting your Twitter to your address can help people find you.`}
+              </TYPE.blue>
             ) : null}
           </AutoColumn>
         )}
