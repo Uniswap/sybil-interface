@@ -75,8 +75,8 @@ export default function ProfileGeneric() {
     }
   }, [loadingVerifiedHandles, twitterAccount, loaded, usernameQuery, verifiedHandleEntry])
 
-  const primaryColor = '#f1f1f1'
-  const secondaryColor = '#E3E3FF'
+  const primaryColor = '#2F80ED'
+  const secondaryColor = '#EBF4FF'
 
   const ProfileContent = () => (
     <SectionWrapper>
