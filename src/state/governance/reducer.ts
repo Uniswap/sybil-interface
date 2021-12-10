@@ -1,5 +1,5 @@
-import { DelegateData } from './hooks'
 import { SerializedToken } from './../user/actions'
+import { DelegateData } from './hooks'
 import { ChainId, Token } from '@uniswap/sdk'
 import {
   updateActiveProtocol,
@@ -15,6 +15,10 @@ import CompLogo from '../../assets/images/compLogo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
+import NounsLogo from '../../assets/images/nouns-logo.png'
+import ENSLogo from '../../assets/images/ens.jpeg'
+import AddAccount from '../../assets/images/AddAccount.png'
+
 import { serializeToken } from '../user/hooks'
 
 export interface GovernanceInfo {
@@ -41,8 +45,10 @@ export interface GlobaData {
 }
 
 // constant addresses for supported protocols
-export const UNI_GOVERNANCE_ADDRESS = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
-export const UNI_GOVERNANCE_ADDRESS_BRAVO = '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6'
+export const UNI_GOVERNANCE_ADDRESS_ALPHA_V0 = '0x5e4be8Bc9637f0EAA1A755019e06A68ce081D58F'
+export const UNI_GOVERNANCE_ADDRESS_ALPHA_V1 = '0xC4e172459f1E7939D522503B81AFAaC1014CE6F6'
+export const UNI_GOVERNANCE_ADDRESS_BRAVO = '0x408ED6354d4973f66138C91495F2f2FCbd8724C3'
+
 export const UNI_ADDRESS = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'
 const UNI = new Token(ChainId.MAINNET, UNI_ADDRESS, 18, 'UNI', 'Uniswap')
 export const UNISWAP_GOVERNANCE: GovernanceInfo = {
@@ -52,9 +58,10 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#FF007A',
   secondaryColor: '#FDEEF5',
   token: serializeToken(UNI),
-  governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS, UNI_GOVERNANCE_ADDRESS_BRAVO],
-  migrationProposalId: 5,
-  social: '@UniswapProtocol',
+  governanceAlphaAddresses: [UNI_GOVERNANCE_ADDRESS_ALPHA_V0, UNI_GOVERNANCE_ADDRESS_ALPHA_V1],
+  governanceAddressBravo: UNI_GOVERNANCE_ADDRESS_BRAVO,
+  migrationProposalId: 8,
+  social: '@Uniswap',
   emoji: '🦄',
 }
 
@@ -121,6 +128,56 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱',
 }
 
+export const ENS_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
+export const ENS_ADDRESS = '0x31c8EAcBFFdD875c74b94b077895Bd78CF1E64A3'
+const ENS = new Token(ChainId.MAINNET, RADICLE_ADDRESS, 18, 'ENS', 'Ethereum Name Service')
+export const ENS_GOVERNANCE: GovernanceInfo = {
+  id: 'ens',
+  name: 'ENS Governance',
+  logo: ENSLogo,
+  primaryColor: '#5284ff',
+  secondaryColor: '#cfddff',
+  token: serializeToken(ENS),
+  governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS],
+  social: '@ensdomains',
+  emoji: '🌱',
+}
+
+export const CONNECT_CONFIG: GovernanceInfo = {
+  id: 'connect',
+  name: 'Connect Social Profile', // placeholder
+  logo: AddAccount, // placeholder
+  primaryColor: '#5284ff', // placeholder
+  secondaryColor: '#cfddff', // placeholder
+  token: serializeToken(ENS), //placeholder
+  governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS], //placeholder
+  social: '@twitter', // placeholder
+}
+
+export const NOUNS_GOVERNANCE_ADDRESS_BRAVO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d'
+export const NOUNS_ADDRESS = '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03'
+const NOUN = new Token(ChainId.MAINNET, NOUNS_ADDRESS, 0, 'NOUN', 'Nouns')
+const EMOJIS = ['🍕', '🤖', '🐶', '🍤', '🚘', '💍', '🐟', '👑', '🐋', '🐸']
+export const NOUNS_GOVERNANCE: GovernanceInfo = {
+  id: 'nouns',
+  name: 'Nouns DAO Governance',
+  logo: NounsLogo,
+  primaryColor: '#D63C5E',
+  secondaryColor: '#E8ECEF',
+  token: serializeToken(NOUN),
+  governanceAlphaAddresses: [],
+  governanceAddressBravo: NOUNS_GOVERNANCE_ADDRESS_BRAVO,
+  migrationProposalId: 0,
+  social: '@nounsdao',
+  emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+}
+
+// #/connect or #/delegates/connect
+// show only identity flow e.g. link to twitter
+export function identityOnlyPath(pathname: string) {
+  return pathname.split('/', 2)[1] == CONNECT_CONFIG.id || pathname.split('/', 3)[2] == CONNECT_CONFIG.id
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
@@ -128,6 +185,9 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
   radicle: RADICLE_GOVERNANCE,
+  nouns: NOUNS_GOVERNANCE,
+  ens: ENS_GOVERNANCE,
+  connect: CONNECT_CONFIG,
 }
 
 export const FETCHING_INTERVAL = 50

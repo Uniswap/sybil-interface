@@ -18,7 +18,13 @@ interface DelegateResponse {
 
 interface GlobalResponse {
   data: {
-    governances: GlobaData[]
+    governances: {
+      id: string
+      delegatedVotes: string
+      delegatedVotesRaw: string
+      totalTokenHolders: string
+      totalDelegates: string
+    }[]
   }
 }
 
@@ -33,7 +39,13 @@ export async function fetchGlobalData(client: any): Promise<GlobaData | null> {
     })
     .then(async (res: GlobalResponse) => {
       if (res) {
-        return res.data.governances[0]
+        return {
+          id: res.data.governances[0].id,
+          delegatedVotes: parseInt(res.data.governances[0].delegatedVotes),
+          delegatedVotesRaw: parseInt(res.data.governances[0].delegatedVotesRaw),
+          totalTokenHolders: parseInt(res.data.governances[0].totalTokenHolders),
+          totalDelegates: parseInt(res.data.governances[0].totalDelegates),
+        }
       } else {
         return Promise.reject('Error fetching global data')
       }
@@ -213,7 +225,11 @@ export async function fetchProposals(client: any, key: string, govId: string): P
       .then(async (res: ProposalResponse) => {
         if (res) {
           return res.data.proposals.map((p, i) => {
-            const description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
+            let description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
+            console.log(p.startBlock)
+            if (p.startBlock === '13551293') {
+              description = description.replace(/  /g, '\n').replace(/\d\. /g, '\n$&')
+            }
 
             return {
               id: p.id,

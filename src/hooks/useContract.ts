@@ -85,10 +85,14 @@ export function useMulticallContract(): Contract | null {
 
 export function useGovernanceContract(): Contract | null {
   const [activeProtocol] = useActiveProtocol()
+
   const latestAlphaGovernanceAddress =
     activeProtocol?.governanceAlphaAddresses[activeProtocol?.governanceAlphaAddresses.length - 1]
+
+  const bravoAddress = activeProtocol?.governanceAddressBravo
+
   return useContract(
-    activeProtocol ? latestAlphaGovernanceAddress : undefined,
+    activeProtocol ? bravoAddress ?? latestAlphaGovernanceAddress : undefined,
     activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,
     true
   )
@@ -115,6 +119,7 @@ export function useAllGovernanceAlphaContracts(): Contract[] | null {
 
 export function useGovernanceContractBravo(): Contract | null {
   const [activeProtocol] = useActiveProtocol()
+
   return useContract(
     activeProtocol ? activeProtocol.governanceAddressBravo : undefined,
     activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,

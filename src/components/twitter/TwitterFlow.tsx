@@ -90,9 +90,9 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   }
 
   // tweet data
-  const tweetCopyForLink = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} %23${
-    activeProtocol?.token?.symbol
-  }Delegate on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${
+  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself as a ${
+    activeProtocol?.social
+  } %23${activeProtocol?.token?.symbol}Delegate on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${
     activeProtocol?.id
   }/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ?? ''}`
 

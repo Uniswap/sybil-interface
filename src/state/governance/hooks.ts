@@ -11,7 +11,7 @@ import {
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -25,7 +25,6 @@ import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
-import { useGenericBravoProposalCount, useGenericAlphaProposalCounts } from 'data/proposalCount.ts'
 import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
 
 export interface DelegateData {
@@ -180,17 +179,6 @@ export interface ProposalData {
   }[]
 }
 
-// get count of all proposals made
-export function useProposalCounts(): number[] | undefined {
-  const [activeProtocol] = useActiveProtocol()
-  const alphaCounts: number[] | undefined = useGenericAlphaProposalCounts()
-  const bravoCount = useGenericBravoProposalCount()
-  if (activeProtocol === COMPOUND_GOVERNANCE) {
-    return bravoCount ? [bravoCount] : undefined
-  }
-  return alphaCounts
-}
-
 /**
  * @TODO can this be used to speed up the loading?
  */
@@ -200,7 +188,11 @@ export function useAllProposalStates(): number[] | undefined {
   const alphaStates = useGenericAlphaProposalStates()
   const bravoStates = useGenericBravoProposalStates()
 
-  if (activeProtocol === COMPOUND_GOVERNANCE) {
+  if (
+    activeProtocol === COMPOUND_GOVERNANCE ||
+    activeProtocol === NOUNS_GOVERNANCE ||
+    activeProtocol === UNISWAP_GOVERNANCE
+  ) {
     return bravoStates
   }
 
@@ -225,8 +217,6 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     setProposals(undefined)
   }, [activeProtocol])
 
-  const states = useAllProposalStates()
-
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
     async function fetchData() {
@@ -249,7 +239,7 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     if (!proposals && govToken) {
       fetchData()
     }
-  }, [activeProtocol, govClient, govToken, proposals, states])
+  }, [activeProtocol, govClient, govToken, proposals])
 
   useEffect(() => {
     if (proposals && govToken) {
