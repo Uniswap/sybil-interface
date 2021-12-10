@@ -83,6 +83,7 @@ export function colors(darkMode: boolean): Colors {
     blue1: '#2172E5',
     blue2: '#4D8FEA',
     blue3: '#EBF4FF',
+    gray1: '#8F96AC',
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
