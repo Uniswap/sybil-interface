@@ -10,7 +10,7 @@ import GOVERNANCE_AAVE_ABI from '../../constants/abis/aave-governance.json'
  * Compound Alpha and forks like Uniswap can sum proposal counts on
  * versions of Alpha.
  *
- * Other protocols with Bravo need custom counting - aka Compount Bravo
+ * Other protocols with Bravo need custom counting - aka Compound Bravo
  *
  */
 
