@@ -21,6 +21,7 @@ import { Identities } from '../../state/social/reducer'
 const ModalContentWrapper = styled.div`
   padding: 2rem;
   width: 100%;
+  overflow-y: scroll;
 `
 
 const TweetWrapper = styled.div`
