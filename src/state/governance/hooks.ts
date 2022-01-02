@@ -11,7 +11,7 @@ import {
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, CNDL_GOVERNANCE } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -190,6 +190,7 @@ export function useAllProposalStates(): number[] | undefined {
 
   if (
     activeProtocol === COMPOUND_GOVERNANCE ||
+    activeProtocol === CNDL_GOVERNANCE ||
     activeProtocol === NOUNS_GOVERNANCE ||
     activeProtocol === UNISWAP_GOVERNANCE
   ) {
