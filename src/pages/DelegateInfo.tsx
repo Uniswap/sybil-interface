@@ -185,7 +185,7 @@ function DelegateInfo({
           <RowFixed style={{ width: '100%', height: '20px' }}>
             <ArrowWrapper to={'/delegates/' + activeProtocol?.id}>
               <TYPE.body fontSize="16px" fontWeight="600">
-                Top Delegates
+                Top Delegates1
               </TYPE.body>
             </ArrowWrapper>
             <ChevronRight size={16} />
