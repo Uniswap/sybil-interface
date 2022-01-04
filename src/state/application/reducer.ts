@@ -6,7 +6,7 @@ import {
   updateBlockNumber,
   ApplicationModal,
   setOpenModal,
-  setModalDelegatee
+  setModalDelegatee,
 } from './actions'
 
 type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
@@ -22,10 +22,10 @@ const initialState: ApplicationState = {
   blockNumber: {},
   popupList: [],
   openModal: null,
-  modalDelegatee: null
+  modalDelegatee: null,
 }
 
-export default createReducer(initialState, builder =>
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(updateBlockNumber, (state, action) => {
       const { chainId, blockNumber } = action.payload
@@ -42,17 +42,17 @@ export default createReducer(initialState, builder =>
       state.modalDelegatee = delegatee
     })
     .addCase(addPopup, (state, { payload: { content, key, removeAfterMs = 15000 } }) => {
-      state.popupList = (key ? state.popupList.filter(popup => popup.key !== key) : state.popupList).concat([
+      state.popupList = (key ? state.popupList.filter((popup) => popup.key !== key) : state.popupList).concat([
         {
           key: key || nanoid(),
           show: true,
           content,
-          removeAfterMs
-        }
+          removeAfterMs,
+        },
       ])
     })
     .addCase(removePopup, (state, { payload: { key } }) => {
-      state.popupList.forEach(p => {
+      state.popupList.forEach((p) => {
         if (p.key === key) {
           p.show = false
         }

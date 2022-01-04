@@ -4,9 +4,7 @@ import { useActiveWeb3React } from '.'
 // sign handle based on data format from EIP-712
 // based on twitter handle, return signature and message signing function
 // return setter function to reset signature if needed
-export function useSignedHandle(
-  twitterHandle: string | undefined
-): {
+export function useSignedHandle(twitterHandle: string | undefined): {
   sig: string | undefined
   signMessage: () => void
   setSig: Dispatch<SetStateAction<string | undefined>>
@@ -30,22 +28,22 @@ export function useSignedHandle(
     }
     const EIP712Domain = [
       { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' }
+      { name: 'version', type: 'string' },
     ]
     const domain = {
       name: 'Sybil Verifier',
-      version: '1'
+      version: '1',
     }
     const Permit = [{ name: 'username', type: 'string' }]
     const message = { username: twitterHandle }
     const data = JSON.stringify({
       types: {
         EIP712Domain,
-        Permit
+        Permit,
       },
       domain,
       primaryType: 'Permit',
-      message
+      message,
     })
 
     /**
@@ -59,11 +57,11 @@ export function useSignedHandle(
       // need to manually prefix with 0x for wallet connect
       library
         ?.send('personal_sign', ['0x' + message, account])
-        .catch(error => {
+        .catch((error) => {
           console.log(error)
           setError('Error signing message')
         })
-        .then(sig => {
+        .then((sig) => {
           setSig(sig)
         })
     }

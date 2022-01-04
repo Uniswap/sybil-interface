@@ -17,7 +17,7 @@ export default function TwitterAccountQueryParamReader({ location: { search } }:
 
     const parsed = parse(search, {
       parseArrays: false,
-      ignoreQueryPrefix: true
+      ignoreQueryPrefix: true,
     })
 
     const username = parsed.username

@@ -1,24 +1,27 @@
 import React, { Suspense } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Polling from '../components/Header/Polling'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
-import Profile from '../components/governance/Profile'
+import Profile from '../components/Profile'
 import { RedirectWithUpdatedGovernance } from './Governance/redirect'
 import SideMenu from '../components/Menu/SideMenu'
 import TwitterAccountQueryParamReader from '../state/social/TwitterAccountQueryParamReader'
 import Web3Status from '../components/Web3Status'
 import Delegates from './Delegates'
 import Proposals from './Proposals'
+import Identities from './Identities'
 import ProposalDetails from '../components/governance/ProposalDetails'
 import DelegateInfo from './DelegateInfo'
 import DelegateModal from '../components/vote/DelegateModal'
 import { useModalOpen, useToggleModal } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import OverviewColumn from '../components/governance/OverviewColumn'
+import { useLocation } from 'react-router-dom'
+import { identityOnlyPath } from '../state/governance/reducer'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -64,31 +67,47 @@ function TopLevelModals() {
 }
 
 export default function App() {
+  const identityOnlyFlow = identityOnlyPath(useLocation().pathname)
+
   return (
     <Suspense fallback={null}>
       <Route component={GoogleAnalyticsReporter} />
       <Route component={DarkModeQueryParamReader} />
       <Route component={TwitterAccountQueryParamReader} />
-      <SiteWrapper>
-        <SideMenu />
-        <OverviewColumn />
-        <ContentWrapper>
+      {!identityOnlyFlow && (
+        <SiteWrapper>
+          <SideMenu />
+          <OverviewColumn />
+          <ContentWrapper>
+            <Web3Status />
+            <Popups />
+            <Polling />
+            <TopLevelModals />
+            <Web3ReactManager>
+              <Switch>
+                <Route exact strict path="/delegates/:protocolID" component={Delegates} />
+                <Route exact strict path="/proposals/:protocolID" component={Proposals} />
+                <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+                <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
+                <Route path="/" component={RedirectWithUpdatedGovernance} />
+              </Switch>
+            </Web3ReactManager>
+          </ContentWrapper>
+          <Profile />
+        </SiteWrapper>
+      )}
+      {identityOnlyFlow && (
+        <div>
+          <SideMenu />
           <Web3Status />
-          <Popups />
-          <Polling />
-          <TopLevelModals />
           <Web3ReactManager>
             <Switch>
-              <Route exact strict path="/delegates/:protocolID" component={Delegates} />
-              <Route exact strict path="/proposals/:protocolID" component={Proposals} />
-              <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
-              <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
-              <Route path="/" component={RedirectWithUpdatedGovernance} />
+              <Route exact strict path="/connect" component={Identities} />
+              <Route exact strict path="/delegates/connect" render={() => <Redirect to="/connect" />} />
             </Switch>
           </Web3ReactManager>
-        </ContentWrapper>
-        <Profile />
-      </SiteWrapper>
+        </div>
+      )}
     </Suspense>
   )
 }

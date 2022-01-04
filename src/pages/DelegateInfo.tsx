@@ -7,7 +7,7 @@ import {
   useGovernanceToken,
   useAllProposals,
   useAllProposalStates,
-  useUserDelegatee
+  useUserDelegatee,
 } from '../state/governance/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import { useActiveWeb3React } from '../hooks'
@@ -23,7 +23,7 @@ import {
   RoundedProfileImage,
   WrappedListLogo,
   ProposalStatusSmall,
-  DelegateButton
+  DelegateButton,
 } from '../components/governance/styled'
 import { getTwitterProfileLink, getEtherscanLink, shortenAddress, isAddress } from '../utils'
 import { TYPE, ExternalLink, GreenIcon, RedIcon, StyledInternalLink, OnlyAboveSmall } from '../theme'
@@ -94,8 +94,8 @@ function localNumber(val: number) {
 
 function DelegateInfo({
   match: {
-    params: { protocolID, delegateAddress }
-  }
+    params: { protocolID, delegateAddress },
+  },
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
@@ -114,8 +114,13 @@ function DelegateInfo({
   ) : (
     <Loader />
   )
+
+  const userDelegatee: string | undefined = useUserDelegatee(formattedAddress)
+
   const holdersRepresented = delegateInfo ? (
-    localNumber(delegateInfo.tokenHoldersRepresentedAmount)
+    localNumber(
+      delegateInfo.tokenHoldersRepresentedAmount - (userDelegatee && userDelegatee === formattedAddress ? 1 : 0)
+    )
   ) : delegateInfo === null ? (
     '0'
   ) : (
@@ -133,7 +138,6 @@ function DelegateInfo({
   const delegateTokenBalance = useTokenBalance(formattedAddress ? formattedAddress : undefined, govToken)
 
   // user gov data
-  const userDelegatee: string | undefined = useUserDelegatee()
   const isDelegatee =
     userDelegatee && delegateAddress ? userDelegatee.toLowerCase() === delegateAddress.toLowerCase() : false
 
@@ -144,17 +148,17 @@ function DelegateInfo({
   const identity = useIdentity(delegateAddress)
   const twitterHandle = identity?.twitter?.handle
   const twitterData = useTwitterProfileData(twitterHandle)
+  const [allIdentities] = useAllIdentities()
 
   // ens name if they have it
   const ensName = useENS(formattedAddress ? formattedAddress : null)?.name
-
-  const [allIdentities] = useAllIdentities()
 
   const nameShortened = nameOrAddress(
     formattedAddress ? formattedAddress : undefined,
     allIdentities,
     true,
-    delegateInfo?.autonomous
+    delegateInfo?.autonomous,
+    ensName
   )
 
   // toggle for showing delegation modal with prefilled delegate
@@ -176,7 +180,7 @@ function DelegateInfo({
 
   return (
     <BodyWrapper>
-      {formattedAddress && chainId ? (
+      {formattedAddress && chainId && delegateAddress ? (
         <AutoColumn gap="lg">
           <RowFixed style={{ width: '100%', height: '20px' }}>
             <ArrowWrapper to={'/delegates/' + activeProtocol?.id}>
@@ -193,9 +197,7 @@ function DelegateInfo({
                   : getEtherscanLink(chainId, formattedAddress, 'address')
               }
             >
-              <TYPE.black>
-                {nameShortened === formattedAddress ? ensName ?? formattedAddress : nameShortened}
-              </TYPE.black>
+              <TYPE.black>{nameShortened}</TYPE.black>
             </ExternalLink>
           </RowFixed>
           <GreyCard>
@@ -223,14 +225,7 @@ function DelegateInfo({
                     </ExternalLink>
                     {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
                   </RowFixed>
-                  {twitterHandle && delegateAddress ? (
-                    <RowFixed>
-                      <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
-                        <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
-                      </ExternalLink>
-                      <CopyHelper toCopy={formattedAddress} />
-                    </RowFixed>
-                  ) : delegateInfo && delegateInfo.autonomous && delegateAddress ? (
+                  {twitterHandle || delegateInfo?.autonomous || nameShortened !== shortenAddress(delegateAddress) ? (
                     <RowFixed>
                       <ExternalLink href={getEtherscanLink(chainId, formattedAddress, 'address')}>
                         <TYPE.black fontSize="12px">{shortenAddress(delegateAddress)}</TYPE.black>
@@ -320,7 +315,7 @@ function DelegateInfo({
                               </RowFixed>
                             </AutoColumn>
                           </RowBetween>
-                          {i !== delegateInfo?.votes.length - 1 && <Break style={{ margin: '1rem 0' }} />}
+                          {i !== 0 && <Break style={{ marginTop: '24px' }} />}
                         </div>
                       )
                     )

@@ -16,8 +16,8 @@ import Dropdown from '../components/governance/Dropdown'
 
 export default function Proposals({
   match: {
-    params: { protocolID }
-  }
+    params: { protocolID },
+  },
 }: RouteComponentProps<{ protocolID?: string }>) {
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)

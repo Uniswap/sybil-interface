@@ -9,7 +9,7 @@ export function useIsEOA(address: string | undefined): null | boolean {
 
   useEffect(() => {
     if (address) {
-      library?.getCode(address).then(code => {
+      library?.getCode(address).then((code) => {
         if (code) {
           setIsEOA(code === '0x')
         }

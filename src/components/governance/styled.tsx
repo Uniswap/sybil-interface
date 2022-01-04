@@ -42,7 +42,7 @@ const handleColorType = (status?: any, theme?: any) => {
     case 'executed':
       return theme.green1
     case 'canceled':
-      return theme.red1
+      return theme.text2
     case 'expired':
       return theme.text3
     default:

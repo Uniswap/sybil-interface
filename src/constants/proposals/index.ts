@@ -7,8 +7,8 @@ export const PRELOADED_PROPOSALS: {
   }
 } = {
   uniswap: {
-    2: UNISWAP_GRANTS
-  }
+    2: UNISWAP_GRANTS,
+  },
 }
 
 export const EDUCATION_FUND_1_START_BLOCK = 12620175
@@ -17,7 +17,7 @@ export const EDUCATION_FUND_1_START_BLOCK = 12620175
 export const BLOCKED_PROPOSALS_BY_START_BLOCK: {
   [protocol: string]: number[]
 } = {
-  uniswap: [EDUCATION_FUND_1_START_BLOCK]
+  uniswap: [EDUCATION_FUND_1_START_BLOCK],
 }
 
 export const AUTONOMOUS_PROPOSAL_BYTECODE =

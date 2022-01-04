@@ -5,7 +5,7 @@ import {
   updateUserDarkMode,
   toggleURLWarning,
   updateTwitterAccount,
-  updateLastSelectedProtocolID
+  updateLastSelectedProtocolID,
 } from './actions'
 
 const currentTimestamp = () => new Date().getTime()
@@ -30,12 +30,12 @@ export const initialState: UserState = {
   matchesDarkMode: false,
   timestamp: currentTimestamp(),
   URLWarningVisible: true,
-  lastSelectedProtocolID: undefined
+  lastSelectedProtocolID: undefined,
 }
 
-export default createReducer(initialState, builder =>
+export default createReducer(initialState, (builder) =>
   builder
-    .addCase(updateVersion, state => {
+    .addCase(updateVersion, (state) => {
       state.lastUpdateVersionTimestamp = currentTimestamp()
     })
     .addCase(updateUserDarkMode, (state, action) => {
@@ -46,7 +46,7 @@ export default createReducer(initialState, builder =>
       state.matchesDarkMode = action.payload.matchesDarkMode
       state.timestamp = currentTimestamp()
     })
-    .addCase(toggleURLWarning, state => {
+    .addCase(toggleURLWarning, (state) => {
       state.URLWarningVisible = !state.URLWarningVisible
     })
     .addCase(updateTwitterAccount, (state, { payload: { twitterAccount } }) => {

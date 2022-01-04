@@ -10,7 +10,7 @@ import GOVERNANCE_AAVE_ABI from '../../constants/abis/aave-governance.json'
  * Compound Alpha and forks like Uniswap can sum proposal counts on
  * versions of Alpha.
  *
- * Other protocols with Bravo need custom counting - aka Compount Bravo
+ * Other protocols with Bravo need custom counting - aka Compound Bravo
  *
  */
 
@@ -29,14 +29,14 @@ export function useGenericAlphaProposalCounts(): number[] | undefined {
   )
 
   // sum up responses
-  const parsedAlphaCounts = alphaCountRes.map(res => {
+  const parsedAlphaCounts = alphaCountRes.map((res) => {
     if (res.result && !res.loading && !res.error) {
       return parseFloat(res.result[0])
     }
     return undefined
   })
 
-  const allLoaded = !parsedAlphaCounts.some(x => x === undefined)
+  const allLoaded = !parsedAlphaCounts.some((x) => x === undefined)
 
   if (!allLoaded) {
     return undefined

@@ -1,7 +1,7 @@
 import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.json'
-import { useGovernanceContract, useGovernanceContractBravo, useIsAave } from 'hooks/useContract'
+import { useGovernanceContractBravo, useIsAave } from 'hooks/useContract'
 import { useActiveProtocol } from 'state/governance/hooks'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useGenericAlphaProposalCounts, useGenericBravoProposalCount } from 'data/proposalCount.ts'
 import { useMultipleContractMultipleData, NEVER_RELOAD, useSingleContractMultipleData } from 'state/multicall/hooks'
 import { Interface } from '@ethersproject/abi'
@@ -20,7 +20,7 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
   const alphaCounts: number[] | undefined = useGenericAlphaProposalCounts()
 
   const ids = alphaCounts
-    ? alphaCounts.map(total => {
+    ? alphaCounts.map((total) => {
         return Array.from({ length: total }, (v, k) => [isAaveGov ? k : k + 1])
       })
     : undefined
@@ -32,20 +32,22 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
     ids
   )
 
+  // for all versions of alpha gov, grab status and concat into one array
   const combinedStatuses = statusRes.reduce((accum: number[], res) => {
-    const currentStatuses = res.map(x => {
+    const currentStatuses = res.map((x) => {
       if (x.result) {
         return x.result?.[0]
-      } else {
       }
       return undefined
     })
-    const newArray = accum.concat(currentStatuses)
-    return newArray
+    return accum.concat(currentStatuses)
   }, [])
 
   const loadingOrError =
-    statusRes && alphaCounts && statusRes?.length !== alphaCounts?.length && combinedStatuses.some(x => x === undefined)
+    statusRes &&
+    alphaCounts &&
+    statusRes?.length !== alphaCounts?.length &&
+    combinedStatuses.some((x) => x === undefined)
 
   useEffect(() => {
     if (!statuses && !loadingOrError) {
@@ -59,48 +61,44 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
 }
 
 export function useGenericBravoProposalStates(): number[] | undefined {
-  const govContract = useGovernanceContract()
   const [activeProtocol] = useActiveProtocol()
-  const migrationProposal = activeProtocol?.migrationProposalId
+  const isAaveGov = useIsAave()
+
   const govContractBravo = useGovernanceContractBravo()
 
+  const migrationProposal = activeProtocol?.migrationProposalId
+
   const [statuses, setStatuses] = useState<number[] | undefined>()
-  const isAaveGov = useIsAave()
 
   // get total amount
   const proposalCount = useGenericBravoProposalCount()
-  const ids = proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]
+  const ids = useMemo(
+    () => (proposalCount ? Array.from({ length: proposalCount }, (v, k) => [isAaveGov ? k : k + 1]) : [['']]),
+    [isAaveGov, proposalCount]
+  )
+  const cutoffProposal = migrationProposal !== undefined ? migrationProposal : proposalCount
+  const bravoOnlyIds = useMemo(() => ids.slice(cutoffProposal), [cutoffProposal, ids])
 
-  const cutoffProposal = migrationProposal ? migrationProposal : proposalCount
-
-  let statusRes = useSingleContractMultipleData(
-    proposalCount ? govContract : undefined,
+  const alphaStates = useGenericAlphaProposalStates()
+  const bravoStates = useSingleContractMultipleData(
+    proposalCount ? govContractBravo : undefined,
     isAaveGov ? 'getProposalState' : 'state',
-    ids.slice(0, cutoffProposal),
+    bravoOnlyIds,
     NEVER_RELOAD
   )
 
-  statusRes = statusRes.concat(
-    useSingleContractMultipleData(
-      proposalCount ? govContractBravo : undefined,
-      isAaveGov ? 'getProposalState' : 'state',
-      ids.slice(cutoffProposal),
-      NEVER_RELOAD
-    )
-  )
-
   useEffect(() => {
-    if (!statuses && proposalCount) {
-      const formattedRes = statusRes?.map(res => {
+    if (!statuses && proposalCount && alphaStates) {
+      const formattedBravo = bravoStates?.map((res) => {
         if (!res.loading && res.valid) {
           return res.result?.[0]
         }
       })
-      if (formattedRes[0]) {
-        setStatuses(formattedRes)
+      if (formattedBravo[0] !== undefined) {
+        setStatuses(alphaStates.concat(formattedBravo))
       }
     }
-  }, [statuses, statusRes, proposalCount])
+  }, [statuses, proposalCount, alphaStates, bravoStates])
 
   return statuses
 }

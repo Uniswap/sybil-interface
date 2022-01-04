@@ -5,6 +5,7 @@ import { TYPE, BlankInternalLink, OnlyAboveExtraSmall, OnlyAboveSmall, OnlyAbove
 import Row, { AutoRow, RowBetween, RowFixed } from '../Row'
 import EmptyProfile from '../../assets/images/emptyprofile.png'
 import { shortenAddress } from '../../utils'
+import useENSName from '../../hooks/useENSName'
 import {
   useActiveProtocol,
   useGlobalData,
@@ -14,7 +15,7 @@ import {
   useUserDelegatee,
   useVerifiedDelegates,
   DelegateData,
-  useMaxFetched
+  useMaxFetched,
 } from '../../state/governance/hooks'
 import { WrappedListLogo, RoundedProfileImage, DelegateButton, EmptyWrapper } from './styled'
 import Card from '../Card'
@@ -123,7 +124,7 @@ const PageButtons = styled.div`
 `
 const Arrow = styled.div<{ faded?: boolean }>`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -184,8 +185,8 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const manualEntries = useMemo(() => {
     return allIdentities && filteredDelegates
       ? Object.keys(allIdentities)
-          .filter(address => {
-            const found = filteredDelegates.find(d => d.id === address)
+          .filter((address) => {
+            const found = filteredDelegates.find((d) => d.id === address)
             return !found
           })
           .map((address: any) => {
@@ -196,7 +197,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   }, [allIdentities, filteredDelegates])
 
   const formattedManualDelegates: DelegateData[] = useMemo(() => {
-    return manualEntries.map(entry => {
+    return manualEntries.map((entry) => {
       return {
         id: entry.address,
         delegatedVotes: 0,
@@ -206,7 +207,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
         EOA: true,
         autonomous: undefined,
         handle: entry.handle,
-        imageURL: undefined
+        imageURL: undefined,
       }
     })
   }, [manualEntries])
@@ -218,7 +219,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
 
   const maxCount = filterActive
     ? combinedDelegates
-      ? combinedDelegates.filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
+      ? combinedDelegates.filter((d) => (hideZero ? !!(d.delegatedVotesRaw > 1) : true)).length
       : 0
     : globalData
     ? globalData.totalDelegates
@@ -227,11 +228,19 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const maxPage = maxCount ? Math.floor(maxCount / FETCHING_INTERVAL) + 1 : 1
 
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
-    const name = nameOrAddress(d.id, allIdentities, true, d.autonomous)
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
     const isDelegatee = userDelegatee ? userDelegatee.toLowerCase() === d.id.toLowerCase() : false
+
+    const { ENSName } = useENSName(d.id ?? undefined)
+    const name = nameOrAddress(d.id, allIdentities, true, d.autonomous, ENSName)
+
+    const percentOfVotes = globalData
+      ? globalData.delegatedVotesRaw === 0
+        ? 0
+        : new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) + '%'
+      : '-'
 
     return (
       <AutoColumn>
@@ -255,7 +264,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
                 </HiddenBelow1080>
                 <AutoColumn gap="6px">
                   <ResponsiveText style={{ fontWeight: 500 }}>{name}</ResponsiveText>
-                  {d.handle || d.autonomous ? (
+                  {d.handle || d.autonomous || shortenAddress(d.id) !== name ? (
                     <TYPE.black fontSize="12px">{shortenAddress(d.id)}</TYPE.black>
                   ) : (
                     <TYPE.black fontSize="12px" style={{ opacity: '0.6' }}>
@@ -267,12 +276,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
             </BlankInternalLink>
           </AutoRow>
           <NoWrap textAlign="end">{d.votes.length}</NoWrap>
-          <NoWrap textAlign="end">
-            {globalData
-              ? new Percent(JSBI.BigInt(d.delegatedVotesRaw), JSBI.BigInt(globalData.delegatedVotesRaw)).toFixed(3) +
-                '%'
-              : '-'}
-          </NoWrap>
+          <NoWrap textAlign="end">{percentOfVotes}</NoWrap>
           <Row style={{ justifyContent: 'flex-end' }}>
             <OnlyAboveExtraSmall>
               <DelegateButton
@@ -302,7 +306,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
       ? combinedDelegates
           // filter for non zero votes
           // eslint-disable-next-line react/prop-types
-          .filter(d => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
+          .filter((d) => (hideZero ? !!(d.delegatedVotesRaw > 1) : true))
           .slice((page - 1) * FETCHING_INTERVAL, (page - 1) * FETCHING_INTERVAL + FETCHING_INTERVAL)
           .map((d, i) => {
             return <DelegateRow d={d} index={i} key={i} />

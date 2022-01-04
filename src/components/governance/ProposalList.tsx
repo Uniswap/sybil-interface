@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
 import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom'
 import Loader, { LoadingRows } from '../Loader'
 import { enumerateProposalState } from '../../data/governance'
 import { BLOCKED_PROPOSALS_BY_START_BLOCK } from 'constants/proposals'
-import { useTempProposalData } from 'hooks/tempProposalData'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -18,6 +17,7 @@ const Wrapper = styled.div<{ backgroundColor?: string }>`
 const ProposalItem = styled.div`
   border-radius: 12px;
   padding: 1rem 0;
+  margin: 1rem;
   text-decoration: none;
 
   :hover {
@@ -42,104 +42,83 @@ export const Break = styled.div`
 export default function ProposalList({ allProposals }: { allProposals: { [id: string]: ProposalData } | undefined }) {
   const [activeProtocol] = useActiveProtocol()
 
-  // used for displaying states
-  /**
-   * @TODO update this to be in one list
-   */
   const allStatuses = useAllProposalStates()
-
-  const tempProposals = useTempProposalData()
-
-  const tempFixed = useMemo(() => {
-    if (activeProtocol?.id !== 'uniswap') {
-      return allProposals
-    } else {
-      if (allProposals && tempProposals?.[0]) {
-        allProposals['6'] = tempProposals?.[0]
-        return allProposals
-      }
-      return allProposals
-    }
-  }, [activeProtocol?.id, allProposals, tempProposals])
 
   return (
     <Wrapper>
-      {tempFixed && Object.keys(tempFixed)?.length === 0 && (
+      {allProposals && Object.keys(allProposals)?.length === 0 ? (
         <EmptyWrapper>
           <TYPE.body style={{ marginBottom: '8px' }}>No proposals found.</TYPE.body>
           <TYPE.subHeader>
             <i>Proposals submitted by community members will appear here.</i>
           </TYPE.subHeader>
         </EmptyWrapper>
-      )}
-      <AutoColumn gap="1rem">
-        <TYPE.body fontSize="16px" fontWeight="600">
-          Proposals
-        </TYPE.body>
-        <Break />
-        {allStatuses && tempFixed
-          ? Object.values(tempFixed)
-              .map((p: ProposalData, i) => {
-                // block hidden proposals
-                if (
-                  activeProtocol &&
-                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
-                  BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
-                ) {
-                  return null
-                }
-
-                const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
-
-                return (
-                  <>
-                    <ProposalItem key={i} as={Link} to={activeProtocol?.id + '/' + p.id}>
-                      <RowBetween>
-                        <RowFixed>
+      ) : (
+        <AutoColumn gap="0">
+          <TYPE.body fontSize="16px" fontWeight="600" mb="1rem">
+            Proposals
+          </TYPE.body>
+          <Break />
+          {allStatuses && allProposals && activeProtocol
+            ? Object.values(allProposals)
+                .map((p: ProposalData, i) => {
+                  if (
+                    BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
+                    BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
+                  ) {
+                    return null
+                  }
+                  const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
+                  return (
+                    <div key={i}>
+                      <ProposalItem as={Link} to={activeProtocol?.id + '/' + p.id}>
+                        <RowBetween>
+                          <RowFixed>
+                            <OnlyAboveSmall>
+                              <TYPE.darkGray mr="8px">{p.id + '.'}</TYPE.darkGray>
+                            </OnlyAboveSmall>
+                            <ResponsiveText mr="10px">{p.title}</ResponsiveText>
+                          </RowFixed>
+                          <OnlyBelowSmall>
+                            {allStatuses && allStatuses?.[i] ? (
+                              <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
+                            ) : (
+                              <Loader />
+                            )}
+                          </OnlyBelowSmall>
                           <OnlyAboveSmall>
-                            <TYPE.darkGray mr="8px">{p.id + '.'}</TYPE.darkGray>
+                            {allStatuses && allStatuses?.[i] !== undefined ? (
+                              <ProposalStatus status={status}>{status}</ProposalStatus>
+                            ) : (
+                              <Loader />
+                            )}
                           </OnlyAboveSmall>
-                          <ResponsiveText mr="10px">{p.title}</ResponsiveText>
-                        </RowFixed>
-                        <OnlyBelowSmall>
-                          {allStatuses && allStatuses?.[i] ? (
-                            <ProposalStatusSmall status={status}>{status}</ProposalStatusSmall>
-                          ) : (
-                            <Loader />
-                          )}
-                        </OnlyBelowSmall>
-                        <OnlyAboveSmall>
-                          {allStatuses && allStatuses?.[i] !== undefined ? (
-                            <ProposalStatus status={status}>{status}</ProposalStatus>
-                          ) : (
-                            <Loader />
-                          )}
-                        </OnlyAboveSmall>
-                      </RowBetween>
-                    </ProposalItem>
-                    <Break />
-                  </>
-                )
-              })
-              .reverse()
-          : !allProposals &&
-            !(allProposals && Object.keys(allProposals)?.length === 0) && (
-              <LoadingRows>
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-                <div />
-              </LoadingRows>
-            )}
-      </AutoColumn>
+                        </RowBetween>
+                      </ProposalItem>
+                      <Break />
+                    </div>
+                  )
+                })
+                .reverse()
+            : !allProposals &&
+              !(allProposals && Object.keys(allProposals)?.length === 0) && (
+                <LoadingRows>
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                  <div />
+                </LoadingRows>
+              )}
+        </AutoColumn>
+      )}
     </Wrapper>
   )
 }

@@ -7,11 +7,11 @@ import {
   updateTopDelegates,
   updateVerifiedDelegates,
   updateGlobalData,
-  updateMaxFetched
+  updateMaxFetched,
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -25,7 +25,6 @@ import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
-import { useGenericBravoProposalCount, useGenericAlphaProposalCounts } from 'data/proposalCount.ts'
 import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
 
 export interface DelegateData {
@@ -46,7 +45,7 @@ export interface DelegateData {
 
 export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtocol: GovernanceInfo) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const activeProtocol = useSelector<AppState, AppState['governance']['activeProtocol']>(state => {
+  const activeProtocol = useSelector<AppState, AppState['governance']['activeProtocol']>((state) => {
     return state.governance.activeProtocol
   })
 
@@ -62,7 +61,7 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
 
 export function useFilterActive(): [boolean, (filterActive: boolean) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const filterActive = useSelector<AppState, AppState['governance']['filterActive']>(state => {
+  const filterActive = useSelector<AppState, AppState['governance']['filterActive']>((state) => {
     return state.governance.filterActive
   })
 
@@ -87,7 +86,7 @@ export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | unde
 
   const [activeProtocol] = useActiveProtocol()
 
-  const globalData = useSelector<AppState, AppState['governance']['globalData']>(state => state.governance.globalData)
+  const globalData = useSelector<AppState, AppState['governance']['globalData']>((state) => state.governance.globalData)
 
   const setGlobalData = useCallback(
     (data: GlobaData | undefined) => {
@@ -102,7 +101,7 @@ export function useGlobalData(): [GlobaData | undefined, (data: GlobaData | unde
 export function useMaxFetched(): [number | undefined, (maxFetched: number | undefined) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const [activeProtocol] = useActiveProtocol()
-  const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>(state => state.governance.maxFetched)
+  const maxFetched = useSelector<AppState, AppState['governance']['maxFetched']>((state) => state.governance.maxFetched)
   const setMaxFetched = useCallback(
     (maxFetched: number | undefined) => {
       activeProtocol && dispatch(updateMaxFetched({ protocolID: activeProtocol.id, maxFetched }))
@@ -116,7 +115,7 @@ export function useTopDelegates(): [DelegateData[] | undefined, (topDelegates: D
   const [activeProtocol] = useActiveProtocol()
 
   const dispatch = useDispatch<AppDispatch>()
-  const delegates = useSelector<AppState, AppState['governance']['topDelegates']>(state => {
+  const delegates = useSelector<AppState, AppState['governance']['topDelegates']>((state) => {
     return state.governance.topDelegates
   })
   const setTopDelegates = useCallback(
@@ -135,7 +134,7 @@ export function useVerifiedDelegates(): [
   const [activeProtocol] = useActiveProtocol()
 
   const dispatch = useDispatch<AppDispatch>()
-  const delegates = useSelector<AppState, AppState['governance']['verifiedDelegates']>(state => {
+  const delegates = useSelector<AppState, AppState['governance']['verifiedDelegates']>((state) => {
     return state.governance.verifiedDelegates
   })
   const setVerifiedDelegates = useCallback(
@@ -180,17 +179,6 @@ export interface ProposalData {
   }[]
 }
 
-// get count of all proposals made
-export function useProposalCounts(): number[] | undefined {
-  const [activeProtocol] = useActiveProtocol()
-  const alphaCounts: number[] | undefined = useGenericAlphaProposalCounts()
-  const bravoCount = useGenericBravoProposalCount()
-  if (activeProtocol === COMPOUND_GOVERNANCE) {
-    return bravoCount ? [bravoCount] : undefined
-  }
-  return alphaCounts
-}
-
 /**
  * @TODO can this be used to speed up the loading?
  */
@@ -200,7 +188,11 @@ export function useAllProposalStates(): number[] | undefined {
   const alphaStates = useGenericAlphaProposalStates()
   const bravoStates = useGenericBravoProposalStates()
 
-  if (activeProtocol === COMPOUND_GOVERNANCE) {
+  if (
+    activeProtocol === COMPOUND_GOVERNANCE ||
+    activeProtocol === NOUNS_GOVERNANCE ||
+    activeProtocol === UNISWAP_GOVERNANCE
+  ) {
     return bravoStates
   }
 
@@ -218,17 +210,12 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
 
   // get subgraph client for active protocol
   const govClient = useSubgraphClient()
-
   const govToken = useGovernanceToken()
-
-  // reset proposals on protocol change
   const [activeProtocol] = useActiveProtocol()
 
   useEffect(() => {
     setProposals(undefined)
   }, [activeProtocol])
-
-  const states = useAllProposalStates()
 
   // subgraphs only store ids in lowercase, format
   useEffect(() => {
@@ -252,11 +239,11 @@ export function useAllProposals(): { [id: string]: ProposalData } | undefined {
     if (!proposals && govToken) {
       fetchData()
     }
-  }, [activeProtocol, govClient, govToken, proposals, states])
+  }, [activeProtocol, govClient, govToken, proposals])
 
   useEffect(() => {
     if (proposals && govToken) {
-      Object.values(proposals).map(p => {
+      Object.values(proposals).map((p) => {
         p.forCount = p.forVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
         p.againstCount = p.againstVotes.reduce((accum, vote) => accum + parseFloat(vote.votes), 0)
         return true
@@ -273,14 +260,16 @@ export function useProposalData(id: string): ProposalData | undefined {
 }
 
 // get the users delegatee if it exists
-export function useUserDelegatee(): string | undefined {
+export function useUserDelegatee(address?: string | undefined | null | false): string | undefined {
   const { account } = useActiveWeb3React()
   const tokenContract = useGovTokenContract()
   const isAave = useIsAave()
+  const accountToUse = address ? address : account
+
   const { result } = useSingleCallResult(
     tokenContract,
     isAave ? 'getDelegateeByType' : 'delegates',
-    isAave ? [account ?? undefined, 0] : [account ?? undefined]
+    isAave ? [accountToUse ?? undefined, 0] : [accountToUse ?? undefined]
   )
 
   const formattedAddress = isAddress(result?.[0])
@@ -333,12 +322,12 @@ export function useDelegateCallback(): (delegatee: string | undefined) => undefi
       if (!library || !chainId || !account || !isAddress(delegatee ?? '')) return undefined
       const args = [delegatee]
       if (!govTokenContract) throw new Error('No Governance Contract!')
-      return govTokenContract.estimateGas.delegate(...args, {}).then(estimatedGasLimit => {
+      return govTokenContract.estimateGas.delegate(...args, {}).then((estimatedGasLimit) => {
         return govTokenContract
           .delegate(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
           .then((response: TransactionResponse) => {
             addTransaction(response, {
-              summary: `Delegated votes`
+              summary: `Delegated votes`,
             })
             return response.hash
           })
@@ -362,23 +351,23 @@ export function useVoteCallback(): {
       if (!account || !govContract || !proposalId) return
       const args = [proposalId, support]
       if (isAaveGov) {
-        return govContract.estimateGas.submitVote(...args, {}).then(estimatedGasLimit => {
+        return govContract.estimateGas.submitVote(...args, {}).then((estimatedGasLimit) => {
           return govContract
             .submitVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
             .then((response: TransactionResponse) => {
               addTransaction(response, {
-                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`,
               })
               return response.hash
             })
         })
       } else {
-        return govContract.estimateGas.castVote(...args, {}).then(estimatedGasLimit => {
+        return govContract.estimateGas.castVote(...args, {}).then((estimatedGasLimit) => {
           return govContract
             .castVote(...args, { value: null, gasLimit: calculateGasMargin(estimatedGasLimit) })
             .then((response: TransactionResponse) => {
               addTransaction(response, {
-                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`
+                summary: `Voted ${support ? 'for ' : 'against'} proposal ${proposalId}`,
               })
               return response.hash
             })
@@ -424,8 +413,8 @@ export function useAllVotersForProposal(
           query: ALL_VOTERS,
           variables: {
             proposalID,
-            support
-          }
+            support,
+          },
         })
         .then(
           (res: {
@@ -515,8 +504,8 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
         ?.query({
           query: DELEGATE_INFO,
           variables: {
-            address: address?.toLocaleLowerCase()
-          }
+            address: address?.toLocaleLowerCase(),
+          },
         })
         .then(async (res: DelegateInfoRes) => {
           if (res && res.data && res.data?.delegates[0]) {
@@ -530,7 +519,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
                 tokenHoldersRepresentedAmount: 0,
                 votes: [],
                 EOA: isEOA,
-                autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE
+                autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE,
               })
             }
 
@@ -541,7 +530,7 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
                   .map((v: { proposal: { id: string }; support: boolean; votes: string }) => ({
                     proposal: parseInt(v.proposal.id),
                     votes: parseFloat(v.votes),
-                    support: v.support
+                    support: v.support,
                   }))
               : []
             setData({
@@ -550,13 +539,13 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
               tokenHoldersRepresentedAmount: resData?.tokenHoldersRepresentedAmount ?? 0,
               votes,
               EOA: isEOA,
-              autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE
+              autonomous: source === AUTONOMOUS_PROPOSAL_BYTECODE,
             })
           } else {
             setData(null)
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e)
         })
     }

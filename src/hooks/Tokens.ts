@@ -67,7 +67,7 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
     token,
     tokenName.loading,
     tokenName.result,
-    tokenNameBytes32.result
+    tokenNameBytes32.result,
   ])
 }
 

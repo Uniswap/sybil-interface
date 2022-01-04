@@ -66,7 +66,7 @@ export default function VoterList({
   percentage,
   voters,
   support,
-  id
+  id,
 }: {
   title: string
   amount: number | undefined

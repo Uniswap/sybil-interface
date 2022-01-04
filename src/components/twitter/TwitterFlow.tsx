@@ -17,17 +17,19 @@ import { OffChainRequestModal } from '../TransactionConfirmationModal'
 import { useSignedHandle } from '../../hooks/useSignedHandle'
 import { fetchLatestTweet, LatestTweetResponse } from '../../data/social'
 import { Identities } from '../../state/social/reducer'
+import { CONNECT_CONFIG } from 'state/governance/reducer'
 
 const ModalContentWrapper = styled.div`
   padding: 2rem;
   width: 100%;
+  overflow-y: scroll;
 `
 
 const TweetWrapper = styled.div`
-    padding: 1rem;
-    color: ${({ theme }) => theme.blue1}
-    background: #F2F2F2;
-    word-break: break-word;
+  padding: 1rem;
+  color: ${({ theme }) => theme.blue1};
+  background: #f2f2f2;
+  word-break: break-word;
 `
 
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
@@ -70,7 +72,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       // new copy of verified list
       verifiedHandles &&
         allIndentities &&
-        Object.keys(verifiedHandles).map(address => {
+        Object.keys(verifiedHandles).map((address) => {
           newVerified[address] = allIndentities[address]
           return true
         })
@@ -80,8 +82,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           ...allIndentities[account],
           twitter: {
             handle: twitterHandle,
-            timestamp: Date.now()
-          }
+            timestamp: Date.now(),
+          },
         }
         setAllIdentities(newVerified)
       }
@@ -90,16 +92,18 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   }
 
   // tweet data
-  const tweetCopyForLink = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} %23${
-    activeProtocol?.token?.symbol
-  }Creator on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${
-    activeProtocol?.id
-  }/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ?? ''}`
+  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself as a ${
+    activeProtocol?.social
+  } ${
+    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
+  } on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${
+    sig ?? ''
+  }`
 
   // used just for display in UI
-  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} #${
-    activeProtocol?.token?.symbol
-  }Delegate on Sybil🏛\n sybil.org/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
+  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} ${
+    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
+  } on Sybil🏛\n sybil.org/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
