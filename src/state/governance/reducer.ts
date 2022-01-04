@@ -17,6 +17,7 @@ import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import NounsLogo from '../../assets/images/nouns-logo.png'
 import ENSLogo from '../../assets/images/ens.jpeg'
+import CandleLogo from '../../assets/images/candle-logo.svg'
 import AddAccount from '../../assets/images/AddAccount.png'
 
 import { serializeToken } from '../user/hooks'
@@ -143,17 +144,6 @@ export const ENS_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱',
 }
 
-export const CONNECT_CONFIG: GovernanceInfo = {
-  id: 'connect',
-  name: 'Connect Social Profile', // placeholder
-  logo: AddAccount, // placeholder
-  primaryColor: '#5284ff', // placeholder
-  secondaryColor: '#cfddff', // placeholder
-  token: serializeToken(ENS), //placeholder
-  governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS], //placeholder
-  social: '@twitter', // placeholder
-}
-
 export const NOUNS_GOVERNANCE_ADDRESS_BRAVO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d'
 export const NOUNS_ADDRESS = '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03'
 const NOUN = new Token(ChainId.MAINNET, NOUNS_ADDRESS, 0, 'NOUN', 'Nouns')
@@ -172,6 +162,32 @@ export const NOUNS_GOVERNANCE: GovernanceInfo = {
   emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
 }
 
+export const CANDLE_GOVERNANCE_ADDRESS = '0xB80Be29667021AE0B617AC9eFe0a3A1a58033681'
+export const CNDL_ADDRESS = '0xbc138bD20C98186CC0342C8e380953aF0cb48BA8'
+const CNDL = new Token(ChainId.MAINNET, CNDL_ADDRESS, 18, 'CNDL', 'Candle')
+export const CANDLE_GOVERNANCE: GovernanceInfo = {
+  id: 'candle',
+  name: 'Candle Platforms',
+  logo: CandleLogo,
+  primaryColor: '#6fbeff',
+  secondaryColor: '#ebfeff',
+  token: serializeToken(CNDL),
+  governanceAlphaAddresses: [CANDLE_GOVERNANCE_ADDRESS],
+  social: '@cndlcoin',
+  emoji: '🕯️',
+}
+
+export const CONNECT_CONFIG: GovernanceInfo = {
+  id: 'connect',
+  name: 'Connect Social Profile', // placeholder
+  logo: AddAccount, // placeholder
+  primaryColor: '#5284ff', // placeholder
+  secondaryColor: '#cfddff', // placeholder
+  token: serializeToken(ENS), //placeholder
+  governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS], //placeholder
+  social: '@twitter', // placeholder
+}
+
 // #/connect or #/delegates/connect
 // show only identity flow e.g. link to twitter
 export function identityOnlyPath(pathname: string) {
@@ -187,6 +203,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   radicle: RADICLE_GOVERNANCE,
   nouns: NOUNS_GOVERNANCE,
   ens: ENS_GOVERNANCE,
+  candle: CANDLE_GOVERNANCE,
   connect: CONNECT_CONFIG,
 }
 
