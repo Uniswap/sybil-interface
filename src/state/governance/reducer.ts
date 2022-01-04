@@ -11,6 +11,7 @@ import {
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
+import Cre8rLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
@@ -200,7 +201,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
   radicle: RADICLE_GOVERNANCE,
-  CRE8R: CRE8R_GOVERNANCE
+  CRE8R: CRE8R_GOVERNANCE,
   nouns: NOUNS_GOVERNANCE,
   ens: ENS_GOVERNANCE,
   connect: CONNECT_CONFIG,
