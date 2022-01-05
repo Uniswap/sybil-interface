@@ -11,7 +11,14 @@ import {
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
+import {
+  GovernanceInfo,
+  GlobaData,
+  COMPOUND_GOVERNANCE,
+  NOUNS_GOVERNANCE,
+  UNISWAP_GOVERNANCE,
+  CANDLE_GOVERNANCE,
+} from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -25,7 +32,11 @@ import { deserializeToken } from '../user/hooks'
 import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
-import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
+import {
+  useGenericAlphaProposalStates,
+  useGenericBravoProposalStates,
+  useGenericOpenZeppelinStates,
+} from 'data/proposalStates'
 
 export interface DelegateData {
   id: string
@@ -187,6 +198,11 @@ export function useAllProposalStates(): number[] | undefined {
 
   const alphaStates = useGenericAlphaProposalStates()
   const bravoStates = useGenericBravoProposalStates()
+  const openZeppelinStates = useGenericOpenZeppelinStates()
+
+  if (activeProtocol === CANDLE_GOVERNANCE) {
+    return openZeppelinStates
+  }
 
   if (
     activeProtocol === COMPOUND_GOVERNANCE ||

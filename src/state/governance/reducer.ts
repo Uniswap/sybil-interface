@@ -31,6 +31,7 @@ export interface GovernanceInfo {
   token: SerializedToken
   governanceAlphaAddresses: string[]
   governanceAddressBravo?: string
+  governanceAddressOpenZeppelin?: string
   migrationProposalId?: number
   social: string
   emoji?: string
@@ -172,7 +173,8 @@ export const CANDLE_GOVERNANCE: GovernanceInfo = {
   primaryColor: '#6fbeff',
   secondaryColor: '#ebfeff',
   token: serializeToken(CNDL),
-  governanceAlphaAddresses: [CANDLE_GOVERNANCE_ADDRESS],
+  governanceAlphaAddresses: [],
+  governanceAddressOpenZeppelin: CANDLE_GOVERNANCE_ADDRESS,
   social: '@cndlcoin',
   emoji: '🕯️',
 }
