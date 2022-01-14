@@ -168,7 +168,7 @@ export const CNDL_ADDRESS = '0xbc138bD20C98186CC0342C8e380953aF0cb48BA8'
 const CNDL = new Token(ChainId.MAINNET, CNDL_ADDRESS, 18, 'CNDL', 'Candle')
 export const CANDLE_GOVERNANCE: GovernanceInfo = {
   id: 'candle',
-  name: 'Candle Platforms',
+  name: 'Candle Governance',
   logo: CandleLogo,
   primaryColor: '#6fbeff',
   secondaryColor: '#ebfeff',
