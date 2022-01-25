@@ -7,7 +7,7 @@ import { updateIdentities } from './actions'
 import { TwitterEntry, Identities, Identity } from './reducer'
 import { isAddress } from '../../utils'
 
-const VERIFICATION_WORKER_URL = 'sybil-verifier.cre8r.workers.dev'
+const VERIFICATION_WORKER_URL = 'https://sybil-verifier.cre8r.workers.dev'
 
 // get all identity info from github file
 export function useAllIdentities(): [Identities | undefined, (identities: Identities) => void] {
