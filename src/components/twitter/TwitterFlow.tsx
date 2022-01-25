@@ -32,7 +32,7 @@ const TweetWrapper = styled.div`
   word-break: break-word;
 `
 
-export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
+export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
   const { account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
 
@@ -53,7 +53,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const [verified, setVerified] = useState(false)
   const [requestError, setRequestError] = useState<string | undefined>()
 
-  async function onVerify() {
+  async function onVerify () {
     //reset error and loading state
     setAttempting(true)
     setRequestError(undefined)
@@ -72,7 +72,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
       // new copy of verified list
       verifiedHandles &&
         allIndentities &&
-        Object.keys(verifiedHandles).map((address) => {
+        Object.keys(verifiedHandles).map(address => {
           newVerified[address] = allIndentities[address]
           return true
         })
@@ -82,8 +82,8 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           ...allIndentities[account],
           twitter: {
             handle: twitterHandle,
-            timestamp: Date.now(),
-          },
+            timestamp: Date.now()
+          }
         }
         setAllIdentities(newVerified)
       }
@@ -92,18 +92,18 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   }
 
   // tweet data
-  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself as a ${
+  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself on ${
     activeProtocol?.social
-  } ${
+  } Amplify 🧱 ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
-  } on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${
-    sig ?? ''
-  }`
+  } %0A%0Asybil.cre8rdao.xyz%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
+    ''}`
 
   // used just for display in UI
   const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
-  } on Sybil🏛\n sybil.org/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
+  } \n sybil.cre8rdao.xyz
+/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
@@ -112,7 +112,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   // use hook to handle polling
   useTweetWatcher(sig, twitterHandle, watch, setWatch, setTweetID, setTweetError)
 
-  function startWatching() {
+  function startWatching () {
     setWatch(true) // restart watcher
     setTweetError(undefined) // reset error
     window.open(
@@ -123,7 +123,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   }
 
   // start watching and open window
-  function checkForTweet() {
+  function checkForTweet () {
     twitterHandle &&
       fetchLatestTweet(twitterHandle)
         .then((res: LatestTweetResponse | null) => {
@@ -150,22 +150,22 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   return (
     <ModalContentWrapper>
       {!twitterHandle ? (
-        <AutoColumn gap="lg">
+        <AutoColumn gap='lg'>
           <RowBetween>
             <RowFixed>
-              <TYPE.mediumHeader ml="6px">Connect Twitter</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml='6px'>Connect Twitter</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
           <TYPE.black>Sign in with Twitter to link your Ethereum address and Twitter handle.</TYPE.black>
           <TwitterAccountPreview />
-          <TwitterLoginButton text="Connect Twitter" />
+          <TwitterLoginButton text='Connect Twitter' />
         </AutoColumn>
       ) : !sig ? (
-        <AutoColumn gap="lg">
+        <AutoColumn gap='lg'>
           <RowBetween>
             <RowFixed>
-              <TYPE.mediumHeader ml="6px">Step 1: Sign Message</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml='6px'>Step 1: Sign Message</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
@@ -177,11 +177,11 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           {sigError && <TYPE.error error={true}>{sigError}</TYPE.error>}
         </AutoColumn>
       ) : !tweetID ? (
-        <AutoColumn gap="lg">
+        <AutoColumn gap='lg'>
           <RowBetween>
             <RowFixed>
               <BackArrowSimple onClick={() => setSig(undefined)} />
-              <TYPE.mediumHeader ml="6px">Step 2: Announce</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml='6px'>Step 2: Announce</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
@@ -193,7 +193,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
           {tweetError && <TYPE.error error={true}>{tweetError}</TYPE.error>}
         </AutoColumn>
       ) : !verified && !attempting ? (
-        <AutoColumn gap="lg">
+        <AutoColumn gap='lg'>
           <RowBetween>
             <RowFixed>
               <BackArrowSimple
@@ -203,7 +203,7 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
                   setWatch(false)
                 }}
               />
-              <TYPE.mediumHeader ml="6px">Step 3: Submit</TYPE.mediumHeader>
+              <TYPE.mediumHeader ml='6px'>Step 3: Submit</TYPE.mediumHeader>
             </RowFixed>
             <CloseIcon onClick={onDismiss} />
           </RowBetween>
