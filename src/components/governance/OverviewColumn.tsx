@@ -49,6 +49,15 @@ export default function OverviewColumn() {
         >
           View Proposals
         </TabOption>
+        <TabOption
+          as={Link}
+          to={'/amplifi/' + activeProtocol?.id}
+          selected={location.pathname.includes('amplifi')}
+          color={activeProtocol?.primaryColor}
+          color2={activeProtocol?.secondaryColor}
+        >
+          Amplifi Dashboard
+        </TabOption>
       </AutoColumn>
     </Wrapper>
   )
