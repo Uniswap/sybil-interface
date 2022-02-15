@@ -11,6 +11,7 @@ import { WrappedListLogo } from '../components/governance/styled'
 import Dropdown from '../components/governance/Dropdown'
 import Tabs from '../components/governance/Tabs'
 import { TYPE } from '../theme'
+import AmplifiCampaignList from 'components/Amplifi/AmplifiCampaignList'
 
 
 export default function Amplifi({
@@ -45,6 +46,7 @@ export default function Amplifi({
                         <Tabs />
                     </AutoColumn>
                 </MediumHeaderWrapper>
+                <AmplifiCampaignList />
             </AutoColumn>
         </BodyWrapper>
     )
