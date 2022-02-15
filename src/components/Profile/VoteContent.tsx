@@ -80,7 +80,7 @@ export default function VoteContent() {
     <AutoColumn gap="16px">
       <WhiteCard border={`1px solid ${theme.bg3}`} style={{ zIndex: 2 }} padding="1rem">
         <RowBetween>
-          <TYPE.black color={theme.text1}>Wallet votes</TYPE.black>
+          <TYPE.black color={theme.text1}>Wallet Votes</TYPE.black>
           <TYPE.main color={activeProtocol?.primaryColor}>
             {walletVotes ? walletVotes.toFixed(0) : account ? <Loader /> : '-'}
           </TYPE.main>

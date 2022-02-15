@@ -11,6 +11,7 @@ import {
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
+import Cre8rLogo from '../../assets/images/uni-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
@@ -178,6 +179,21 @@ export function identityOnlyPath(pathname: string) {
   return pathname.split('/', 2)[1] == CONNECT_CONFIG.id || pathname.split('/', 3)[2] == CONNECT_CONFIG.id
 }
 
+export const CRE8R_GOVERNANCE_ADDRESS = '0xa832ce1b31bfb0961e78350320ab4cb7f110e7e2'
+export const CRE8R_ADDRESS = '0x238d82a35e69d7c10fe69a649134171c63e57522'
+const CRE8R = new Token(ChainId.MAINNET, CRE8R_ADDRESS, 18, 'CRE8R', 'CRE8R Cash')
+export const CRE8R_GOVERNANCE: GovernanceInfo = {
+  id: 'CRE8R',
+  name: 'CRE8R Governance',
+  logo: Cre8rLogo,
+  primaryColor: '#5555FF',
+  secondaryColor: '#E3E3FF',
+  token: serializeToken(CRE8R),
+  governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
+  social: '@CRE8RDAO',
+  emoji: '🧱'
+}
+
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   uniswap: UNISWAP_GOVERNANCE,
@@ -185,6 +201,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   aave: AAVE_GOVERNANCE,
   pool: POOL_TOGETHER_GOVERNANCE,
   radicle: RADICLE_GOVERNANCE,
+  CRE8R: CRE8R_GOVERNANCE,
   nouns: NOUNS_GOVERNANCE,
   ens: ENS_GOVERNANCE,
   connect: CONNECT_CONFIG,

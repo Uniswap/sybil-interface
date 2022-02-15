@@ -64,6 +64,17 @@ function Tabs() {
               Proposals
             </TYPE.black>
           </TabOption>
+          <TabOption
+            as={Link}
+            to={'/amplifi/' + activeProtocol?.id}
+            selected={location.pathname.includes('amplifi')}
+            color={activeProtocol?.primaryColor}
+            color2={activeProtocol?.secondaryColor}
+          >
+            <TYPE.black fontSize={'16px'} color={activeProtocol?.primaryColor}>
+              Amplifi
+            </TYPE.black>
+          </TabOption>
         </AutoRow>
         {location.pathname.includes('delegates') && (
           <AboveSmall>
