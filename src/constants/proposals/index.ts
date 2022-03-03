@@ -11,6 +11,11 @@ export const PRELOADED_PROPOSALS: {
   },
 }
 
+export const COMMON_CONTRACT_NAMES: { [address: string]: string } = {
+  '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e': 'ENS Registry',
+  '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41': 'ENS Public Resolver',
+}
+
 export const EDUCATION_FUND_1_START_BLOCK = 12620175
 
 // hidden proposals that may be broken
