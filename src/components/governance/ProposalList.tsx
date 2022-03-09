@@ -75,7 +75,11 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
                         <RowBetween>
                           <RowFixed>
                             <OnlyAboveSmall>
-                              <TYPE.darkGray mr="8px">{p.id + '.'}</TYPE.darkGray>
+                              <TYPE.darkGray mr="8px">
+                                {activeProtocol.id === 'candle'
+                                  ? p.id.slice(0, 3) + '...' + p.id.slice(-3) + '.'
+                                  : p.id + '.'}
+                              </TYPE.darkGray>
                             </OnlyAboveSmall>
                             <ResponsiveText mr="10px">{p.title}</ResponsiveText>
                           </RowFixed>

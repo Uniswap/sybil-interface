@@ -4,6 +4,7 @@ import { abi as UNI_ABI } from '@uniswap/governance/build/Uni.json'
 import { ChainId, WETH } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import GOVERNANCE_AAVE_ABI from '../constants/abis/aave-governance.json'
+import GOVERNANCE_OPENZEPPELIN_ABI from '../constants/abis/openzeppelin-governor.json'
 import AAVE_ABI from '../constants/abis/aave-token.json'
 import {
   ARGENT_WALLET_DETECTOR_ABI,
@@ -123,6 +124,16 @@ export function useGovernanceContractBravo(): Contract | null {
   return useContract(
     activeProtocol ? activeProtocol.governanceAddressBravo : undefined,
     activeProtocol?.id === AAVE_GOVERNANCE.id ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI,
+    true
+  )
+}
+
+export function useGovernanceContractOpenZeppelin(): Contract | null {
+  const [activeProtocol] = useActiveProtocol()
+
+  return useContract(
+    activeProtocol ? activeProtocol.governanceAddressOpenZeppelin : undefined,
+    GOVERNANCE_OPENZEPPELIN_ABI,
     true
   )
 }
