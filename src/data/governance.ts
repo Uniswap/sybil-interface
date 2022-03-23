@@ -1,14 +1,14 @@
-import { Identities } from './../state/social/reducer'
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST, TOP_DELEGATES_OFFSET } from '../apollo/queries'
-import { DelegateData, ProposalData } from '../state/governance/hooks'
-import { fetchProfileData } from './social'
-import { isAddress } from '../utils'
-import { DocumentNode } from 'graphql'
-import { PRELOADED_PROPOSALS } from '../constants'
-import { GlobaData } from '../state/governance/reducer'
-import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../constants/proposals'
 import { defaultAbiCoder } from 'ethers/lib/utils'
+import { DocumentNode } from 'graphql'
+import { DELEGATES_FROM_LIST, GLOBAL_DATA, PROPOSALS, TOP_DELEGATES, TOP_DELEGATES_OFFSET } from '../apollo/queries'
+import { PRELOADED_PROPOSALS } from '../constants'
+import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../constants/proposals'
+import { DelegateData, ProposalData } from '../state/governance/hooks'
+import { GlobaData } from '../state/governance/reducer'
+import { isAddress } from '../utils'
+import { Identities } from './../state/social/reducer'
+import { fetchProfileData } from './social'
 
 interface DelegateResponse {
   data: {

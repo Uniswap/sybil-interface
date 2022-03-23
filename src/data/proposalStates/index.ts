@@ -1,10 +1,10 @@
-import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.json'
-import { useGovernanceContractBravo, useIsAave } from 'hooks/useContract'
-import { useActiveProtocol } from 'state/governance/hooks'
-import { useState, useEffect, useMemo } from 'react'
-import { useGenericAlphaProposalCounts, useGenericBravoProposalCount } from 'data/proposalCount.ts'
-import { useMultipleContractMultipleData, NEVER_RELOAD, useSingleContractMultipleData } from 'state/multicall/hooks'
 import { Interface } from '@ethersproject/abi'
+import { abi as GOVERNANCE_ABI } from '@uniswap/governance/build/GovernorAlpha.json'
+import { useGenericAlphaProposalCounts, useGenericBravoProposalCount } from 'data/proposalCount.ts'
+import { useGovernanceContractBravo, useIsAave } from 'hooks/useContract'
+import { useEffect, useMemo, useState } from 'react'
+import { useActiveProtocol } from 'state/governance/hooks'
+import { NEVER_RELOAD, useMultipleContractMultipleData, useSingleContractMultipleData } from 'state/multicall/hooks'
 import GOVERNANCE_AAVE_ABI from '../../constants/abis/aave-governance.json'
 
 /**
@@ -27,7 +27,7 @@ export function useGenericAlphaProposalStates(): number[] | undefined {
 
   const statusRes = useMultipleContractMultipleData(
     activeProtocol ? activeProtocol?.governanceAlphaAddresses : [undefined],
-    new Interface(useIsAave() ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI),
+    new Interface(isAaveGov ? GOVERNANCE_AAVE_ABI : GOVERNANCE_ABI),
     isAaveGov ? 'getProposalState' : 'state',
     ids
   )

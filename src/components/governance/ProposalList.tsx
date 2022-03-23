@@ -1,14 +1,14 @@
-import React from 'react'
-import styled from 'styled-components'
-import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
-import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
-import { TYPE, OnlyAboveSmall, OnlyBelowSmall } from '../../theme'
-import { RowBetween, RowFixed } from '../Row'
-import { AutoColumn } from '../Column'
-import { Link } from 'react-router-dom'
-import Loader, { LoadingRows } from '../Loader'
-import { enumerateProposalState } from '../../data/governance'
 import { BLOCKED_PROPOSALS_BY_START_BLOCK } from 'constants/proposals'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+import { enumerateProposalState } from '../../data/governance'
+import { ProposalData, useActiveProtocol, useAllProposalStates } from '../../state/governance/hooks'
+import { OnlyAboveSmall, OnlyBelowSmall, TYPE } from '../../theme'
+import { AutoColumn } from '../Column'
+import Loader, { LoadingRows } from '../Loader'
+import { RowBetween, RowFixed } from '../Row'
+import { EmptyWrapper, ProposalStatus, ProposalStatusSmall } from './styled'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -62,10 +62,7 @@ export default function ProposalList({ allProposals }: { allProposals: { [id: st
           {allStatuses && allProposals && activeProtocol
             ? Object.values(allProposals)
                 .map((p: ProposalData, i) => {
-                  if (
-                    BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id] &&
-                    BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id].includes(p.startBlock)
-                  ) {
+                  if (BLOCKED_PROPOSALS_BY_START_BLOCK[activeProtocol.id]?.includes(p.startBlock)) {
                     return null
                   }
                   const status = allStatuses[i] ? enumerateProposalState(allStatuses[i]) : enumerateProposalState(0)
