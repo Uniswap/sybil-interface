@@ -1,14 +1,14 @@
-import { Identities } from './../state/social/reducer'
 import { Web3Provider } from '@ethersproject/providers'
-import { TOP_DELEGATES, PROPOSALS, GLOBAL_DATA, DELEGATES_FROM_LIST, TOP_DELEGATES_OFFSET } from '../apollo/queries'
-import { DelegateData, ProposalData } from '../state/governance/hooks'
-import { ethers } from 'ethers'
-import { fetchProfileData } from './social'
-import { isAddress } from '../utils'
+import { defaultAbiCoder } from 'ethers/lib/utils'
 import { DocumentNode } from 'graphql'
+import { DELEGATES_FROM_LIST, GLOBAL_DATA, PROPOSALS, TOP_DELEGATES, TOP_DELEGATES_OFFSET } from '../apollo/queries'
 import { PRELOADED_PROPOSALS } from '../constants'
-import { GlobaData } from '../state/governance/reducer'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../constants/proposals'
+import { DelegateData, ProposalData } from '../state/governance/hooks'
+import { GlobaData } from '../state/governance/reducer'
+import { isAddress } from '../utils'
+import { Identities } from './../state/social/reducer'
+import { fetchProfileData } from './social'
 
 interface DelegateResponse {
   data: {
@@ -211,6 +211,12 @@ export const enumerateProposalState = (state: number) => {
   return proposalStates[state]
 }
 
+const FOUR_BYTES_DIR: { [sig: string]: string } = {
+  '0x5ef2c7f0': 'setSubnodeRecord(bytes32,bytes32,address,address,uint64)',
+  '0x10f13a8c': 'setText(bytes32,string,string)',
+  '0xb4720477': 'sendMessageToChild(address,bytes)',
+}
+
 // @todo add typed query response
 const PROPOSAL_PROMISES: { [key: string]: Promise<ProposalData[] | null> } = {}
 
@@ -226,7 +232,6 @@ export async function fetchProposals(client: any, key: string, govId: string): P
         if (res) {
           return res.data.proposals.map((p, i) => {
             let description = PRELOADED_PROPOSALS[govId]?.[res.data.proposals.length - i - 1] || p.description
-            console.log(p.startBlock)
             if (p.startBlock === '13551293') {
               description = description.replace(/  /g, '\n').replace(/\d\. /g, '\n$&')
             }
@@ -243,27 +248,27 @@ export async function fetchProposals(client: any, key: string, govId: string): P
               endBlock: parseInt(p.endBlock),
               forVotes: p.forVotes,
               againstVotes: p.againstVotes,
-              details: p.targets.map((t, i) => {
+              details: p.targets.map((target, i) => {
                 let name = '',
-                  types = '',
-                  callData = ''
+                  types = ''
                 const signature = p.signatures[i]
-                if (signature) {
-                  const sigSplit = signature.substr(0, signature.length - 1).split('(')
-                  name = sigSplit[0]
-                  types = sigSplit[1]
-                }
+                let calldata = p.calldatas[i]
 
-                const calldata = p.calldatas[i]
-                if (calldata && types) {
-                  const decoded = ethers.utils.defaultAbiCoder.decode(types.split(','), calldata)
-                  callData = decoded.toString()
+                if (signature === '') {
+                  const fourbyte = calldata.slice(0, 10)
+                  const sig = FOUR_BYTES_DIR[fourbyte] ?? 'UNKNOWN()'
+                  if (!sig) throw new Error('Missing four byte sig')
+                  ;[name, types] = sig.substring(0, sig.length - 1).split('(')
+                  calldata = `0x${calldata.slice(10)}`
+                } else {
+                  ;[name, types] = signature.substring(0, signature.length - 1).split('(')
                 }
+                const decoded = defaultAbiCoder.decode(types.split(','), calldata)
 
                 return {
-                  target: p.targets[i],
+                  target,
                   functionSig: name,
-                  callData,
+                  callData: decoded.join(', '),
                 }
               }),
             }
