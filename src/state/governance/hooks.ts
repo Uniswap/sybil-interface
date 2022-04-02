@@ -27,6 +27,7 @@ import {
 } from './actions'
 import { COMPOUND_GOVERNANCE, GlobaData, GovernanceInfo, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
 
+
 export interface DelegateData {
   id: string
   delegatedVotes: number
@@ -190,6 +191,7 @@ export function useAllProposalStates(): number[] | undefined {
 
   if (
     activeProtocol === COMPOUND_GOVERNANCE ||
+    activeProtocol === CNDL_GOVERNANCE ||
     activeProtocol === NOUNS_GOVERNANCE ||
     activeProtocol === UNISWAP_GOVERNANCE
   ) {

@@ -17,6 +17,7 @@ import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import NounsLogo from '../../assets/images/nouns-logo.png'
 import ENSLogo from '../../assets/images/ens.jpeg'
+import CandleLogo from '../../assets/images/cndlLogo.png'
 import AddAccount from '../../assets/images/AddAccount.png'
 
 import { serializeToken } from '../user/hooks'
@@ -172,6 +173,21 @@ export const NOUNS_GOVERNANCE: GovernanceInfo = {
   emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
 }
 
+export const CNDL_GOVERNANCE_ADDRESS = '0xB80Be29667021AE0B617AC9eFe0a3A1a58033681'
+export const CNDL_ADDRESS = '0xbc138bd20c98186cc0342c8e380953af0cb48ba8'
+const CNDL = new Token(ChainId.MAINNET, CNDL_ADDRESS, 18, 'CNDL', 'Candle Token')
+export const CNDL_GOVERNANCE: GovernanceInfo = {
+  id: 'cndl',
+  name: 'Candle Governance',
+  logo: CandleLogo,
+  primaryColor: '#6fbeff',
+  secondaryColor: '#ebfeff',
+  token: serializeToken(CNDL),
+  governanceAlphaAddresses: [CNDL_GOVERNANCE_ADDRESS],
+  social: '@candle_labs',
+  emoji: '👻',
+}
+
 // #/connect or #/delegates/connect
 // show only identity flow e.g. link to twitter
 export function identityOnlyPath(pathname: string) {
@@ -187,6 +203,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   radicle: RADICLE_GOVERNANCE,
   nouns: NOUNS_GOVERNANCE,
   ens: ENS_GOVERNANCE,
+  cndl: CNDL_GOVERNANCE,
   connect: CONNECT_CONFIG,
 }
 
