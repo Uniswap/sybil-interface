@@ -116,7 +116,7 @@ export function useVerifyCallback(tweetID: string | undefined): { verifyCallback
       .catch(() => {
         return {
           success: false,
-          error: 'Error submitting verification',
+          error: 'Error submitting the fucking verification',
         }
       })
   }, [account, tweetID])
