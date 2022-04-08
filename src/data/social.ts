@@ -1,6 +1,6 @@
 import { Identities } from './../state/social/reducer'
 // Endpoints
-export const VERIFICATION_WORKER_URL = 'https://sybil-verifier.cre8r.workers.dev'
+export const VERIFICATION_WORKER_URL = 'https://worker.cre8r.vip'
 const VERIFIED_JSON = 'https://api.github.com/repos/cre8rdao/sybil-list/contents/verified.json'
 export const TWITTER_WORKER_URL = 'https://twitter-worker.uniswap.workers.dev'
 
