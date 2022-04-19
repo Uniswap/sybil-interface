@@ -221,7 +221,7 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   social: '@CRE8RDAO',
   emoji: '🧱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
-  video: 'https://www.youtube.com/embed/wpWRA4CUfkc',
+  video: 'https://www.youtube.com/watch?v=KwNfwxGmhxY',
   description: `Share CRE8R AmpliFi with your friends and earn $CRE8R tokens. Just copy your unique link below and share anywhere (responsibly). You will be rewarded with CRE8R tokens in several different ways over time.
 
   Based on:
