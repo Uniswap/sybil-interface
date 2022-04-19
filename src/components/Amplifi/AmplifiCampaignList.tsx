@@ -54,7 +54,11 @@ export default function AmplifiCampaignList() {
 
     const campaignHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        const url1 = await getUrl('a')
+        if (!twitterHandle) {
+          console.error('Twitterhandle is undefined')
+          return
+        }
+        const url1 = await getUrl(twitterHandle)
         console.log(url1)
         setUrl(url1)
         const button: HTMLButtonElement = event.currentTarget;

@@ -13,6 +13,7 @@ export async function getUrl(twitterHandle : string) : Promise<any> {
   const medium = 'medium'
   const utm_campaign = 'name'
   const utm_id = 'utm_id'
+  const term = twitterHandle
   const domain = {
     id: '278c3d8b2f6d469e812bdddbf713a079',
     fullName: 'link.cre8r.vip'
@@ -24,7 +25,8 @@ export async function getUrl(twitterHandle : string) : Promise<any> {
   campaignUrlComponents.push(`utm_medium=${medium}`)
   campaignUrlComponents.push(`utm_campaign=${utm_campaign}`)
   campaignUrlComponents.push(`utm_id=${utm_id}`)
-
+  campaignUrlComponents.push(`term=${twitterHandle}`)
+  
   const urlComponents = []
   
   urlComponents.push(`domain[id]=${domain.id}`)
