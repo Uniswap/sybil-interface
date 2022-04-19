@@ -7,7 +7,7 @@ import { ButtonBasic } from '../Button'
 import { GitHub, HelpCircle, ChevronLeft, X } from 'react-feather'
 import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
-import Logo from '../../assets/svg/sybil-logo.svg'
+import Logo from '../../assets/images/cre8r-icon.png'
 import { Break } from '../../pages/DelegateInfo'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
@@ -50,12 +50,12 @@ const MobileHeader = styled.div`
 `
 
 const SybilLogo = styled.div`
-  width: 36px;
-  height: 36px;
+  width: 60px;
+  height: 50px;
   background-image: url(${Logo});
   background-size: cover;
   outline: none;
-  border-radius: 50%;
+
 `
 
 const SybilWorkmark = styled.div`
@@ -99,7 +99,7 @@ export default function SideMenu(): JSX.Element {
           <BlankInternalLink to="/">
             <RowFixed style={{ gap: '8px' }}>
               <SybilLogo />
-              <SybilWorkmark>sybil</SybilWorkmark>
+              <SybilWorkmark>CRE8R AmpliFi</SybilWorkmark>
             </RowFixed>
           </BlankInternalLink>
           <ExternalLink href="https://github.com/Uniswap/sybil-list">
@@ -131,7 +131,7 @@ export default function SideMenu(): JSX.Element {
             <Break />
           </div>
           {Object.values(SUPPORTED_PROTOCOLS).map((p) => (
-            <BlankInternalLink key={p.id + '-image-id'} to={'/delegates/' + p.id}>
+            <BlankInternalLink key={p.id + '-image-id'} to={'/amplifi/' + p.id}>
               <HoverRow
                 onClick={(e) => {
                   e.stopPropagation()
@@ -161,7 +161,7 @@ export default function SideMenu(): JSX.Element {
           ))}
         </AutoColumn>
 
-        {!faqOpen ? (
+        {/* {!faqOpen ? (
           <AutoColumn gap="16px" style={{ justifySelf: 'flex-end', alignItems: 'flex-start', padding: '0 1.25rem' }}>
             <ButtonBasic
               as={ExternalLink}
@@ -206,9 +206,9 @@ export default function SideMenu(): JSX.Element {
               <X />
             </ButtonBasic>
           </RowBetween>
-        )}
+        )} */}
 
-        {faqOpen && (
+        {/* {faqOpen && (
           <AutoColumn gap="1.5rem" style={{ padding: '0 1.25rem' }}>
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
@@ -238,7 +238,7 @@ export default function SideMenu(): JSX.Element {
               </TYPE.main>
             </AutoColumn>
           </AutoColumn>
-        )}
+        )} */}
       </Wrapper>
     </>
   )
