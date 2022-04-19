@@ -1,5 +1,5 @@
 
-export async function getUrl(twitterHandle : string, activeProtocol : string) : Promise<any> {
+export async function getUrl(twitterHandle : string, activeProtocolName : string) : Promise<any> {
   const options = {
     method: 'GET',
     headers: {Accept: 'application/json', apikey: process.env.REACT_APP_REBRANDLY || ":("}
@@ -8,10 +8,11 @@ export async function getUrl(twitterHandle : string, activeProtocol : string) : 
   /**
    * https://hundred.finance/?utm_source=source&utm_medium=medium&utm_campaign=name&utm_id=twitter-ugm
    */
+  console.log(activeProtocolName)
   const campaignUrl = 'https://hundred.finance/\?'
   const utm_source = 'source'
   const medium = 'medium'
-  const utm_campaign = activeProtocol || 'no_protocol_found'
+  const utm_campaign = activeProtocolName || 'no_protocol_found'
   const utm_id = 'utm_id'
   const term = twitterHandle
   const domain = {
