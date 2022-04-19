@@ -36,6 +36,7 @@ export interface GovernanceInfo {
   social: string
   emoji?: string
   baseUrl?: string // TODO - this should be required
+  video?:string
  }
 
 // protocol wide data
@@ -104,7 +105,8 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   migrationProposalId: 42,
   social: '@HundredFinance',
   emoji: '🏦',
-  baseUrl: 'https://hundred.finance/?'
+  baseUrl: 'https://hundred.finance/?',
+  video: 'https://www.youtube.com/embed/ccPUXuS4_Is'
 }
 
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
@@ -215,7 +217,8 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
   social: '@CRE8RDAO',
   emoji: '🧱',
-  baseUrl: 'https://amplifi.cre8r.vip/?'
+  baseUrl: 'https://amplifi.cre8r.vip/?',
+  video: 'https://www.youtube.com/embed/wpWRA4CUfkc'
 }
 
 // mapping for routing

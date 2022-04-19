@@ -13,6 +13,7 @@ import { RowBetween, RowFixed } from 'components/Row'
 import { getUrl } from 'data/url'
 import Copy from 'components/AccountDetails/Copy'
 import { _100 } from '@uniswap/sdk/dist/constants'
+import Youtube from 'components/Youtube'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -96,17 +97,17 @@ export default function AmplifiCampaignList() {
                     Campaigns
                 </TYPE.body>
                 <Break />
-                {activeProtocol && <TYPE.body fontSize="12px" fontWeight="600" mb="1rem" mt="1rem">
+                {activeProtocol && <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
                     Campaigns Budget <span >50</span> {activeProtocol.token.symbol} 
                     {/* <WrappedListLogo src={activeProtocol.logo} style={{width: 100, height: 100}}/> */}
                 </TYPE.body>}
-                <TYPE.body fontSize="10px" fontWeight="300" mb="1rem">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled i
+                <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.
                 </TYPE.body>
                 {/* {activeProtocol && <TYPE.body fontSize="16px" fontWeight="600" mb="1rem">
                     {activeProtocol.token}
                 </TYPE.body>} */}
-                <CampaignItem onClick={campaignHandler}>
+                {/* <CampaignItem onClick={campaignHandler}>
                     <RowBetween>
                         <RowFixed>
                             <ResponsiveText mr="10px" ml='10px'>Click here to get referal link (look in console)</ResponsiveText>
@@ -119,12 +120,13 @@ export default function AmplifiCampaignList() {
                             <ResponsiveText mr="10px" ml='10px'>{url}</ResponsiveText>
                         </RowFixed>
                     </RowBetween>
-                </CampaignItem>
+                </CampaignItem> */}
                 {url && (
                   <Copy toCopy={url}>
-                    <span style={{ marginLeft: '4px' }}>{url}</span>
+                    <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{url}</span>
                   </Copy>
                 )}
+                {activeProtocol && activeProtocol.video && <Youtube video={activeProtocol?.video}/>}
             </AutoColumn>
         </Wrapper>
     )
