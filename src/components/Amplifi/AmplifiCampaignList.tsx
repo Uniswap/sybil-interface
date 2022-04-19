@@ -6,7 +6,7 @@ import { TYPE } from 'theme'
 import { useTwitterAccount } from '../../state/user/hooks'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import {useVerifiedHandle } from '../../state/social/hooks'
-import { CONNECT_CONFIG, CRE8R_ADDRESS } from 'state/governance/reducer'
+import { CONNECT_CONFIG, CRE8R_ADDRESS, CRE8R_GOVERNANCE } from 'state/governance/reducer'
 import { useActiveWeb3React } from '../../hooks'
 import { useSignedHandle } from '../../hooks/useSignedHandle'
 import { RowBetween, RowFixed } from 'components/Row'
@@ -97,13 +97,15 @@ export default function AmplifiCampaignList() {
                     Campaigns
                 </TYPE.body>
                 <Break />
-                {activeProtocol && <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
+                {activeProtocol && activeProtocol.description && (<>
+                  <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
                     Campaigns Budget <span >50</span> {activeProtocol.token.symbol} 
                     {/* <WrappedListLogo src={activeProtocol.logo} style={{width: 100, height: 100}}/> */}
-                </TYPE.body>}
-                <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.
                 </TYPE.body>
+                <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">
+                  {activeProtocol.description}
+                </TYPE.body>
+                </>)}
                 {/* {activeProtocol && <TYPE.body fontSize="16px" fontWeight="600" mb="1rem">
                     {activeProtocol.token}
                 </TYPE.body>} */}

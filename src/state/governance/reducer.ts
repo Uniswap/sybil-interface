@@ -37,7 +37,8 @@ export interface GovernanceInfo {
   emoji?: string
   baseUrl?: string // TODO - this should be required
   video?:string
- }
+  description?:string
+}
 
 // protocol wide data
 export interface GlobaData {
@@ -106,7 +107,9 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   social: '@HundredFinance',
   emoji: '🏦',
   baseUrl: 'https://hundred.finance/?',
-  video: 'https://www.youtube.com/embed/ccPUXuS4_Is'
+  video: 'https://www.youtube.com/embed/ccPUXuS4_Is',
+  description: `Share Hundred Finance with your friends using your unique tracking link below and earn HND + CRE8R 
+  You will be rewarded based on onchain data that can be tracked back to your unique link using AmpliFi`
 }
 
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
@@ -218,7 +221,11 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   social: '@CRE8RDAO',
   emoji: '🧱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
-  video: 'https://www.youtube.com/embed/wpWRA4CUfkc'
+  video: 'https://www.youtube.com/embed/wpWRA4CUfkc',
+  description: `Share CRE8R AmpliFi with your friends and earn $CRE8R tokens. Just copy your unique link below and share anywhere (responsibly). You will be rewarded with CRE8R tokens in several different ways over time.
+
+  Based on:
+  The number of people you refer, and the KPI goals that are hit on other campaigns in AmpliFi that can be attributed to your unique link. More info will be released on this as the system develops.`
 }
 
 // mapping for routing
@@ -230,7 +237,7 @@ export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   // radicle: RADICLE_GOVERNANCE,
   CRE8R: CRE8R_GOVERNANCE,
   HND: HND_GOVERNANCE,
-  uniswap: UNISWAP_GOVERNANCE,
+  //uniswap: UNISWAP_GOVERNANCE,
   // nouns: NOUNS_GOVERNANCE,
   // ens: ENS_GOVERNANCE,
   // connect: CONNECT_CONFIG,
