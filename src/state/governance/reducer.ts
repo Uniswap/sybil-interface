@@ -11,8 +11,9 @@ import {
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
-import Cre8rLogo from '../../assets/images/uni-logo.png'
+import Cre8rLogo from '../../assets/images/cre8r-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
+import HundredLogo from '../../assets/images/hundred-logo.png'
 import AaveLogo from '../../assets/images/aave-logo.png'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
@@ -34,7 +35,9 @@ export interface GovernanceInfo {
   migrationProposalId?: number
   social: string
   emoji?: string
-}
+  baseUrl?: string // TODO - this should be required
+  video?:string
+ }
 
 // protocol wide data
 export interface GlobaData {
@@ -64,6 +67,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   migrationProposalId: 8,
   social: '@Uniswap',
   emoji: '🦄',
+  baseUrl:'https://uniswap.org/?'
 }
 
 export const COMP_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb17b66529'
@@ -82,6 +86,27 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   migrationProposalId: 42,
   social: '@compoundfinance',
   emoji: '🏦',
+  //baseUrl: 'https://hundred.finance/?'
+}
+
+// export const H_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb17b66529'
+// export const COMP_GOVERNANCE_ADDRESS = '0xc0dA01a04C3f3E0be433606045bB7017A7323E38'
+// export const COMP_ADDRESS = '0xc00e94cb662c3520282e6f5717214004a7f26888'
+const HND = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'HND', 'Hundred Governance Token')
+export const HND_GOVERNANCE: GovernanceInfo = {
+  id: 'HND',
+  name: 'Hundred Governance',
+  logo: HundredLogo,
+  primaryColor: '#00D395',
+  secondaryColor: '#E1F9F1',
+  token: serializeToken(HND),
+  governanceAlphaAddresses: [COMP_GOVERNANCE_ADDRESS],
+  governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
+  migrationProposalId: 42,
+  social: '@HundredFinance',
+  emoji: '🏦',
+  baseUrl: 'https://hundred.finance/?',
+  video: 'https://www.youtube.com/embed/ccPUXuS4_Is'
 }
 
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
@@ -191,20 +216,24 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(CRE8R),
   governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
   social: '@CRE8RDAO',
-  emoji: '🧱'
+  emoji: '🧱',
+  baseUrl: 'https://amplifi.cre8r.vip/?',
+  video: 'https://www.youtube.com/embed/wpWRA4CUfkc'
 }
 
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
-  uniswap: UNISWAP_GOVERNANCE,
-  compound: COMPOUND_GOVERNANCE,
-  aave: AAVE_GOVERNANCE,
-  pool: POOL_TOGETHER_GOVERNANCE,
-  radicle: RADICLE_GOVERNANCE,
+  
+  // compound: COMPOUND_GOVERNANCE,
+  // aave: AAVE_GOVERNANCE,
+  // pool: POOL_TOGETHER_GOVERNANCE,
+  // radicle: RADICLE_GOVERNANCE,
   CRE8R: CRE8R_GOVERNANCE,
-  nouns: NOUNS_GOVERNANCE,
-  ens: ENS_GOVERNANCE,
-  connect: CONNECT_CONFIG,
+  HND: HND_GOVERNANCE,
+  uniswap: UNISWAP_GOVERNANCE,
+  // nouns: NOUNS_GOVERNANCE,
+  // ens: ENS_GOVERNANCE,
+  // connect: CONNECT_CONFIG,
 }
 
 export const FETCHING_INTERVAL = 50

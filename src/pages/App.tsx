@@ -22,6 +22,7 @@ import { ApplicationModal } from '../state/application/actions'
 import OverviewColumn from '../components/governance/OverviewColumn'
 import { useLocation } from 'react-router-dom'
 import { identityOnlyPath } from '../state/governance/reducer'
+import Amplifi from './Amplifi'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -85,6 +86,7 @@ export default function App() {
             <TopLevelModals />
             <Web3ReactManager>
               <Switch>
+                <Route exact strict path="/amplifi/:protocolID" component={Amplifi} />
                 <Route exact strict path="/delegates/:protocolID" component={Delegates} />
                 <Route exact strict path="/proposals/:protocolID" component={Proposals} />
                 <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
