@@ -1,5 +1,5 @@
 import { GovernanceInfo } from "state/governance/reducer";
-import { SerializedToken } from "state/user/actions";
+// import { SerializedToken } from "state/user/actions";
 
 
 export async function getUrl(twitterHandle : string, governanceInfo : GovernanceInfo | undefined) : Promise<any> {

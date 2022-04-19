@@ -2,7 +2,7 @@ import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useProtocolUpdate } from '../hooks/useProtocolUpdate'
 import { BodyWrapper, MediumHeaderWrapper } from './AppBody'
-import { useActiveWeb3React } from '../hooks'
+// import { useActiveWeb3React } from '../hooks'
 import { useActiveProtocol } from '../state/governance/hooks'
 import { AutoColumn } from '../components/Column'
 import { Above1080Only, Below1080Only } from '../theme/components'
@@ -23,7 +23,7 @@ export default function Amplifi({
     useProtocolUpdate(protocolID)
 
     // if on testnet, show warning
-    const { chainId } = useActiveWeb3React()
+    //const { chainId } = useActiveWeb3React()
 
     const [activeProtocol] = useActiveProtocol()
 

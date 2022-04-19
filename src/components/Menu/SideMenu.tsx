@@ -4,7 +4,7 @@ import { RowBetween, RowFixed } from '../Row'
 import { TYPE, ExternalLink, BlankInternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
 import { ButtonBasic } from '../Button'
-import { GitHub, HelpCircle, ChevronLeft, X } from 'react-feather'
+import { GitHub, ChevronLeft, X, HelpCircle } from 'react-feather'
 import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
 import Logo from '../../assets/images/cre8r-icon.png'
@@ -161,7 +161,7 @@ export default function SideMenu(): JSX.Element {
           ))}
         </AutoColumn>
 
-        {/* {!faqOpen ? (
+        {!faqOpen ? (
           <AutoColumn gap="16px" style={{ justifySelf: 'flex-end', alignItems: 'flex-start', padding: '0 1.25rem' }}>
             <ButtonBasic
               as={ExternalLink}
@@ -206,9 +206,9 @@ export default function SideMenu(): JSX.Element {
               <X />
             </ButtonBasic>
           </RowBetween>
-        )} */}
+        )} 
 
-        {/* {faqOpen && (
+        {faqOpen && (
           <AutoColumn gap="1.5rem" style={{ padding: '0 1.25rem' }}>
             <AutoColumn gap="0.5rem">
               <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
@@ -238,7 +238,7 @@ export default function SideMenu(): JSX.Element {
               </TYPE.main>
             </AutoColumn>
           </AutoColumn>
-        )} */}
+        )}
       </Wrapper>
     </>
   )

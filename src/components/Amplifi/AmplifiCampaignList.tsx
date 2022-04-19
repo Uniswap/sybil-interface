@@ -1,19 +1,13 @@
+import Copy from 'components/AccountDetails/Copy'
 import { AutoColumn } from 'components/Column'
-import {WrappedListLogo} from 'components/Menu/SideMenu'
+import Youtube from 'components/Youtube'
+import { getUrl } from 'data/url'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
-import { useTwitterAccount } from '../../state/user/hooks'
-import { useActiveProtocol } from '../../state/governance/hooks'
-import {useVerifiedHandle } from '../../state/social/hooks'
-import { CONNECT_CONFIG, CRE8R_ADDRESS, CRE8R_GOVERNANCE } from 'state/governance/reducer'
 import { useActiveWeb3React } from '../../hooks'
-import { useSignedHandle } from '../../hooks/useSignedHandle'
-import { RowBetween, RowFixed } from 'components/Row'
-import { getUrl } from 'data/url'
-import Copy from 'components/AccountDetails/Copy'
-import { _100 } from '@uniswap/sdk/dist/constants'
-import Youtube from 'components/Youtube'
+import { useActiveProtocol } from '../../state/governance/hooks'
+import { useVerifiedHandle } from '../../state/social/hooks'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -26,35 +20,17 @@ export const Break = styled.div`
   margin: 0;
 `
 
-const CampaignItem = styled.button`
-  border-radius: 12px;
-  padding: 1rem 0;
-  margin: 1rem;
-  text-decoration: none;
-
-  :hover {
-    cursor: pointer;
-    opacity: 0.7;
-  }
-`
-
-const ResponsiveText = styled(TYPE.black)`
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 14px;
-  `};
-`
-
 export default function AmplifiCampaignList() {
-    const { chainId, account } = useActiveWeb3React()
+    const { account } = useActiveWeb3React()
     const [activeProtocol] = useActiveProtocol()
     const [url, setUrl] = useState('');
     // monitor user inputs
-    const [twitterHandle] = useTwitterAccount()
+    // const [twitterHandle] = useTwitterAccount()
     const verifiedHandleEntry = useVerifiedHandle(account)
-    const [twitterShareURL, setTwitterShareURL] = useState('https://cre8r.vip')
-    const [tweetContent, setTweetContent] = useState(
-        'Hello Guys, This is a testing of twitter share example',
-    )
+    // const [twitterShareURL, setTwitterShareURL] = useState('https://cre8r.vip')
+    // const [tweetContent, setTweetContent] = useState(
+    //     'Hello Guys, This is a testing of twitter share example',
+    // )
     useEffect(() => {
       if (!verifiedHandleEntry) return;
       getUrl(verifiedHandleEntry?.handle || 'user_not_known', activeProtocol).then(url1 => {
@@ -63,32 +39,32 @@ export default function AmplifiCampaignList() {
       })
     }, [verifiedHandleEntry, activeProtocol])
 
-    const campaignHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-        if (!twitterHandle) {
-          console.error('Twitterhandle is undefined')
-          // return;
-        }
-        const button: HTMLButtonElement = event.currentTarget;
-        const utmParameters = [];
-        utmParameters.push('utm_source=' + encodeURI(twitterHandle || ''));
-        utmParameters.push('utm_medium=amplifi');
-        const longUrl = 'https://cre8r.vip?' + utmParameters.join('&');
-        setTweetContent(longUrl);
+    // const campaignHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     event.preventDefault();
+    //     if (!twitterHandle) {
+    //       console.error('Twitterhandle is undefined')
+    //       // return;
+    //     }
+    //     const button: HTMLButtonElement = event.currentTarget;
+    //     const utmParameters = [];
+    //     utmParameters.push('utm_source=' + encodeURI(twitterHandle || ''));
+    //     utmParameters.push('utm_medium=amplifi');
+    //     const longUrl = 'https://cre8r.vip?' + utmParameters.join('&');
+    //     setTweetContent(longUrl);
 
-        const twitterParameters = [];
-        if (twitterShareURL)
-            twitterParameters.push('url=' + encodeURI(twitterShareURL));
-        if (tweetContent)
-            twitterParameters.push('text=' + encodeURI(tweetContent));
-        if (twitterHandle)
-            twitterParameters.push('via=' + encodeURI(twitterHandle));
-        const url =
-            'https://twitter.com/intent/tweet?'
-            + twitterParameters.join('&')
+    //     const twitterParameters = [];
+    //     if (twitterShareURL)
+    //         twitterParameters.push('url=' + encodeURI(twitterShareURL));
+    //     if (tweetContent)
+    //         twitterParameters.push('text=' + encodeURI(tweetContent));
+    //     if (twitterHandle)
+    //         twitterParameters.push('via=' + encodeURI(twitterHandle));
+    //     const url =
+    //         'https://twitter.com/intent/tweet?'
+    //         + twitterParameters.join('&')
 
-        console.log(url)
-    }
+    //     console.log(url)
+    // }
 
     return (
         <Wrapper>
