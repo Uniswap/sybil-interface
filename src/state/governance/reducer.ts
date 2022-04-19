@@ -105,7 +105,7 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   migrationProposalId: 42,
   social: '@HundredFinance',
-  emoji: '🏦',
+  emoji: '💯',
   baseUrl: 'https://hundred.finance/?',
   video: 'https://www.youtube.com/embed/ccPUXuS4_Is',
   description: `Share Hundred Finance with your friends using your unique tracking link below and earn HND + CRE8R 
@@ -212,7 +212,7 @@ export const CRE8R_ADDRESS = '0x238d82a35e69d7c10fe69a649134171c63e57522'
 const CRE8R = new Token(ChainId.MAINNET, CRE8R_ADDRESS, 18, 'CRE8R', 'CRE8R Cash')
 export const CRE8R_GOVERNANCE: GovernanceInfo = {
   id: 'CRE8R',
-  name: 'CRE8R Governance',
+  name: 'CRE8R Ampbassadooors',
   logo: Cre8rLogo,
   primaryColor: '#5555FF',
   secondaryColor: '#E3E3FF',
@@ -221,7 +221,7 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   social: '@CRE8RDAO',
   emoji: '🧱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
-  video: 'https://www.youtube.com/watch?v=KwNfwxGmhxY',
+  video: 'https://www.youtube.com/embed/KwNfwxGmhxY',
   description: `Share CRE8R AmpliFi with your friends and earn $CRE8R tokens. Just copy your unique link below and share anywhere (responsibly). You will be rewarded with CRE8R tokens in several different ways over time.
 
   Based on:
