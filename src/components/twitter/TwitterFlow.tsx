@@ -96,13 +96,13 @@ export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
     activeProtocol?.social
   } Amplify 🧱 ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
-  } %0A%0Asybil.cre8rdao.xyz%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
+  } %0A%0Aamplifi.cre8r.vip%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
     ''}`
 
   // used just for display in UI
   const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
-  } \n sybil.cre8rdao.xyz
+  } \n amplifi.cre8r.vip
 /#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
 
   // watch for user tweet
