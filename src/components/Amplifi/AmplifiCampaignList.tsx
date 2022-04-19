@@ -100,7 +100,7 @@ export default function AmplifiCampaignList() {
                     </RowBetween>
                 </CampaignItem> */}
                 {url && (
-                  <Copy toCopy={url}>
+                  <Copy toCopy={"https://" + url}>
                     <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{url}</span>
                   </Copy>
                 )}
