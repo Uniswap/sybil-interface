@@ -56,9 +56,8 @@ export default function AmplifiCampaignList() {
         event.preventDefault();
         if (!twitterHandle) {
           console.error('Twitterhandle is undefined')
-          return
         }
-        const url1 = await getUrl(twitterHandle)
+        const url1 = await getUrl(twitterHandle || 'user_not_known')
         console.log(url1)
         setUrl(url1)
         const button: HTMLButtonElement = event.currentTarget;
