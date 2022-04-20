@@ -1,13 +1,12 @@
 import Copy from 'components/AccountDetails/Copy'
 import { AutoColumn } from 'components/Column'
 import Youtube from 'components/Youtube'
-import { getUrl } from 'data/url'
-import React, { useEffect, useState } from 'react'
+import useUTM from 'hooks/useUTM'
+import React from 'react'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
-import { useActiveWeb3React } from '../../hooks'
+
 import { useActiveProtocol } from '../../state/governance/hooks'
-import { useVerifiedHandle } from '../../state/social/hooks'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -21,23 +20,15 @@ export const Break = styled.div`
 `
 
 export default function AmplifiCampaignList() {
-    const { account } = useActiveWeb3React()
+
     const [activeProtocol] = useActiveProtocol()
-    const [url, setUrl] = useState('');
+    const utmLinks = useUTM();
     // monitor user inputs
     // const [twitterHandle] = useTwitterAccount()
-    const verifiedHandleEntry = useVerifiedHandle(account)
     // const [twitterShareURL, setTwitterShareURL] = useState('https://cre8r.vip')
     // const [tweetContent, setTweetContent] = useState(
     //     'Hello Guys, This is a testing of twitter share example',
     // )
-    useEffect(() => {
-      if (!verifiedHandleEntry) return;
-      getUrl(verifiedHandleEntry?.handle || 'user_not_known', activeProtocol).then(url1 => {
-        console.log(url1)
-        setUrl(url1)
-      })
-    }, [verifiedHandleEntry, activeProtocol])
 
     // const campaignHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     //     event.preventDefault();
@@ -99,11 +90,11 @@ export default function AmplifiCampaignList() {
                         </RowFixed>
                     </RowBetween>
                 </CampaignItem> */}
-                {url && (
-                  <Copy toCopy={"https://" + url}>
-                    <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{url}</span>
+                {utmLinks && activeProtocol ? (
+                  <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
+                    <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
                   </Copy>
-                )}
+                ) : <p>Please connect to Twitter in order to generate your UTM link.</p>}
                 {activeProtocol && activeProtocol.video && <Youtube video={activeProtocol?.video}/>}
             </AutoColumn>
         </Wrapper>
