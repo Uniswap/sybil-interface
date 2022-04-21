@@ -181,8 +181,8 @@ export default function SideMenu(): JSX.Element {
               <AutoColumn gap="1rem" style={{ justifySelf: 'flex-start' }}>
                 <TYPE.black style={{ lineHeight: '125%', fontWeight: 400, fontSize: '12px', padding: 0 }}>
                   A{' '}
-                  <ExternalLink style={{ color: '#ff007a' }} href="https://uniswap.org/">
-                    Uniswap
+                  <ExternalLink style={{ color: '#ff007a' }} href="https://cre8r.vip/">
+                    CRE8R DAO
                   </ExternalLink>{' '}
                   Project
                 </TYPE.black>
@@ -193,7 +193,7 @@ export default function SideMenu(): JSX.Element {
           <RowBetween style={{ padding: '0 1rem' }}>
             <ButtonBasic
               onClick={() => setfaqOpen(!faqOpen)}
-              href="https://GitHub.com/Uniswap/sybil-list"
+              href="https://GitHub.com/CRE8RDAO"
               style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: '#000', gap: 12 }}
             >
               <HelpCircle size={20} />
@@ -211,30 +211,25 @@ export default function SideMenu(): JSX.Element {
         {faqOpen && (
           <AutoColumn gap="1.5rem" style={{ padding: '0 1.25rem' }}>
             <AutoColumn gap="0.5rem">
-              <TYPE.body fontWeight={600}>Why build Sybil?</TYPE.body>
+              <TYPE.body fontWeight={600}>Why build AmpliFi?</TYPE.body>
               <TYPE.main>
-                We wanted to support various Ethereum governance initiatives and found it hard to find potential
-                delegates or no easy way to delegate our vote. Sybil is our contribution to help everyone in the
-                ecosystem.
+                Boost CRE8R DAO content marketing campaigns reach. And facilitate KPI based marketing campaigns for web3
               </TYPE.main>
             </AutoColumn>
             <AutoColumn gap="0.5rem">
-              <TYPE.body fontWeight={600}>I don’t have Twitter, can I use Sybil?</TYPE.body>
+              <TYPE.body fontWeight={600}>I don’t have Twitter, can I use AmpliFi?</TYPE.body>
               <TYPE.main>
-                At the moment Sybil is Twitter only, but the architecture allows arbitrary services to act as
-                authentication methods. We are planning to add GitHub soon and feel free to suggest others in our&nbsp;
-                <ExternalLink href="https://github.com/Uniswap/sybil-interface#adding-protocol-support">
-                  repo
+                Soon Discord, but yes if you DM @CRE8RDAO we can set you up..&nbsp;
+                <ExternalLink href="">
+                  Twitter Link
                 </ExternalLink>
                 .
               </TYPE.main>
             </AutoColumn>
             <AutoColumn gap="0.5rem">
-              <TYPE.body fontWeight={600}>Is Sybil only for governance?</TYPE.body>
+              <TYPE.body fontWeight={600}>Can I use AmpliFi?</TYPE.body>
               <TYPE.main>
-                Since the mapping of wallets to identities is public, you can easily use it to show identities anywhere.
-                In fact, you don’t even have to use Sybil through this interface! Check out the documentation for how to
-                set up a similar system.
+                Yep, dm @CRE8RDAO on twitter and lets chat!
               </TYPE.main>
             </AutoColumn>
           </AutoColumn>

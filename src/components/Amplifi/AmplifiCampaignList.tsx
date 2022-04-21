@@ -5,7 +5,7 @@ import useUTM from 'hooks/useUTM'
 import React from 'react'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
-
+import parse from 'html-react-parser';
 import { useActiveProtocol } from '../../state/governance/hooks'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
@@ -66,11 +66,11 @@ export default function AmplifiCampaignList() {
                 <Break />
                 {activeProtocol && activeProtocol.description && (<>
                   <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
-                    Campaigns Budget <span >50</span> {activeProtocol.token.symbol} 
+                    Phase 1 Campaign Budget <span >50</span> {activeProtocol.token.symbol} 
                     {/* <WrappedListLogo src={activeProtocol.logo} style={{width: 100, height: 100}}/> */}
                 </TYPE.body>
                 <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">
-                  {activeProtocol.description}
+                  {parse(activeProtocol.description)}
                 </TYPE.body>
                 </>)}
                 {/* {activeProtocol && <TYPE.body fontSize="16px" fontWeight="600" mb="1rem">
@@ -94,7 +94,7 @@ export default function AmplifiCampaignList() {
                   <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
                     <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
                   </Copy>
-                ) : <p>Please connect to Twitter in order to generate your UTM link.</p>}
+                ) : <p>Please connect to Twitter in order to generate your unique referral link.</p>}
                 {activeProtocol && activeProtocol.video && <Youtube video={activeProtocol?.video}/>}
             </AutoColumn>
         </Wrapper>

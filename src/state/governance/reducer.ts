@@ -14,7 +14,7 @@ import UniLogo from '../../assets/images/uni-logo.png'
 import Cre8rLogo from '../../assets/images/cre8r-logo.png'
 import CompLogo from '../../assets/images/compLogo.png'
 import HundredLogo from '../../assets/images/hundred-logo.png'
-import AaveLogo from '../../assets/images/aave-logo.png'
+import BeanLogo from '../../assets/images/bean-logo.jpg'
 import PoolLogo from '../../assets/images/pooltogether-icon.png'
 import RadicleLogo from '../../assets/images/radicle-logo.svg'
 import NounsLogo from '../../assets/images/nouns-logo.png'
@@ -98,7 +98,7 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   id: 'HND',
   name: 'Hundred Governance',
   logo: HundredLogo,
-  primaryColor: '#00D395',
+  primaryColor: '#000000',
   secondaryColor: '#E1F9F1',
   token: serializeToken(HND),
   governanceAlphaAddresses: [COMP_GOVERNANCE_ADDRESS],
@@ -107,24 +107,26 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   social: '@HundredFinance',
   emoji: '💯',
   baseUrl: 'https://hundred.finance/?',
-  video: 'https://www.youtube.com/embed/ccPUXuS4_Is',
-  description: `Share Hundred Finance with your friends using your unique tracking link below and earn HND + CRE8R 
+  video: 'https://www.youtube.com/embed/ccPUXuS4_Is',// ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
+  description: `<b>In phase one of the campaign only wallets that have used Hundred Finance will be eligible for AmpliFi payouts.</b> Share Hundred Finance with your friends using your unique tracking link below and earn HND + CRE8R 
   You will be rewarded based on onchain data that can be tracked back to your unique link using AmpliFi`
 }
-
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
 export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
-const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
+const BEAN = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'BEAN', 'BEAN Token')
 export const AAVE_GOVERNANCE: GovernanceInfo = {
-  id: 'aave',
-  name: 'Aave Governance',
-  logo: AaveLogo,
-  primaryColor: '#B6509E',
-  secondaryColor: '#ebfeff',
-  token: serializeToken(AAVE),
+  id: 'AAVE',
+  name: 'Beanstalk Protocol',
+  logo: BeanLogo,
+  primaryColor: '#00D395',
+  secondaryColor: '#E1F9F1',
+  token: serializeToken(BEAN),
   governanceAlphaAddresses: [AAVE_GOVERNANCE_ADDRESS],
-  social: '@AaveAave',
-  emoji: '👻',
+  social: '@BeanstalkFarms',
+  emoji: '🌱',
+  baseUrl: 'https://amplifi.cre8r.vip/?',
+  video: 'https://www.youtube.com/embed/s6p3TFREmzg', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
+  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX>"Barn Raise"</a>"`
 }
 
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
@@ -232,11 +234,12 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
   
   // compound: COMPOUND_GOVERNANCE,
-  // aave: AAVE_GOVERNANCE,
+   
   // pool: POOL_TOGETHER_GOVERNANCE,
   // radicle: RADICLE_GOVERNANCE,
   CRE8R: CRE8R_GOVERNANCE,
   HND: HND_GOVERNANCE,
+  BEAN: AAVE_GOVERNANCE,
   //uniswap: UNISWAP_GOVERNANCE,
   // nouns: NOUNS_GOVERNANCE,
   // ens: ENS_GOVERNANCE,

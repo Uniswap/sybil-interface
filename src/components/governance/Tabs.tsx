@@ -50,7 +50,7 @@ function Tabs() {
             color2={activeProtocol?.secondaryColor}
           >
             <TYPE.main color={activeProtocol?.primaryColor} fontSize={'16px'}>
-              Delegates
+              Ampbassadooors
             </TYPE.main>
           </TabOption>
           <TabOption
