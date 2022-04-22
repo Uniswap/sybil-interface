@@ -115,7 +115,7 @@ export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE225
 export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
 const BEAN = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'BEAN', 'BEAN Token')
 export const AAVE_GOVERNANCE: GovernanceInfo = {
-  id: 'AAVE',
+  id: 'BEAN',
   name: 'Beanstalk Protocol',
   logo: BeanLogo,
   primaryColor: '#00D395',
