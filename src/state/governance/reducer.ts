@@ -126,7 +126,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   emoji: '🌱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
   video: 'https://www.youtube.com/embed/s6p3TFREmzg', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
-  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX>"Barn Raise"</a>"`
+  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX>Barn Raise</a>"`
 }
 
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
