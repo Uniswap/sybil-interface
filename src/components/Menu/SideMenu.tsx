@@ -7,7 +7,7 @@ import { ButtonBasic } from '../Button'
 import { GitHub, ChevronLeft, X, HelpCircle } from 'react-feather'
 import '../../theme/extraFonts.css'
 import MenuBG from '../../assets/images/menu-bg.png'
-import Logo from '../../assets/images/cre8r-icon.png'
+import Logo from '../../assets/svg/AmpliFi.svg'
 import { Break } from '../../pages/DelegateInfo'
 import { useActiveProtocol } from '../../state/governance/hooks'
 import { SUPPORTED_PROTOCOLS } from '../../state/governance/reducer'
@@ -109,14 +109,14 @@ export default function SideMenu(): JSX.Element {
       </MobileHeader>
       <Wrapper open={open} onClick={() => !open && setOpen(!open)}>
         <AutoColumn gap="24px">
-          <div style={{ padding: '0 1.25rem', height: '28px' }}>
+          <div style={{ padding: '0px 5px 55px 5px', height: '28px' }}>
             {!open ? (
               <SybilLogo />
             ) : (
               <RowBetween align="flex-start">
                 <RowFixed style={{ gap: '8px' }}>
                   <SybilLogo />
-                  <SybilWorkmark>sybil</SybilWorkmark>
+                  <SybilWorkmark style={{ fontSize: '40px' }}>AmpliFi</SybilWorkmark>
                 </RowFixed>
                 <ButtonBasic
                   onClick={() => closeBoth()}

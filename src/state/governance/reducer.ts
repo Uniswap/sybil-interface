@@ -96,7 +96,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
 const HND = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'HND', 'Hundred Governance Token')
 export const HND_GOVERNANCE: GovernanceInfo = {
   id: 'HND',
-  name: 'Hundred Governance',
+  name: 'Hundred Finance',
   logo: HundredLogo,
   primaryColor: '#000000',
   secondaryColor: '#E1F9F1',
