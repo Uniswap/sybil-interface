@@ -64,9 +64,9 @@ export default function AmplifiCampaignList() {
                     Campaigns
                 </TYPE.body>
                 <Break />
-                {activeProtocol && activeProtocol.description && (<>
+                {activeProtocol && activeProtocol.description && activeProtocol.campaignBudget &&  (<>
                   <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
-                    Phase 1 Campaign Budget <span >50</span> {activeProtocol.token.symbol} 
+                  <span style={{ fontWeight: 'bolder' }} > Campaign Budget: </span>  <span >{activeProtocol.campaignBudget}</span> {activeProtocol.token.symbol} 
                     {/* <WrappedListLogo src={activeProtocol.logo} style={{width: 100, height: 100}}/> */}
                 </TYPE.body>
                 <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">

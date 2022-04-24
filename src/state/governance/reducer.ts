@@ -36,6 +36,7 @@ export interface GovernanceInfo {
   social: string
   emoji?: string
   baseUrl?: string // TODO - this should be required
+  campaignBudget?:any
   video?:string
   description?:string
 }
@@ -96,7 +97,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
 const HND = new Token(ChainId.MAINNET, COMP_ADDRESS, 18, 'HND', 'Hundred Governance Token')
 export const HND_GOVERNANCE: GovernanceInfo = {
   id: 'HND',
-  name: 'Hundred Governance',
+  name: 'Hundred Finance',
   logo: HundredLogo,
   primaryColor: '#000000',
   secondaryColor: '#E1F9F1',
@@ -107,7 +108,8 @@ export const HND_GOVERNANCE: GovernanceInfo = {
   social: '@HundredFinance',
   emoji: '💯',
   baseUrl: 'https://hundred.finance/?',
-  video: 'https://www.youtube.com/embed/ccPUXuS4_Is',// ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
+  campaignBudget: '10,000 USD in $CRE8R & 30,000',
+  video: 'https://www.youtube.com/embed/ccPUXuS4_Is', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
   description: `<b>In phase one of the campaign only wallets that have used Hundred Finance will be eligible for AmpliFi payouts.</b> Share Hundred Finance with your friends using your unique tracking link below and earn HND + CRE8R 
   You will be rewarded based on onchain data that can be tracked back to your unique link using AmpliFi`
 }
@@ -124,9 +126,10 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   governanceAlphaAddresses: [AAVE_GOVERNANCE_ADDRESS],
   social: '@BeanstalkFarms',
   emoji: '🌱',
-  baseUrl: 'https://amplifi.cre8r.vip/?',
+  baseUrl: 'https://amplifi.cre8r.vip/#/amplifi/HND?',
+  campaignBudget: 'Phase 1 has no budget, we just getting ready to save the BEANS!! Phase 2 soon tho ;)',
   video: 'https://www.youtube.com/embed/s6p3TFREmzg', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
-  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX>"Barn Raise"</a>"`
+  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX">Barn Raise</a>`
 }
 
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
@@ -223,6 +226,7 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   social: '@CRE8RDAO',
   emoji: '🧱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
+  campaignBudget: '50,000',
   video: 'https://www.youtube.com/embed/KwNfwxGmhxY',
   description: `Share CRE8R AmpliFi with your friends and earn $CRE8R tokens. Just copy your unique link below and share anywhere (responsibly). You will be rewarded with CRE8R tokens in several different ways over time.
 
