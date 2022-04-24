@@ -127,7 +127,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   governanceAlphaAddresses: [AAVE_GOVERNANCE_ADDRESS],
   social: '@BeanstalkFarms',
   emoji: '🌱',
-  baseUrl: 'https://amplifi.cre8r.vip/#/amplifi/HND?',
+  baseUrl: 'https://amplifi.cre8r.vip/#/amplifi/BEAN?',
   campaignBudget: 'Phase 1 has no budget, we just getting ready to save the BEANS!! Phase 2 soon tho ;)',
   video: 'https://www.youtube.com/embed/s6p3TFREmzg', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
   description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX">Barn Raise</a>`
