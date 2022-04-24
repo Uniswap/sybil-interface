@@ -1,4 +1,4 @@
-import Copy from 'components/AccountDetails/Copy'
+//import Copy from 'components/AccountDetails/Copy'
 import { AutoColumn } from 'components/Column'
 import Youtube from 'components/Youtube'
 import useUTM from 'hooks/useUTM'
