@@ -27,7 +27,6 @@ import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
 import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
-import useUTM from 'hooks/useUTM'
 import { useVerifiedHandle } from 'state/social/hooks'
 import { getUrl } from 'data/url'
 
@@ -602,7 +601,7 @@ export function useUtm():  { [id: string]: string } | undefined {
       })
     }))
     console.log(protocolUrls)
-  }, [verifiedHandleEntry])
+  }, [verifiedHandleEntry, utms, dispatch])
   return utm 
 }
 
