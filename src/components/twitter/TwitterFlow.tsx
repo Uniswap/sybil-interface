@@ -90,18 +90,18 @@ export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
       setVerified(true)
     }
   }
-
+//todo  make it so we can customise tweet for each protocol..
   // tweet data
-  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself on ${
+  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself for ${
     activeProtocol?.social
-  } Amplify 🧱 ${
-    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
+  }'s collab with @CRE8RDAO AmpliFi 🧱 ${
+    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Ampbassador`
   } %0A%0Aamplifi.cre8r.vip%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
     ''}`
 
   // used just for display in UI
-  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} ${
-    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Delegate`
+  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself for ${activeProtocol?.social}'s collab with @CRE8RDAO AmpliFi 🧱 ${
+    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Ampbassador`
   } \n amplifi.cre8r.vip
 /#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
 
