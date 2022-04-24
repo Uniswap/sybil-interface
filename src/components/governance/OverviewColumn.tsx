@@ -31,7 +31,7 @@ export default function OverviewColumn() {
         >
           {activeProtocol?.name}
         </TYPE.main>
-         <TabOption
+        { /* <TabOption
           as={Link}
           to={'/delegates/' + activeProtocol?.id}
           selected={location.pathname.includes('delegates')}
@@ -39,7 +39,7 @@ export default function OverviewColumn() {
           color2={activeProtocol?.secondaryColor}
         >
           Ambassadors
-        </TabOption>
+  </TabOption> */}
         {/*<TabOption
           as={Link}
           to={'/proposals/' + activeProtocol?.id}
