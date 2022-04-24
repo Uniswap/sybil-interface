@@ -8,10 +8,11 @@ import {
   updateVerifiedDelegates,
   updateGlobalData,
   updateMaxFetched,
+  updateUtm,
 } from './actions'
 import { AppDispatch, AppState } from './../index'
 import { useDispatch, useSelector } from 'react-redux'
-import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE } from './reducer'
+import { GovernanceInfo, GlobaData, COMPOUND_GOVERNANCE, NOUNS_GOVERNANCE, UNISWAP_GOVERNANCE, SUPPORTED_PROTOCOLS } from './reducer'
 import { useState, useEffect, useCallback } from 'react'
 import { useGovernanceContract, useGovTokenContract, useIsAave } from '../../hooks/useContract'
 import { useSingleCallResult } from '../multicall/hooks'
@@ -26,6 +27,9 @@ import { useIsEOA } from '../../hooks/useIsEOA'
 import { AUTONOMOUS_PROPOSAL_BYTECODE } from '../../constants/proposals'
 import usePrevious from '../../hooks/usePrevious'
 import { useGenericAlphaProposalStates, useGenericBravoProposalStates } from 'data/proposalStates'
+import useUTM from 'hooks/useUTM'
+import { useVerifiedHandle } from 'state/social/hooks'
+import { getUrl } from 'data/url'
 
 export interface DelegateData {
   id: string
@@ -556,3 +560,49 @@ export function useDelegateInfo(address: string | undefined): DelegateInfo | und
 
   return data
 }
+
+
+export interface DelegateData {
+  id: string
+  delegatedVotes: number
+  delegatedVotesRaw: number
+  votePercent: Percent
+  votes: {
+    id: string
+    support: boolean
+    votes: number
+  }[]
+  EOA: boolean | undefined //
+  autonomous: boolean | undefined
+  handle: string | undefined // twitter handle
+  imageURL?: string | undefined
+}
+
+//todo - make this flexible based on the twitter
+export function useUtm():  { [id: string]: string } | undefined {
+  const dispatch = useDispatch<AppDispatch>()
+  const { account } = useActiveWeb3React()
+  const verifiedHandleEntry = useVerifiedHandle(account)
+  const utms = useSelector<AppState, AppState['governance']['utm']>(
+    (state) => state.governance.utm
+    )
+  const [utm, setUtm] = useState({})
+  useEffect(() => {
+    if (!verifiedHandleEntry) return;
+    const protocolUrls : { [id: string]: GovernanceInfo }  = {}
+    if (utms) {
+      setUtm(utms)
+    }
+    Promise.all(Object.keys(SUPPORTED_PROTOCOLS).map(key => {
+      if (utms[key]) return; 
+      return getUrl(verifiedHandleEntry?.handle || 'user_not_known', SUPPORTED_PROTOCOLS[key]).then(utm => {
+        protocolUrls[key] = utm
+        setUtm(u => ({...u,...protocolUrls}))
+        dispatch(updateUtm({protocolID: key, utm}))
+      })
+    }))
+    console.log(protocolUrls)
+  }, [verifiedHandleEntry])
+  return utm 
+}
+

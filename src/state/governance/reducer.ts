@@ -8,6 +8,7 @@ import {
   updateVerifiedDelegates,
   updateGlobalData,
   updateMaxFetched,
+  updateUtm,
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
@@ -36,7 +37,7 @@ export interface GovernanceInfo {
   social: string
   emoji?: string
   baseUrl?: string // TODO - this should be required
-  campaignBudget?:any
+  campaignBudget?:string
   video?:string
   description?:string
 }
@@ -277,6 +278,11 @@ export interface GovernanceState {
   globalData: {
     [protocolID: string]: GlobaData | undefined
   }
+
+  //utm links for delegates
+  utm: {
+    [protocolID: string]: string
+  }
 }
 
 export const initialState: GovernanceState = {
@@ -289,6 +295,7 @@ export const initialState: GovernanceState = {
 
   verifiedDelegates: {},
   globalData: {},
+  utm: {}
 }
 
 export default createReducer(initialState, (builder) =>
@@ -310,5 +317,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(updateMaxFetched, (state, action) => {
       state.maxFetched[action.payload.protocolID] = action.payload.maxFetched
+    })
+    .addCase(updateUtm, (state, action) => {
+      state.utm[action.payload.protocolID] = action.payload.utm
     })
 )

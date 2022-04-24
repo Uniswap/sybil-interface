@@ -1,12 +1,11 @@
-//import Copy from 'components/AccountDetails/Copy'
+import Copy from 'components/AccountDetails/Copy'
 import { AutoColumn } from 'components/Column'
 import Youtube from 'components/Youtube'
-import useUTM from 'hooks/useUTM'
 import React from 'react'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import parse from 'html-react-parser';
-import { useActiveProtocol } from '../../state/governance/hooks'
+import { useActiveProtocol, useUtm } from '../../state/governance/hooks'
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -22,7 +21,7 @@ export const Break = styled.div`
 export default function AmplifiCampaignList() {
 
     const [activeProtocol] = useActiveProtocol()
-    const utmLinks = useUTM();
+    const utmLinks = useUtm();
     // monitor user inputs
     // const [twitterHandle] = useTwitterAccount()
     // const [twitterShareURL, setTwitterShareURL] = useState('https://cre8r.vip')
@@ -90,11 +89,11 @@ export default function AmplifiCampaignList() {
                         </RowFixed>
                     </RowBetween>
                 </CampaignItem> */}
-                {utmLinks && activeProtocol && false ? (
+                {utmLinks && activeProtocol ? (
                   <>
-                    {/* <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
+                    <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
                       <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
-                    </Copy> */}
+                    </Copy> 
                   </>
                 ) : <p>Please connect to Twitter in order to generate your unique referral link.</p>}
                 {activeProtocol && activeProtocol.video && <Youtube video={activeProtocol?.video}/>}

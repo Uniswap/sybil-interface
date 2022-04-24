@@ -20,3 +20,8 @@ export const updateMaxFetched = createAction<{
   protocolID: string
   maxFetched: number | undefined
 }>('/governance/updateMaxFetched')
+
+export const updateUtm = createAction<{
+  protocolID: string,
+  utm: string
+}>('/governance/utm')
