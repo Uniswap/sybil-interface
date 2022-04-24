@@ -59,8 +59,9 @@ export default function AmplifiCampaignList() {
     return (
         <Wrapper>
             <AutoColumn gap="0">
+          
                 <TYPE.body fontSize="16px" fontWeight="600" mb="1rem">
-                    Campaigns
+                Campaigns are still in testing phase and are subject to change. Please check back soon.
                 </TYPE.body>
                 <Break />
                 {activeProtocol && activeProtocol.description && activeProtocol.campaignBudget &&  (<>
@@ -90,9 +91,9 @@ export default function AmplifiCampaignList() {
                     </RowBetween>
                 </CampaignItem> */}
                 {utmLinks && activeProtocol ? (
-                  <>
+                  <><span style={{ fontWeight: 'lighter', padding: '10px' }} > Click to copy your unique link: </span>
                     <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
-                      <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
+                     <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
                     </Copy> 
                   </>
                 ) : <p>Please connect to Twitter in order to generate your unique referral link.</p>}

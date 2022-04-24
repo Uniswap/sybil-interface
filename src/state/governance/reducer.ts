@@ -8,7 +8,7 @@ import {
   updateVerifiedDelegates,
   updateGlobalData,
   updateMaxFetched,
-  updateUtm,
+  updateUtm
 } from './actions'
 import { createReducer } from '@reduxjs/toolkit'
 import UniLogo from '../../assets/images/uni-logo.png'
@@ -37,9 +37,9 @@ export interface GovernanceInfo {
   social: string
   emoji?: string
   baseUrl?: string // TODO - this should be required
-  campaignBudget?:string
-  video?:string
-  description?:string
+  campaignBudget?: string
+  video?: string
+  description?: string
 }
 
 // protocol wide data
@@ -70,7 +70,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   migrationProposalId: 8,
   social: '@Uniswap',
   emoji: '🦄',
-  baseUrl:'https://uniswap.org/?'
+  baseUrl: 'https://uniswap.org/?'
 }
 
 export const COMP_GOVERNANCE_ADDRESS_BRAVO = '0xc0da02939e1441f497fd74f78ce7decb17b66529'
@@ -88,7 +88,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   governanceAddressBravo: COMP_GOVERNANCE_ADDRESS_BRAVO,
   migrationProposalId: 42,
   social: '@compoundfinance',
-  emoji: '🏦',
+  emoji: '🏦'
   //baseUrl: 'https://hundred.finance/?'
 }
 
@@ -128,9 +128,17 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   social: '@BeanstalkFarms',
   emoji: '🌱',
   baseUrl: 'https://amplifi.cre8r.vip/#/amplifi/BEAN?',
-  campaignBudget: 'Phase 1 has no budget, we just getting ready to save the BEANS!! Phase 2 soon tho ;)',
+  campaignBudget:
+    'Please note: This campaign is not live yet. Details will be updated ASAP. Phase 1 Budget 20,000 CRE8R',
   video: 'https://www.youtube.com/embed/s6p3TFREmzg', // ['https://www.youtube.com/embed/ccPUXuS4_Is','https://www.youtube.com/embed/BDQlJNiDav8'],
-  description: `<b>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX">Barn Raise</a>`
+  description: `<p>In phase one of the campaign the goal is to let people know about how they can help @beanstalkFarms in the build up to the  <a href="https://twitter.com/i/spaces/1BdGYwMyymBxX">Barn Raise</a>.</p>
+  <hr>
+  <b>Phase 2 Budget:</b> 500,000 PODS @ end of Barn Raise line<br>
+  
+  <p>Share explainer content along with your unique link to help Beanstalk Protocol during the Barn Raise!</p>
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"><link type="text/css" rel="stylesheet" href="resources/sheet.css" >
+<style type="text/css">.ritz .waffle a { color: inherit; }.ritz .waffle .s1{background-color:#ffffff;text-align:right;color:#000000;font-family:'Inter var';font-size:10pt;vertical-align:bottom;white-space:nowrap;direction:ltr;padding:2px 3px 2px 3px;}.ritz .waffle .s0{background-color:#ffffff;text-align:left;color:#000000;font-family:'Arial';font-size:10pt;vertical-align:bottom;white-space:normal;overflow:hidden;word-wrap:break-word;direction:ltr;padding:2px 3px 2px 3px;}</style><div class="ritz grid-container" dir="ltr"><table class="waffle" cellspacing="0" cellpadding="0"><thead><tr><th class="row-header freezebar-origin-ltr"></th><th id="305164801C0" style="width:700px;" class="column-headers-background"></th><th id="305164801C1" style="width:700px;" class="column-headers-background"></th></tr></thead><tbody><tr style="height: 20px"><th id="305164801R0" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"</div></th><td class="s0">Max payout </td><td class="s1">500,000</td></tr><tr style="height: 20px"><th id="305164801R1" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"></div></th><td class="s0" dir="ltr">Min amount raised from AmpliFi to activate payout</td><td class="s1">5,000,000</td></tr><tr style="height: 20px"><th id="305164801R2" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"></div></th><td class="s0" dir="ltr">Target for max payout</td><td class="s1">25,000,000</td></tr><tr style="height: 20px"><th id="305164801R3" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"></div></th><td class="s0" dir="ltr">Payout per million raised via AmpliFi</td><td class="s1">20,000</td></tr><tr style="height: 20px"><th id="305164801R4" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"></div></th><td class="s0" dir="ltr">Payout per 100k raised via AmpliFi</td><td class="s1">2,000</td></tr><tr style="height: 20px"><th id="305164801R5" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px"></div></th><td class="s0" dir="ltr">Percent cut per amount raised via AmpliFi up to 25,000,000</td><td class="s1" dir="ltr">2.00%</td></tr></tbody></table></div>`
 }
 
 export const POOL_TOGETHER_GOVERNANCE_ADDRESS = '0xB3a87172F555ae2a2AB79Be60B336D2F7D0187f0'
@@ -145,7 +153,7 @@ export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(POOL),
   governanceAlphaAddresses: [POOL_TOGETHER_GOVERNANCE_ADDRESS],
   social: '@PoolTogether_',
-  emoji: '🏆',
+  emoji: '🏆'
 }
 
 export const RADICLE_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
@@ -160,7 +168,7 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(RADICLE),
   governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
   social: '@radicle',
-  emoji: '🌱',
+  emoji: '🌱'
 }
 
 export const ENS_GOVERNANCE_ADDRESS = '0x690e775361AD66D1c4A25d89da9fCd639F5198eD'
@@ -175,7 +183,7 @@ export const ENS_GOVERNANCE: GovernanceInfo = {
   token: serializeToken(ENS),
   governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS],
   social: '@ensdomains',
-  emoji: '🌱',
+  emoji: '🌱'
 }
 
 export const CONNECT_CONFIG: GovernanceInfo = {
@@ -186,7 +194,7 @@ export const CONNECT_CONFIG: GovernanceInfo = {
   secondaryColor: '#cfddff', // placeholder
   token: serializeToken(ENS), //placeholder
   governanceAlphaAddresses: [ENS_GOVERNANCE_ADDRESS], //placeholder
-  social: '@twitter', // placeholder
+  social: '@twitter' // placeholder
 }
 
 export const NOUNS_GOVERNANCE_ADDRESS_BRAVO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d'
@@ -204,12 +212,12 @@ export const NOUNS_GOVERNANCE: GovernanceInfo = {
   governanceAddressBravo: NOUNS_GOVERNANCE_ADDRESS_BRAVO,
   migrationProposalId: 0,
   social: '@nounsdao',
-  emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+  emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
 }
 
 // #/connect or #/delegates/connect
 // show only identity flow e.g. link to twitter
-export function identityOnlyPath(pathname: string) {
+export function identityOnlyPath (pathname: string) {
   return pathname.split('/', 2)[1] == CONNECT_CONFIG.id || pathname.split('/', 3)[2] == CONNECT_CONFIG.id
 }
 
@@ -237,14 +245,13 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
 
 // mapping for routing
 export const SUPPORTED_PROTOCOLS: { [id: string]: GovernanceInfo } = {
-  
   // compound: COMPOUND_GOVERNANCE,
-   
+
   // pool: POOL_TOGETHER_GOVERNANCE,
   // radicle: RADICLE_GOVERNANCE,
   CRE8R: CRE8R_GOVERNANCE,
   HND: HND_GOVERNANCE,
-  BEAN: AAVE_GOVERNANCE,
+  BEAN: AAVE_GOVERNANCE
   //uniswap: UNISWAP_GOVERNANCE,
   // nouns: NOUNS_GOVERNANCE,
   // ens: ENS_GOVERNANCE,
@@ -298,7 +305,7 @@ export const initialState: GovernanceState = {
   utm: {}
 }
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, builder =>
   builder
     .addCase(updateActiveProtocol, (state, action) => {
       state.activeProtocol = action.payload.activeProtocol
