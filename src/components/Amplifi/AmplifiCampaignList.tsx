@@ -90,10 +90,12 @@ export default function AmplifiCampaignList() {
                         </RowFixed>
                     </RowBetween>
                 </CampaignItem> */}
-                {utmLinks && activeProtocol ? (
-                  <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
-                    <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
-                  </Copy>
+                {utmLinks && activeProtocol && false ? (
+                  <>
+                    {/* <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
+                      <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
+                    </Copy> */}
+                  </>
                 ) : <p>Please connect to Twitter in order to generate your unique referral link.</p>}
                 {activeProtocol && activeProtocol.video && <Youtube video={activeProtocol?.video}/>}
             </AutoColumn>
