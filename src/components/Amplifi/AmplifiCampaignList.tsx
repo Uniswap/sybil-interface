@@ -6,6 +6,8 @@ import styled from 'styled-components'
 import { TYPE } from 'theme'
 import parse from 'html-react-parser';
 import { useActiveProtocol, useUtm } from '../../state/governance/hooks'
+import FeaturedImage from 'components/FeaturedImage/FeaturedImage'
+
 
 const Wrapper = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -64,12 +66,17 @@ export default function AmplifiCampaignList() {
                 Campaigns are still in testing phase and are subject to change. Please check back soon.
                 </TYPE.body>
                 <Break />
-                {activeProtocol && activeProtocol.description && activeProtocol.campaignBudget &&  (<>
+                { activeProtocol && activeProtocol.featuredImage &&  (<>
+                  <FeaturedImage image={activeProtocol.featuredImage} />
+                  </>)
+                 }
+                 { activeProtocol && activeProtocol.description && activeProtocol.campaignBudget && (<>
                   <TYPE.body fontSize="14px" fontWeight="600" mb="1rem" mt="1rem">
                   <span style={{ fontWeight: 'bolder' }} > Campaign Budget: </span>  <span >{activeProtocol.campaignBudget}</span> {activeProtocol.token.symbol} 
                     {/* <WrappedListLogo src={activeProtocol.logo} style={{width: 100, height: 100}}/> */}
                 </TYPE.body>
                 <TYPE.body fontSize="14px" fontWeight="300" mb="1rem">
+                  {console.log(activeProtocol)}
                   {parse(activeProtocol.description)}
                 </TYPE.body>
                 </>)}
@@ -91,9 +98,9 @@ export default function AmplifiCampaignList() {
                     </RowBetween>
                 </CampaignItem> */}
                 {utmLinks && activeProtocol ? (
-                  <><span style={{ fontWeight: 'lighter', padding: '10px' }} > Click to copy your unique link: </span>
+                  <><span style={{ fontWeight: 'lighter', padding: '10px' }} > Copy your unique link &amp; start earning: </span>
                     <Copy toCopy={"https://" + utmLinks[activeProtocol?.id]}>
-                     <span style={{ marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
+                     <span style={{ fontSize: '18px', marginLeft: '4px', marginBottom: '16px' }}>{utmLinks[activeProtocol?.id]}</span>
                     </Copy> 
                   </>
                 ) : <p>Please connect to Twitter in order to generate your unique referral link.</p>}
