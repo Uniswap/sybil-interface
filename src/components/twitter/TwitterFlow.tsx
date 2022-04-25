@@ -94,8 +94,8 @@ export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
   // tweet data
   const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself for ${
     activeProtocol?.social
-  }'s collab with @CRE8RDAO AmpliFi 🧱 ${
-    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Ampbassador`
+  } X @CRE8RDAO AmpliFi 🧱 ${
+    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}`
   } %0A%0Aamplifi.cre8r.vip%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
     ''}`
 
