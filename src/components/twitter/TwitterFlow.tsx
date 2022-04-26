@@ -96,14 +96,14 @@ export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
     activeProtocol?.social
   } X @CRE8RDAO AmpliFi 🧱 ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}`
-  } %0A%0Aamplifi.cre8r.vip%2F%23%2Fdelegates/${activeProtocol?.id}/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ??
+  } %0A%0Aamplifi.cre8r.vip%2F%23%2Famplifi/%0A%0Aaddr:${account}%0A%0Asig:${sig ??
     ''}`
 
   // used just for display in UI
-  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself for ${activeProtocol?.social}'s collab with @CRE8RDAO AmpliFi 🧱 ${
+  const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself for ${activeProtocol?.social} X @CRE8RDAO AmpliFi 🧱 ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Ampbassador`
   } \n amplifi.cre8r.vip
-/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
+/#/amplifi/${activeProtocol?.id} \n addr:${account} \n sig:${sig ?? ''}`
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()

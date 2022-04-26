@@ -238,7 +238,7 @@ export const CRE8R_GOVERNANCE: GovernanceInfo = {
   secondaryColor: '#E3E3FF',
   token: serializeToken(CRE8R),
   governanceAlphaAddresses: [RADICLE_GOVERNANCE_ADDRESS],
-  social: '@CRE8RDAO',
+  social: '@cre8rAmpliFi',
   emoji: '🧱',
   baseUrl: 'https://amplifi.cre8r.vip/?',
   campaignBudget: '50,000',
