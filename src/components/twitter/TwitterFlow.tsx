@@ -92,18 +92,21 @@ export default function TwitterFlow ({ onDismiss }: { onDismiss: () => void }) {
   }
 //todo  make it so we can customise tweet for each protocol..
   // tweet data
-  const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself for ${
-    activeProtocol?.social
-  } X @CRE8RDAO AmpliFi 🧱 ${
-    activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}`
-  } %0A%0Aamplifi.cre8r.vip%2F%23%2Famplifi/%0A%0Aaddr:${account}%0A%0Asig:${sig ??
-    ''}`
+
+  // const tweetCopyForLink = `${activeProtocol?.emoji ? `${activeProtocol?.emoji} ` : ''}Verifying myself for ${
+  //   activeProtocol?.social
+  // } X @CRE8RDAO AmpliFi 🧱 ${
+  //   activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}`
+  // } %0A%0Aamplifi.cre8r.vip%2F%23%2Famplifi/%0A%0Aaddr:${account}%0A%0Asig:${sig ??
+  //   ''}`
 
   // used just for display in UI
   const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself for ${activeProtocol?.social} X @CRE8RDAO AmpliFi 🧱 ${
     activeProtocol?.id == CONNECT_CONFIG.id ? 'user' : `%23${activeProtocol?.token?.symbol}Ampbassador`
   } \n amplifi.cre8r.vip
 /#/amplifi/${activeProtocol?.id} \n addr:${account} \n sig:${sig ?? ''}`
+
+const tweetCopyForLink = encodeURIComponent(readableTweetCopy)
 
   // watch for user tweet
   const [tweetError, setTweetError] = useState<string | undefined>()
