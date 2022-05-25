@@ -23,7 +23,7 @@ import OverviewColumn from '../components/governance/OverviewColumn'
 import { useLocation } from 'react-router-dom'
 import { identityOnlyPath } from '../state/governance/reducer'
 import Amplifi from './Amplifi'
-
+ 
 const SiteWrapper = styled.div`
   height: 100vh;
   width: 100%;
