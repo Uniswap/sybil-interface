@@ -230,14 +230,12 @@ function DelegateInfo({
                       </TYPE.black>
                     </ExternalLink>
                     {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
-                    {ensName && (
-                      <Receiver
-                        inlineLaunchLogo
-                        launchButtonStyle={{ height: 13, width: 15 }}
-                        peerAddress={ensName || 'panel.eth'}
-                        signer={signer}
-                      />
-                    )}
+                    <Receiver
+                      inlineLaunchLogo
+                      launchButtonStyle={{ height: 13, width: 15 }}
+                      peerAddress={formattedAddress}
+                      signer={signer}
+                    />
                   </RowFixed>
                   {twitterHandle || delegateInfo?.autonomous || nameShortened !== shortenAddress(delegateAddress) ? (
                     <RowFixed>

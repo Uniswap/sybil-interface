@@ -22,6 +22,8 @@ import { ApplicationModal } from '../state/application/actions'
 import OverviewColumn from '../components/governance/OverviewColumn'
 import { useLocation } from 'react-router-dom'
 import { identityOnlyPath } from '../state/governance/reducer'
+import { ReceiverConfig } from '@daopanel/receiver'
+import { useActiveWeb3React } from '../hooks'
 
 const SiteWrapper = styled.div`
   height: 100vh;
@@ -69,6 +71,13 @@ function TopLevelModals() {
 export default function App() {
   const identityOnlyFlow = identityOnlyPath(useLocation().pathname)
 
+  const { library, account } = useActiveWeb3React()
+  let signer
+
+  if (account && library) {
+    signer = library.getSigner(account)
+  }
+
   return (
     <Suspense fallback={null}>
       <Route component={GoogleAnalyticsReporter} />
@@ -84,13 +93,15 @@ export default function App() {
             <Polling />
             <TopLevelModals />
             <Web3ReactManager>
-              <Switch>
-                <Route exact strict path="/delegates/:protocolID" component={Delegates} />
-                <Route exact strict path="/proposals/:protocolID" component={Proposals} />
-                <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
-                <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
-                <Route path="/" component={RedirectWithUpdatedGovernance} />
-              </Switch>
+              <ReceiverConfig signer={signer}>
+                <Switch>
+                  <Route exact strict path="/delegates/:protocolID" component={Delegates} />
+                  <Route exact strict path="/proposals/:protocolID" component={Proposals} />
+                  <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+                  <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
+                  <Route path="/" component={RedirectWithUpdatedGovernance} />
+                </Switch>
+              </ReceiverConfig>
             </Web3ReactManager>
           </ContentWrapper>
           <Profile />
