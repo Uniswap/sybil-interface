@@ -78,7 +78,7 @@ export default function VoteContent() {
 
   return (
     <AutoColumn gap="16px">
-      <WhiteCard border={`1px solid ${theme.bg3}`} style={{ zIndex: 2 }} padding="1rem">
+      <WhiteCard border={`1px solid ${theme.bg3}`} style={{ zIndex: 0 }} padding="1rem">
         <RowBetween>
           <TYPE.black color={theme.text1}>Wallet votes</TYPE.black>
           <TYPE.main color={activeProtocol?.primaryColor}>
@@ -142,7 +142,7 @@ export default function VoteContent() {
         border={`1px solid ${theme.bg3}`}
         padding="16px"
         opacity={receivedVotes?.greaterThan(BIG_INT_ZERO) ? '1' : '0.5'}
-        style={{ zIndex: 3 }}
+        style={{ zIndex: 0 }}
       >
         <RowBetween>
           <TYPE.black color={theme.text1}>Received votes</TYPE.black>

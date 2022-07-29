@@ -39,6 +39,7 @@ import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
+import { Receiver } from '@daopanel/receiver'
 
 const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;
@@ -100,8 +101,13 @@ function DelegateInfo({
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
 
-  const { chainId, account } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
+  let signer
+
+  if (account && library) {
+    signer = library.getSigner(account)
+  }
 
   const formattedAddress = isAddress(delegateAddress)
 
@@ -116,7 +122,7 @@ function DelegateInfo({
   )
 
   const userDelegatee: string | undefined = useUserDelegatee(formattedAddress)
-
+  console.log(userDelegatee)
   const holdersRepresented = delegateInfo ? (
     localNumber(
       delegateInfo.tokenHoldersRepresentedAmount - (userDelegatee && userDelegatee === formattedAddress ? 1 : 0)
@@ -224,6 +230,14 @@ function DelegateInfo({
                       </TYPE.black>
                     </ExternalLink>
                     {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
+                    {ensName && (
+                      <Receiver
+                        inlineLaunchLogo
+                        launchButtonStyle={{ height: 13, width: 15 }}
+                        peerAddress={ensName || 'panel.eth'}
+                        signer={signer}
+                      />
+                    )}
                   </RowFixed>
                   {twitterHandle || delegateInfo?.autonomous || nameShortened !== shortenAddress(delegateAddress) ? (
                     <RowFixed>
@@ -239,6 +253,7 @@ function DelegateInfo({
                   )}
                 </AutoColumn>
               </AutoRow>
+
               <DelegateButton
                 width="fit-content"
                 disabled={!showDelegateButton || !account || isDelegatee}
