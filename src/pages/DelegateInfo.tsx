@@ -234,7 +234,6 @@ function DelegateInfo({
                       inlineLaunchLogo
                       launchButtonStyle={{ height: 13, width: 15 }}
                       peerAddress={formattedAddress}
-                      signer={signer}
                     />
                   </RowFixed>
                   {twitterHandle || delegateInfo?.autonomous || nameShortened !== shortenAddress(delegateAddress) ? (
