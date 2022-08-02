@@ -39,7 +39,7 @@ import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
-import { Receiver } from '@daopanel/receiver'
+import { ReceiverLaunch } from '@daopanel/receiver'
 
 const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;
@@ -230,8 +230,9 @@ function DelegateInfo({
                       </TYPE.black>
                     </ExternalLink>
                     {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
-                    <Receiver
-                      inlineLaunchLogo
+                    <ReceiverLaunch
+                      inlineLaunch
+                      launchText=""
                       launchButtonStyle={{ height: 13, width: 15 }}
                       peerAddress={formattedAddress}
                     />
