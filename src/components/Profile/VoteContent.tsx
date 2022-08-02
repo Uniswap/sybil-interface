@@ -31,7 +31,6 @@ const OffsetCard = styled(Card)<{ bgColor?: string }>`
   padding: 16px;
   margin-top: -40px;
   padding-top: 32px;
-  z-index: 1;
 `
 
 export default function VoteContent() {
