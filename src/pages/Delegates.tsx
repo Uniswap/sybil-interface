@@ -15,6 +15,7 @@ import { WrappedListLogo } from '../components/governance/styled'
 import Tabs from '../components/governance/Tabs'
 
 import { Above1080Only, Below1080Only } from '../theme/components'
+import { ReceiverLaunch } from '@daopanel/receiver'
 
 export default function Delegates({
   match: {
@@ -54,6 +55,12 @@ export default function Delegates({
           <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
         )}
       </AutoColumn>
+      <ReceiverLaunch
+        inlineLaunch
+        launchText=""
+        launchButtonStyle={{ position: 'fixed', bottom: 15, right: 100, height: 20, width: 23 }}
+        peerAddress="0x0cb27e883e207905ad2a94f9b6ef0c7a99223c37"
+      />
     </BodyWrapper>
   )
 }
