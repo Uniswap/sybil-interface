@@ -3,3 +3,9 @@
   src: url('../assets/fonts//GT-Haptik-Medium.woff') format('woff');
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../assets/fonts/CircularStd.otf') format('otf');
+  font-style: normal;
+}
