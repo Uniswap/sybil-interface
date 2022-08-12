@@ -1336,10 +1336,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
   integrity sha512-ij4wRiunFfaJxjB0BdrYHIH8FxBJpOwNPhhAcunlmPdXudL1WQV1qoP9un6JsEBAgQH+7UXyyjh0g7jTxXK6tg==
 
-"@daopanel/receiver@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@daopanel/receiver/-/receiver-0.4.1.tgz#ad6ef9e0ab44d4164a9f6acc2ac733d5c8838aa0"
-  integrity sha512-gi2pjKK8nvzhpiC7yN19Q63Vfnx/Aff7UPENpEK8mozSkAYqMPv2xhTK9O0vN+pKC9ke/29nv/+7wnpz4QPpRg==
+"@daopanel/receiver@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@daopanel/receiver/-/receiver-0.5.0.tgz#f8b889f5afbfdb37c21e74623ebaa7095226df74"
+  integrity sha512-7VxZDixcyN8goZ/r9CbWDi5dA21HYXUbZQuqma4Xt2nDAREbcVXoQi6VkRfwmx8J4Y1BKb71CR/TIeh2Fe1awg==
 
 "@emotion/cache@^10.0.27":
   version "10.0.29"
@@ -18853,7 +18853,7 @@ zen-observable@^0.8.0:
   resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.8.15.tgz#96415c512d8e3ffd920afd3889604e30b9eaac15"
   integrity sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==
 
-zustand@^4.0.0-rc.1:
+zustand@^4.0.0, zustand@^4.0.0-rc.1:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.0.0.tgz#739cba69209ffe67b31e7d6741c25b51496114a7"
   integrity sha512-OrsfQTnRXF1LZ9/vR/IqN9ws5EXUhb149xmPjErZnUrkgxS/gAHGy2dPNIVkVvoxrVe1sIydn4JjF0dYHmGeeQ==

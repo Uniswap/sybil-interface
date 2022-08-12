@@ -4,7 +4,7 @@
   "homepage": ".",
   "private": true,
   "devDependencies": {
-    "@daopanel/receiver": "0.4.1",
+    "@daopanel/receiver": "0.5.0",
     "@ethersproject/experimental": "^5.0.1",
     "@popperjs/core": "^2.4.4",
     "@reach/dialog": "^0.10.3",
@@ -139,6 +139,7 @@
     "react-twitter-embed": "^3.0.3",
     "react-twitter-widgets": "^1.9.5",
     "request": "^2.88.2",
-    "subscriptions-transport-ws": "^0.9.18"
+    "subscriptions-transport-ws": "^0.9.18",
+    "zustand": "^4.0.0"
   }
 }
