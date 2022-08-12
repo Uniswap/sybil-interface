@@ -1336,12 +1336,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
   integrity sha512-ij4wRiunFfaJxjB0BdrYHIH8FxBJpOwNPhhAcunlmPdXudL1WQV1qoP9un6JsEBAgQH+7UXyyjh0g7jTxXK6tg==
 
-"@daopanel/receiver@0.4.8":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@daopanel/receiver/-/receiver-0.4.8.tgz#84e8be6ac9353bebcf8e9f2f614bb879e7ea1603"
-  integrity sha512-0ReO5eD3gbc0VvrsZbaKr+gzGTTJIaW8Jng74BUflCWYNrApfvoH2LtRMUV1darHzrqYjxauX5BPCAiQwADdLg==
-  dependencies:
-    zustand "^4.0.0"
+"@daopanel/receiver@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@daopanel/receiver/-/receiver-0.5.0.tgz#f8b889f5afbfdb37c21e74623ebaa7095226df74"
+  integrity sha512-7VxZDixcyN8goZ/r9CbWDi5dA21HYXUbZQuqma4Xt2nDAREbcVXoQi6VkRfwmx8J4Y1BKb71CR/TIeh2Fe1awg==
 
 "@emotion/cache@^10.0.27":
   version "10.0.29"
