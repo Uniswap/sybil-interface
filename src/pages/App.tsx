@@ -22,7 +22,7 @@ import { ApplicationModal } from '../state/application/actions'
 import OverviewColumn from '../components/governance/OverviewColumn'
 import { useLocation } from 'react-router-dom'
 import { identityOnlyPath } from '../state/governance/reducer'
-import { Receiver, ReceiverLaunch } from '@daopanel/receiver'
+import { Receiver, ReceiverLaunch } from '@relaycc/receiver'
 import { useActiveWeb3React } from '../hooks'
 
 const SiteWrapper = styled.div`

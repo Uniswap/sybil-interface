@@ -39,7 +39,7 @@ import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
-import { ReceiverLaunch } from '@daopanel/receiver'
+import { ReceiverLaunch } from '@relaycc/receiver'
 
 const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;

@@ -16,7 +16,7 @@ import Tabs from '../components/governance/Tabs'
 import RelayMessageIcon from '../assets/images/newRelayMessage.svg'
 
 import { Above1080Only, Below1080Only } from '../theme/components'
-import { ReceiverLaunch } from '@daopanel/receiver'
+import { ReceiverLaunch } from '@relaycc/receiver'
 
 export default function Delegates({
   match: {
