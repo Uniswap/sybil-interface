@@ -30,6 +30,7 @@ import { useAllIdentities, useTwitterProfileData } from '../../state/social/hook
 import { nameOrAddress } from '../../utils/getName'
 import { FETCHING_INTERVAL } from '../../state/governance/reducer'
 import Toggle from 'components/Toggle'
+import { useLaunch } from '@relaycc/receiver'
 
 const ColumnLabel = styled(TYPE.darkGray)`
   white-space: no-wrap;
@@ -228,6 +229,7 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
   const maxPage = maxCount ? Math.floor(maxCount / FETCHING_INTERVAL) + 1 : 1
 
   const DelegateRow = ({ d, index }: { d: DelegateData; index: number }) => {
+    const launch = useLaunch()
     const votes = parseFloat(parseFloat(d.delegatedVotes.toString()).toFixed(0)).toLocaleString()
     const twitterData = useTwitterProfileData(allIdentities?.[d.id]?.twitter?.handle)
     const imageURL = d.imageURL ?? twitterData?.profileURL ?? undefined
@@ -284,11 +286,10 @@ export default function DelegateList({ hideZero }: { hideZero: boolean }) {
                 mr="24px"
                 disabled={!showDelegateButton || isDelegatee}
                 onClick={() => {
-                  setPrefilledDelegate(d.id)
-                  toggelDelegateModal()
+                  launch(d.id)
                 }}
               >
-                {isDelegatee ? 'Delegated' : 'Delegate'}
+                Message
               </DelegateButton>
             </OnlyAboveExtraSmall>
             <VoteText textAlign="end">

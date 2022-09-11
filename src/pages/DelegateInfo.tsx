@@ -39,7 +39,7 @@ import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
 import useENS from '../hooks/useENS'
 import { nameOrAddress } from '../utils/getName'
-import { ReceiverLaunch } from '@daopanel/receiver'
+import { useLaunch } from '@relaycc/receiver'
 
 const ArrowWrapper = styled(StyledInternalLink)`
   display: flex;
@@ -98,16 +98,12 @@ function DelegateInfo({
     params: { protocolID, delegateAddress },
   },
 }: RouteComponentProps<{ protocolID?: string; delegateAddress?: string }>) {
+  const launch = useLaunch()
   // if valid protocol id passed in, update global active protocol
   useProtocolUpdate(protocolID)
 
-  const { library, chainId, account } = useActiveWeb3React()
+  const { chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
-  let signer
-
-  if (account && library) {
-    signer = library.getSigner(account)
-  }
 
   const formattedAddress = isAddress(delegateAddress)
 
@@ -122,7 +118,6 @@ function DelegateInfo({
   )
 
   const userDelegatee: string | undefined = useUserDelegatee(formattedAddress)
-  console.log(userDelegatee)
   const holdersRepresented = delegateInfo ? (
     localNumber(
       delegateInfo.tokenHoldersRepresentedAmount - (userDelegatee && userDelegatee === formattedAddress ? 1 : 0)
@@ -230,12 +225,6 @@ function DelegateInfo({
                       </TYPE.black>
                     </ExternalLink>
                     {!twitterHandle && !delegateInfo?.autonomous && <CopyHelper toCopy={formattedAddress} />}
-                    <ReceiverLaunch
-                      inlineLaunch
-                      launchText=""
-                      launchButtonStyle={{ height: 13, width: 15 }}
-                      peerAddress={formattedAddress}
-                    />
                   </RowFixed>
                   {twitterHandle || delegateInfo?.autonomous || nameShortened !== shortenAddress(delegateAddress) ? (
                     <RowFixed>
@@ -252,6 +241,16 @@ function DelegateInfo({
                 </AutoColumn>
               </AutoRow>
 
+              <DelegateButton
+                style={{ marginRight: '1rem' }}
+                width="fit-content"
+                disabled={false}
+                onClick={() => {
+                  launch(delegateAddress)
+                }}
+              >
+                Message
+              </DelegateButton>
               <DelegateButton
                 width="fit-content"
                 disabled={!showDelegateButton || !account || isDelegatee}

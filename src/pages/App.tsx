@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
@@ -22,7 +22,7 @@ import { ApplicationModal } from '../state/application/actions'
 import OverviewColumn from '../components/governance/OverviewColumn'
 import { useLocation } from 'react-router-dom'
 import { identityOnlyPath } from '../state/governance/reducer'
-import { Receiver, ReceiverLaunch } from '@daopanel/receiver'
+import { useSetWallet, Window } from '@relaycc/receiver'
 import { useActiveWeb3React } from '../hooks'
 
 const SiteWrapper = styled.div`
@@ -70,13 +70,15 @@ function TopLevelModals() {
 
 export default function App() {
   const identityOnlyFlow = identityOnlyPath(useLocation().pathname)
+  const setWallet = useSetWallet()
 
   const { library, account } = useActiveWeb3React()
-  let signer
 
-  if (account && library) {
-    signer = library.getSigner(account)
-  }
+  useEffect(() => {
+    if (account && library) {
+      setWallet(library.getSigner(account) as any)
+    }
+  }, [account, library, setWallet])
 
   return (
     <Suspense fallback={null}>
@@ -93,16 +95,15 @@ export default function App() {
             <Polling />
             <TopLevelModals />
             <Web3ReactManager>
-              <Receiver signer={signer}>
-                <Switch>
-                  <Route exact strict path="/delegates/:protocolID" component={Delegates} />
-                  <Route exact strict path="/proposals/:protocolID" component={Proposals} />
-                  <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
-                  <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
-                  <Route path="/" component={RedirectWithUpdatedGovernance} />
-                </Switch>
-              </Receiver>
+              <Switch>
+                <Route exact strict path="/delegates/:protocolID" component={Delegates} />
+                <Route exact strict path="/proposals/:protocolID" component={Proposals} />
+                <Route exact strict path="/proposals/:protocolID/:proposalID" component={ProposalDetails} />
+                <Route exact strict path="/delegates/:protocolID/:delegateAddress" component={DelegateInfo} />
+                <Route path="/" component={RedirectWithUpdatedGovernance} />
+              </Switch>
             </Web3ReactManager>
+            <Window />
           </ContentWrapper>
           <Profile />
         </SiteWrapper>

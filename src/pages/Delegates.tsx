@@ -13,10 +13,8 @@ import { useActiveProtocol } from '../state/governance/hooks'
 import { RowFixed } from '../components/Row'
 import { WrappedListLogo } from '../components/governance/styled'
 import Tabs from '../components/governance/Tabs'
-import RelayMessageIcon from '../assets/images/newRelayMessage.svg'
 
 import { Above1080Only, Below1080Only } from '../theme/components'
-import { ReceiverLaunch } from '@daopanel/receiver'
 
 export default function Delegates({
   match: {
@@ -56,20 +54,6 @@ export default function Delegates({
           <OutlineCard>Please switch to Ethereum mainnet. </OutlineCard>
         )}
       </AutoColumn>
-      <ReceiverLaunch
-        inlineLaunch
-        launchText=""
-        launchButtonStyle={{
-          backgroundSize: 50,
-          backgroundImage: 'url(' + RelayMessageIcon + ')',
-          position: 'fixed',
-          bottom: 50,
-          right: 20,
-          height: 50,
-          width: 50,
-        }}
-        peerAddress="0x0cb27e883e207905ad2a94f9b6ef0c7a99223c37"
-      />
     </BodyWrapper>
   )
 }

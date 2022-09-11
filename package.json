@@ -4,7 +4,6 @@
   "homepage": ".",
   "private": true,
   "devDependencies": {
-    "@daopanel/receiver": "0.5.0",
     "@ethersproject/experimental": "^5.0.1",
     "@popperjs/core": "^2.4.4",
     "@reach/dialog": "^0.10.3",
@@ -40,7 +39,6 @@
     "@web3-react/portis-connector": "^6.0.9",
     "@web3-react/walletconnect-connector": "^6.1.1",
     "@web3-react/walletlink-connector": "^6.0.9",
-    "@xmtp/xmtp-js": "^5.1.0",
     "ajv": "^6.12.3",
     "cids": "^1.0.0",
     "copy-to-clipboard": "^3.2.0",
@@ -83,11 +81,8 @@
     "redux-localstorage-simple": "^2.3.1",
     "serve": "^11.3.0",
     "start-server-and-test": "^1.11.0",
-    "styled-components": "^4.2.0",
-    "typescript": "^4.2.3",
+    "typescript": "^4.8.3",
     "use-count-up": "^2.2.5",
-    "use-immer": "^0.7.0",
-    "wagmi": "^0.6.0",
     "wcag-contrast": "^3.0.0"
   },
   "resolutions": {
@@ -122,6 +117,7 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@relaycc/receiver": "^0.1.45",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
     "apollo-link": "^1.2.14",
